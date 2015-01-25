@@ -43,6 +43,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -74,7 +75,9 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -218,6 +221,8 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		}
 		super.onCreate(savedInstanceState);
 		mActivity = this;
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setProgressBarIndeterminateVisibility(true);
 
 		int titleId = -1;
 
@@ -428,18 +433,21 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
 
-		if (mAufrufart > 0) {
-			// 0 Feed
-			// 1 Browser schon aus Liste herraus
-			if (mAufrufart == AUFRUFART_MOBILIZE) {
-				loadMoblize();
-			} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
-				loadInstapaper();
-			} else if (mAufrufart == AUFRUFART_READABILITY) {
-				loadReadability();
-			}
-		}
 		setZoomsScale();
+		MyWebViewClient myWebViewClient = new MyWebViewClient();
+		webView.setWebViewClient(myWebViewClient);
+		webView0.setWebViewClient(myWebViewClient);
+
+		// 1 Browser schon aus Liste herraus
+		if (mAufrufart == AUFRUFART_FEED) {
+			reload();
+		} else if (mAufrufart == AUFRUFART_MOBILIZE) {
+			loadMoblize();
+		} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
+			loadInstapaper();
+		} else if (mAufrufart == AUFRUFART_READABILITY) {
+			loadReadability();
+		}
 	}// onCreate
 
 	@SuppressLint("NewApi")
@@ -453,7 +461,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 	}
 
 	private void loadReadability() {
-		System.out.println("readability:" + link);
 		webView.loadUrl("http://www.readability.com/m?url=" + link);
 	}
 
@@ -484,10 +491,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 			CompatibilityHelper.onResume(webView);
 		}
 
-		if (mAufrufart == 0) {
-			reload();
-			return;
-		}
 		// wegen Absturz durch leere _nextId
 		setupButton(previousButton, false, timestamp);
 		setupButton(nextButton, true, timestamp);
@@ -836,15 +839,14 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		cursor.close();
 	}
 
-	@SuppressLint("NewApi")
-	private void switchEntry(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
+	private void switchEntry2(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
 		uri = parentUri.buildUpon().appendPath(id).build();
 		getIntent().setData(uri);
 		scrollX = 0;
 		scrollY = 0;
 
 		// ausgeknippst, da viewer sich nicht mit Animation vertragen...
-//		animate = false;
+		// animate = false;
 		if (mAufrufart > 0) {
 			animate = false;
 		}
@@ -892,10 +894,12 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 	}
 
 	private void nextEntry(boolean animate) {
+		mAnimationDirection = android.R.anim.slide_out_right;
 		switchEntry(_nextId, animate, Animations.SLIDE_IN_RIGHT, Animations.SLIDE_OUT_LEFT);
 	}
 
 	private void previousEntry(boolean animate) {
+		mAnimationDirection = android.R.anim.fade_out;
 		switchEntry(_previousId, animate, Animations.SLIDE_IN_LEFT, Animations.SLIDE_OUT_RIGHT);
 	}
 
@@ -1263,6 +1267,65 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 			}
 		});
 		mAlertDialog.show();
+	}
+
+	/**
+	 * Für onPageFinished um ProzessBar an/aus zu knipsen da webview aSyncron die animation trasht
+	 */
+	private class MyWebViewClient extends WebViewClient {
+
+		@Override
+		public void onPageFinished(WebView view, String url) {
+			// animate(view);
+			setProgressBarIndeterminateVisibility(false);
+			view.setVisibility(View.VISIBLE);
+			super.onPageFinished(view, url);
+		}
+	}
+
+	int mAnimationDirection = android.R.anim.slide_out_right;
+
+	private void animate(final WebView view) {
+		Animation anim = AnimationUtils.loadAnimation(getBaseContext(), mAnimationDirection);
+		view.startAnimation(anim);
+	}
+
+	private void switchEntry(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
+
+		// webView.setVisibility(View.GONE);
+		setProgressBarIndeterminateVisibility(true);
+
+		uri = parentUri.buildUpon().appendPath(id).build();
+		getIntent().setData(uri);
+		scrollX = 0;
+		scrollY = 0;
+
+		if (mAufrufart > 0) {
+			// link laden
+			Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
+			if (entryCursor.moveToFirst()) {
+				link = entryCursor.getString(linkPosition);
+				link = fixLink(link);
+				timestamp = entryCursor.getLong(datePosition);
+			}
+			entryCursor.close();
+
+			if (mAufrufart == AUFRUFART_MOBILIZE) {
+				loadMoblize();
+			} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
+				loadInstapaper();
+			} else if (mAufrufart == AUFRUFART_READABILITY) {
+				loadReadability();
+			}
+
+			// markRead 2
+			getContentResolver().update(uri, RSSOverview.getReadContentValues(), new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
+
+			setupButton(previousButton, false, timestamp);
+			setupButton(nextButton, true, timestamp);
+		} else {
+			reload();
+		}
 	}
 
 }
