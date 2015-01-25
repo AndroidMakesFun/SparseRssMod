@@ -43,4 +43,10 @@
     <item android:id="@+id/menu_delete"
         android:icon="@android:drawable/ic_menu_delete"
         android:title="@string/contextmenu_delete"/>
+    
+    <item android:id="@+id/menu_text_scale"
+        android:icon="@android:drawable/ic_menu_sort_alphabetically"
+        android:title="Text Scale" 
+        android:showAsAction="ifRoom"/>
+    
 </menu>

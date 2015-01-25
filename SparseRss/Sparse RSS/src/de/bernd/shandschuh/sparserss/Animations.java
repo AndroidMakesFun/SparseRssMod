@@ -42,7 +42,7 @@ public class Animations {
 	public static final TranslateAnimation SLIDE_OUT_LEFT = generateAnimation(0, -1);
 
 	/** Duration of one animation */
-	private static final long DURATION = 180;
+	private static final long DURATION = 180; //180
 	
 	private static TranslateAnimation generateAnimation(float fromX, float toX) {
 		TranslateAnimation transformAnimation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, fromX, Animation.RELATIVE_TO_SELF, toX, 0, 0, 0, 0);

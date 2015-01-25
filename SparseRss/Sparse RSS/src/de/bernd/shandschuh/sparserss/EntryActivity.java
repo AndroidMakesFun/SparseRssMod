@@ -77,13 +77,15 @@ import android.view.animation.Animation;
 import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class EntryActivity extends Activity {
+public class EntryActivity extends Activity implements android.widget.SeekBar.OnSeekBarChangeListener {
+
 	/*
 	 * private static final String NEWLINE = "\n";
 	 * 
@@ -197,18 +199,25 @@ public class EntryActivity extends Activity {
 	private boolean localPictures;
 
 	private TextView titleTextView;
-	private int aufrufart = 0;
+	private int mAufrufart = 0;
+	private static final int AUFRUFART_FEED = 0;
+	private static final int AUFRUFART_BROWSER = 1;
+	private static final int AUFRUFART_MOBILIZE = 2;
+	private static final int AUFRUFART_INSTAPAPER = 3;
+	private static final int AUFRUFART_READABILITY = 4;
+	private static final int AUFRUFART_WEBVIEW = 5;
+
+	private Activity mActivity = null;
 
 	// private boolean viewFulscreen = true;
 
-	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		if (MainTabActivity.isLightTheme(this)) {
 			setTheme(R.style.Theme_Light);
 		}
-
 		super.onCreate(savedInstanceState);
+		mActivity = this;
 
 		int titleId = -1;
 
@@ -245,7 +254,7 @@ public class EntryActivity extends Activity {
 		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
 		showRead = getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
 		iconBytes = getIntent().getByteArrayExtra(FeedData.FeedColumns.ICON);
-		aufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
+		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
 		feedId = 0;
 
 		Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
@@ -343,6 +352,12 @@ public class EntryActivity extends Activity {
 								nextEntry(true);
 							}
 						}
+					} else { // mehr y als x
+						if (velocityY > 800) {
+							setNavVisibility(true);
+						} else if (velocityY < -800) {
+							setNavVisibility(false);
+						}
 					}
 				}
 				return false;
@@ -355,11 +370,11 @@ public class EntryActivity extends Activity {
 			public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 				if (distanceY > 0.0) {
 					if (Math.abs(distanceY) > 30) {
-						setNavVisibility(false);
+						// setNavVisibility(false);
 					}
 				} else {
 					if (Math.abs(distanceY) > 30) {
-						setNavVisibility(true);
+						// setNavVisibility(true);
 					}
 				}
 				return false;
@@ -410,29 +425,46 @@ public class EntryActivity extends Activity {
 		// webView.setOnSystemUiVisibilityChangeListener(onSystemUiVisibilityChangeListener);
 		// displayFullscreen();
 
-		if (aufrufart > 0) {
+		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
 
-			// Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
-			// if (entryCursor.moveToFirst()) {
-			// link = entryCursor.getString(linkPosition);
-			// fixLink();
-			// }
-			// entryCursor.close();
-
-			if (aufrufart == 2) {
-				readUrl();
-//				markRead();
-			} else if (aufrufart == 3) {
-				webView.loadUrl("http://www.instapaper.com/m?u=" + link);
-//				markRead();
-			} else if (aufrufart == 4) {
-				webView.loadUrl("http://www.readability.com/m?url=" + link);
-				 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-						webView.getSettings().setTextZoom(80); //% von 100 // API 14 !!
-				 }
+		if (mAufrufart > 0) {
+			// 0 Feed
+			// 1 Browser schon aus Liste herraus
+			if (mAufrufart == AUFRUFART_MOBILIZE) {
+				loadMoblize();
+			} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
+				loadInstapaper();
+			} else if (mAufrufart == AUFRUFART_READABILITY) {
+				loadReadability();
 			}
 		}
+		setZoomsScale();
 	}// onCreate
+
+	@SuppressLint("NewApi")
+	void setZoomsScale() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			webView.getSettings().setTextZoom(mIntScalePercent * 2); // % von 100 // API 14 !!
+			if (webView0 != null) {
+				webView0.getSettings().setTextZoom(mIntScalePercent * 2); // % von 100 // API 14 !!
+			}
+		}
+	}
+
+	private void loadReadability() {
+		System.out.println("readability:" + link);
+		webView.loadUrl("http://www.readability.com/m?url=" + link);
+	}
+
+	private void loadInstapaper() {
+		webView.loadUrl("http://www.instapaper.com/m?u=" + link);
+	}
+
+	@SuppressLint("NewApi")
+	private void loadMoblize() {
+		readUrl();
+	}
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -452,11 +484,11 @@ public class EntryActivity extends Activity {
 			CompatibilityHelper.onResume(webView);
 		}
 
-		if (aufrufart == 0) {
+		if (mAufrufart == 0) {
 			reload();
 			return;
 		}
-		//wegen Absturz durch leere _nextId 
+		// wegen Absturz durch leere _nextId
 		setupButton(previousButton, false, timestamp);
 		setupButton(nextButton, true, timestamp);
 
@@ -477,24 +509,25 @@ public class EntryActivity extends Activity {
 		setIntent(intent);
 	}
 
-	//DEAD -> EntriesListActivity
-//	public void markRead() {
-//
-//		ContentValues values = new ContentValues();
-//		values.put(FeedData.EntryColumns.READDATE, System.currentTimeMillis());
-//
-//		Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
-//		int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
-//
-//		if (entryCursor.moveToFirst()) {
-//
-//			if (entryCursor.isNull(readDatePosition)) {
-//				getContentResolver().update(uri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
-//			}
-//		}
-//		entryCursor.close();
-//	}
+	// DEAD -> EntriesListActivity
+	// public void markRead() {
+	//
+	// ContentValues values = new ContentValues();
+	// values.put(FeedData.EntryColumns.READDATE, System.currentTimeMillis());
+	//
+	// Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
+	// int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
+	//
+	// if (entryCursor.moveToFirst()) {
+	//
+	// if (entryCursor.isNull(readDatePosition)) {
+	// getContentResolver().update(uri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
+	// }
+	// }
+	// entryCursor.close();
+	// }
 
+	@SuppressLint("NewApi")
 	private void reload() {
 		if (_id != null && _id.equals(uri.getLastPathSegment())) {
 			return;
@@ -520,6 +553,7 @@ public class EntryActivity extends Activity {
 				entryCursor.close();
 				finish();
 				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+
 			} else {
 				setTitle(entryCursor.getString(titlePosition));
 				if (titleTextView != null) {
@@ -802,45 +836,51 @@ public class EntryActivity extends Activity {
 		cursor.close();
 	}
 
+	@SuppressLint("NewApi")
 	private void switchEntry(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
 		uri = parentUri.buildUpon().appendPath(id).build();
 		getIntent().setData(uri);
 		scrollX = 0;
 		scrollY = 0;
 
+		// ausgeknippst, da viewer sich nicht mit Animation vertragen...
+//		animate = false;
+		if (mAufrufart > 0) {
+			animate = false;
+		}
+
 		if (animate) {
 			WebView dummy = webView; // switch reference
 			webView = webView0;
 			webView0 = dummy;
 		}
-		
-		
-		if (aufrufart > 0) {
-			//link laden
-			 Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
-			 if (entryCursor.moveToFirst()) {
-			 link = entryCursor.getString(linkPosition);
-			 link=fixLink(link);
-			 timestamp = entryCursor.getLong(datePosition);
-			 }
-			 entryCursor.close();
-				if (aufrufart == 2) {
-					readUrl();
-//					markRead();
-				} else if (aufrufart == 3) {
-					webView.loadUrl("http://www.instapaper.com/m?u=" + link);
-//					markRead();
-				}
-				//markRead 2
-				getContentResolver().update(uri, RSSOverview.getReadContentValues(), new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
-				
-				setupButton(previousButton, false, timestamp);
-				setupButton(nextButton, true, timestamp);
-		}else{
+
+		if (mAufrufart > 0) {
+			// link laden
+			Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
+			if (entryCursor.moveToFirst()) {
+				link = entryCursor.getString(linkPosition);
+				link = fixLink(link);
+				timestamp = entryCursor.getLong(datePosition);
+			}
+			entryCursor.close();
+
+			if (mAufrufart == AUFRUFART_MOBILIZE) {
+				loadMoblize();
+			} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
+				loadInstapaper();
+			} else if (mAufrufart == AUFRUFART_READABILITY) {
+				loadReadability();
+			}
+
+			// markRead 2
+			getContentResolver().update(uri, RSSOverview.getReadContentValues(), new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
+
+			setupButton(previousButton, false, timestamp);
+			setupButton(nextButton, true, timestamp);
+		} else {
 			reload();
 		}
-		
-		
 
 		if (animate) {
 			viewFlipper.setInAnimation(inAnimation);
@@ -903,34 +943,25 @@ public class EntryActivity extends Activity {
 			if (link != null) {
 				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
 
-				webView.loadUrl("http://www.instapaper.com/m?u=" + link);
-
-//				readUrl();
-				// webView.loadUrl("http://www.instapaper.com/m?u="+link);
-				// webView.loadUrl("http://www.google.com/gwt/x?u="+link);
-
-				// displayFullscreen();
+				loadInstapaper();
 			}
 			break;
 		}
-		
+
 		case R.id.menu_feed: {
-			_id=null;
+			_id = null;
 			reload();
-//			readUrl(); // TODO ???
-		break;
+			// readUrl(); // TODO ???
+			break;
 		}
-		
+
 		case R.id.menu_mobilize: {
-			readUrl();
-		break;
+			loadMoblize();
+			break;
 		}
-		
+
 		case R.id.menu_readability: {
-			webView.loadUrl("http://www.readability.com/m?url=" + link);
-			 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-					webView.getSettings().setTextZoom(80); //% von 100 // API 14 !!
-			 }
+			loadReadability();
 			break;
 		}
 
@@ -963,6 +994,11 @@ public class EntryActivity extends Activity {
 			}
 			break;
 		}
+		case R.id.menu_text_scale: {
+			showSeekBarDialog();
+		}
+			break;
+
 		}
 		return true;
 	}
@@ -1022,15 +1058,15 @@ public class EntryActivity extends Activity {
 					// bahtml = Jsoup.clean(bahtml, Whitelist.basicWithImages());
 					// String baseUrl = con.getURL().getProtocol() + "://" + con.getURL().getHost();
 					System.out.println("e" + (System.currentTimeMillis() - start));
-					
-//					long u=System.currentTimeMillis();
-//					int pBody=bahtml.indexOf("<body");
-//					System.out.println("pBody"+(System.currentTimeMillis() - u));
-//					int classCon=bahtml.indexOf("class=\"con\"",pBody);
-//					System.out.println("classCon"+(System.currentTimeMillis() - u));
-//					bahtml=bahtml.substring(classCon);
-//					System.out.println("f0 " + (System.currentTimeMillis() - start));
-					
+
+					// long u=System.currentTimeMillis();
+					// int pBody=bahtml.indexOf("<body");
+					// System.out.println("pBody"+(System.currentTimeMillis() - u));
+					// int classCon=bahtml.indexOf("class=\"con\"",pBody);
+					// System.out.println("classCon"+(System.currentTimeMillis() - u));
+					// bahtml=bahtml.substring(classCon);
+					// System.out.println("f0 " + (System.currentTimeMillis() - start));
+
 					Document dirty = Jsoup.parseBodyFragment(bahtml, baseUrl); // 2300ms !!
 					System.out.println("f" + (System.currentTimeMillis() - start));
 					Elements elements = dirty.getElementsByClass("content");
@@ -1182,4 +1218,51 @@ public class EntryActivity extends Activity {
 		// mTitleView.setVisibility(visible ? VISIBLE : INVISIBLE);
 		// mSeekView.setVisibility(visible ? VISIBLE : INVISIBLE);
 	}
+
+	private int mIntScalePercent = 50; // 0..100
+	// mSeekBar.setProgress(intLaufzeitPercent);
+	SeekBar mSeekBar;
+
+	// mSeekBar = (SeekBar) findViewById(R.id.seekBar);
+	// mSeekBar.setOnSeekBarChangeListener(this);
+
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+		// progress 1..100
+		mIntScalePercent = progress;
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+	}
+
+	@SuppressLint("NewApi")
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		setZoomsScale();
+	}
+
+	AlertDialog.Builder mAlertDialog = null;
+	public static final String PREFERENCE_SCALE = "preference_scale_readability";
+	public final static String PREFS_NAME = "de.bernd.sparse.rss.preferences";
+
+	private void showSeekBarDialog() {
+		View view = getLayoutInflater().inflate(R.layout.entry_seek_bar, null);
+		mSeekBar = (SeekBar) view.findViewById(R.id.seekBar);
+		mSeekBar.setOnSeekBarChangeListener(this);
+		mSeekBar.setProgress(mIntScalePercent);
+		mAlertDialog = new AlertDialog.Builder(this);
+		mAlertDialog.setTitle("Scale the Text");
+		mAlertDialog.setView(view);
+		mAlertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+				SharedPreferences.Editor editor = prefs.edit();
+				editor.putInt(PREFERENCE_SCALE + mAufrufart, mIntScalePercent);
+				editor.commit();
+			}
+		});
+		mAlertDialog.show();
+	}
+
 }
