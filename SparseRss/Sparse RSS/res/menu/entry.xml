@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item android:id="@+id/menu_mobilize"
+        android:icon="@android:drawable/ic_menu_zoom"
+        android:title="Mobilize" 
+        android:showAsAction="ifRoom"/>
+    
+    
+	<item android:id="@+id/menu_instapaper"
+        android:icon="@android:drawable/ic_menu_compass"
+        android:title="@string/contextmenu_instapaper" 
+        android:showAsAction="ifRoom"/>
+
+	<item android:id="@+id/menu_readability"
+        android:icon="@android:drawable/ic_menu_report_image"
+        android:title="Readability" 
+        android:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menu_feed"
+        android:icon="@android:drawable/ic_menu_crop"
+        android:title="Feed" 
+        android:showAsAction="ifRoom"/>
+				
+	
+    <item android:id="@+id/menu_copytoclipboard"
+        android:icon="@android:drawable/ic_menu_upload"
+        android:title="@string/contextmenu_copyurl"/>
+    
+    <item android:id="@+id/url_button"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/contextmenu_browser"
+		android:showAsAction="always"/>
+
+    <item android:id="@+id/menu_markasread"
+    	android:icon="@android:drawable/ic_menu_revert"
+        android:title="@string/contextmenu_markasread"
+        android:showAsAction="always"/>
+    
+    <item android:id="@+id/menu_share"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="@string/menu_share"/>
+    <item android:id="@+id/menu_delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/contextmenu_delete"/>
+</menu>

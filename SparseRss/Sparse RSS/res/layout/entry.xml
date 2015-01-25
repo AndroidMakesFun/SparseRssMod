@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/entry_date_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="4pt"
+        >
+
+        <TextView
+            android:id="@+id/entry_date"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill"
+            android:layout_weight="1"
+            android:autoLink="email"
+            android:paddingTop="2pt" />
+
+        <ImageView
+            android:id="@android:id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="@android:drawable/title_bar" />
+
+    <RelativeLayout
+        android:id="@+id/entry_content"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_gravity="fill"
+        android:layout_weight="1"
+        tools:ignore="NewApi" >
+
+        <ViewFlipper
+            android:id="@+id/content_flipper"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
+
+        <LinearLayout
+            android:id="@+id/button_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal" >
+
+            <ImageButton
+                android:id="@+id/prev_button"
+                android:layout_width="70dp"
+                android:layout_height="fill_parent"
+                android:background="#7C000000"
+                android:src="@android:drawable/ic_media_previous" />
+
+            <ImageButton
+                android:id="@+id/url_button"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="fill"
+                android:layout_weight="1"
+                android:background="#7C000000"
+                android:src="@android:drawable/ic_menu_view" />
+
+            <ImageButton
+                android:id="@+id/play_button"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:background="#7C000000"
+                android:src="@android:drawable/ic_media_play" />
+
+            <ImageButton
+                android:id="@+id/next_button"
+                android:layout_width="70dp"
+                android:layout_height="fill_parent"
+                android:background="#7C000000"
+                android:src="@android:drawable/ic_media_next" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

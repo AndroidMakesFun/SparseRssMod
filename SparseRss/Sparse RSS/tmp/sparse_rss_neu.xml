@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<opml version="1.1">
+	<head>
+		<title>Sparse RSS export</title>
+		<dateCreated>1364414091772</dateCreated>
+	</head>
+	<body>
+		<outline title="Caschys Blog" type="rss"
+			xmlUrl="http://feeds.feedburner.com/stadt-bremerhaven/dqXM?format=xml" />
+		<outline title="heise atom" type="rss"
+			xmlUrl="http://www.heise.de/newsticker/heise-atom.xml" />
+		<outline title="androidnext" type="rss"
+			xmlUrl="http://feeds.feedburner.com/androidnext?format=xml" />
+		<outline title="tagesschau.de - Die Nachrichten der ARD" type="rss"
+			xmlUrl="http://www.tagesschau.de/xml/rss2" />
+		<outline text="HAZ.de - Lokal" title="HAZ.de - Lokal" type="rss"
+			xmlUrl="http://www.haz.de/rss/feed/haz_hannoverregion" htmlUrl="http://www.haz.de/" />
+		<outline title="GoogleWatchBlog" type="rss"
+			xmlUrl="http://feeds.feedburner.com/jmboard/UITV" />
+		<outline title="tabtech.de - Tablet News und Testberichte"
+			type="rss" xmlUrl="http://feeds.feedburner.com/Tabtechde" />
+		<outline title="ComputerBase News" type="rss"
+			xmlUrl="http://www.computerbase.de/rss/news.xml" />
+		<outline text="derStandard.at add Web" title="derStandard.at add Web"
+			type="rss" xmlUrl="http://derstandard.at/?page=rss&amp;ressort=web"
+			htmlUrl="http://derstandard.at/Web" />
+		<outline text="GamersGlobal News-Feed" title="GamersGlobal News-Feed"
+			type="rss" xmlUrl="http://gamersglobal.de/news/feed" htmlUrl="http://www.gamersglobal.de/topnews/feed" />
+		<outline text="Golem.de" title="Golem.de" type="rss"
+			xmlUrl="http://rss.golem.de/rss.php?feed=RSS1.0" htmlUrl="http://www.golem.de/" />
+		<outline text="t3n News" title="t3n News" type="rss"
+			xmlUrl="http://feeds2.feedburner.com/aktuell/feeds/rss/" htmlUrl="http://t3n.de/" />
+		<outline text="ZDNet.de - Alle Seiten der IT" title="ZDNet.de - Alle Seiten der IT"
+			type="rss" xmlUrl="http://www.zdnet.de/feeds/news/xml/rss_h5.xml.htm"
+			htmlUrl="http://www.zdnet.de" />
+		<outline text="Twitter / cyanogen" title="Twitter / cyanogen"
+			type="rss" xmlUrl="http://twitter.com/statuses/user_timeline/8131122.rss"
+			htmlUrl="http://twitter.com/cyanogen" />
+		<outline title="JAXenter" type="rss"
+			xmlUrl="http://it-republik.de/jaxenter/feed/" />
+		<outline title="EclipseSource Blog" type="rss"
+			xmlUrl="http://eclipsesource.com/blogs/feed/" />
+		<outline text="Wiwo RSS-Feed" title="Wiwo RSS-Feed" type="rss"
+			xmlUrl="http://www.wiwo.de/rss/cat/0,451,452,453,454,455,555,456,518,553,577,578,579,585,586,685,510,511,517,562,563,673,557,515,516,550,552,554,580,581,582,583,584,595,459,460,461,462,463,527,464,561,590,591,596,597,598,599,600,601,602,603,604,605,606,607,608,676,465,466,467,468,469,524,470,519,544,545,528,556,609,610,611,612,613,614,615,616,617,618,619,471,472,473,474,475,476,477,478,521,529,530,531,532,533,534,535,536,548,537,538,539,540,541,542,543,546,547,620,621,622,623,624,683,684,480,481,482,483,484,485,486,498,570,587,588,592,627,628,629,630,625,626,488,493,558,490,491,492,559,560,565,567,571,671,674,675,677,686,494,495,497,523,525,526,549,564,566,568,569,572,573,574,593,594,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,649,650,651,652,682,653,654,655,656,657,658,659,660,661,662,663,664,665,666,667,668,669,670,672.xml"
+			htmlUrl="http://www.wiwo.de" />
+	</body>
+</opml>
