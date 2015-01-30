@@ -55,6 +55,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -218,8 +219,12 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		if (MainTabActivity.isLightTheme(this)) {
 			setTheme(R.style.Theme_Light);
 		}
-		// gegen das flackern der ActionBar
-		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
+		if (mAufrufart != AUFRUFART_FEED) {
+			// gegen das flackern der ActionBar Inhalt hinter actionbar
+			getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);			
+		}
+		
 		super.onCreate(savedInstanceState);
 		mActivity = this;
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -260,7 +265,7 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
 		showRead = getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
 		iconBytes = getIntent().getByteArrayExtra(FeedData.FeedColumns.ICON);
-		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
+//		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
 		feedId = 0;
 		
 		Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
@@ -1021,9 +1026,137 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		return true;
 	}
 
-	public String bahtml = "";
+	public String bahtml = null;
+	public String mNewLink = null;
 
 	private void readUrl() {
+		setProgressBarIndeterminateVisibility(true);
+		new AsyncReadUrl().execute();
+	}
+
+	class AsyncReadUrl extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			
+			try {
+				long start = System.currentTimeMillis();// 0
+				URL url = new URL(link);
+				System.out.println("a" + (System.currentTimeMillis() - start));
+				// InputStream is = url.openStream();
+				URLConnection con = url.openConnection();
+				System.out.println("b" + (System.currentTimeMillis() - start));
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8")); // 950ms
+				System.out.println("c" + (System.currentTimeMillis() - start));
+				// baseUrl wechselt ab con.getInputStream (open?)
+				String baseUrl = con.getURL().getProtocol() + "://" + con.getURL().getHost();
+				if (con.getURL().getHost().endsWith("golem.de")) {
+					String[] arr = con.getURL().getPath().split("-");
+					String newLink = "http://www.golem.de/pda/pda-" + arr[arr.length - 1];
+					mNewLink=newLink;
+					return null;
+				}
+				if (con.getURL().getHost().endsWith("heise.de")) {
+					String newLink = baseUrl + con.getURL().getPath() + "?view=print";
+					mNewLink=newLink;
+					return null;
+				}
+				if (con.getURL().getHost().endsWith("wiwo.de")) {
+					String newLink = baseUrl + con.getURL().getPath();
+					int pos = newLink.lastIndexOf('/');
+					if (pos > 0) {
+						newLink = newLink.substring(0, pos) + "/v_detail_tab_print/" + newLink.substring(pos, newLink.length());
+					}
+					// bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+					// webView.loadUrl(newLink);
+					// Wiwo print im Browser öffnen
+					startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(newLink)), 0);
+					finish();
+					return null;
+				}
+
+				// BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+				String line = bufferedReader.readLine();
+				while (line != null) {
+					line = bufferedReader.readLine();
+					bahtml += line;
+				}
+				bufferedReader.close();
+				System.out.println("d" + (System.currentTimeMillis() - start));
+
+				// bahtml = Jsoup.clean(bahtml, Whitelist.basicWithImages());
+				// String baseUrl = con.getURL().getProtocol() + "://" + con.getURL().getHost();
+				System.out.println("e" + (System.currentTimeMillis() - start));
+
+				// long u=System.currentTimeMillis();
+				// int pBody=bahtml.indexOf("<body");
+				// System.out.println("pBody"+(System.currentTimeMillis() - u));
+				// int classCon=bahtml.indexOf("class=\"con\"",pBody);
+				// System.out.println("classCon"+(System.currentTimeMillis() - u));
+				// bahtml=bahtml.substring(classCon);
+				// System.out.println("f0 " + (System.currentTimeMillis() - start));
+
+				Document dirty = Jsoup.parseBodyFragment(bahtml, baseUrl); // 2300ms !!
+				System.out.println("f" + (System.currentTimeMillis() - start));
+				Elements elements = dirty.getElementsByClass("content");
+				System.out.println("g" + (System.currentTimeMillis() - start));
+				if (elements.size() > 0) {
+					// dirty auf content setzen, 2.parse
+					bahtml = elements.first().html();
+					dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
+				} else {
+					elements = dirty.getElementsByClass("con"); // Tagesschau
+					if (elements.size() > 0) {
+						bahtml = elements.first().html();
+						dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
+					} else {
+						elements = dirty.getElementsByAttributeValue("id", "content"); // Heise
+						if (elements.size() > 0) {
+							bahtml = elements.first().html();
+							dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
+							// } else {
+							// elements = dirty.getElementsByClass("hcf-content"); // Wiwo - nope, unsused!!
+							// if (elements.size() > 0) {
+							// bahtml = elements.first().html();
+							// dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
+							// }
+						}
+					}
+				}
+				Whitelist whitelist = Whitelist.basic(); // 500ms
+				// Whitelist whitelist = Whitelist.basicWithImages(); // 500ms
+				whitelist.addTags("h1", "h2", "h3");
+				System.out.println("x" + (System.currentTimeMillis() - start));
+				Cleaner cleaner2 = new Cleaner(whitelist);
+				System.out.println("h" + (System.currentTimeMillis() - start));
+				Document clean = cleaner2.clean(dirty);
+				System.out.println("i" + (System.currentTimeMillis() - start));
+				// clean.body().removeAttr(attributeKey)
+				bahtml = clean.body().html();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				Util.toastMessageLong(EntryActivity.this, "" + e);
+			}
+			
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			if(mNewLink!=null){
+				webView.loadUrl(mNewLink);
+			}else if (bahtml!=null){
+				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
+			}
+		}
+	}
+
+		
+	
+	
+	private void readUrl_alt() {
 
 		new Thread(new Runnable() {
 			public void run() {
