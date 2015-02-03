@@ -39,6 +39,7 @@ import org.jsoup.select.Elements;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -54,6 +55,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -1503,6 +1505,12 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 	public void setHomeButtonActive() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			getActionBar().setHomeButtonEnabled(true);
+			//durchsichtige Actionbar
+			ActionBar actionBar = getActionBar();
+//			actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#330000ff")));
+			actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+//			actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#550000ff")));
+
 		}
 	}
 
