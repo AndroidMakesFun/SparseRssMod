@@ -29,12 +29,14 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Vector;
 
+import android.R.color;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -99,6 +101,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	
 	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload) {
 		super(context, R.layout.entrylistitem, createManagedCursor(context, uri, true), autoreload);
+
 		showRead = true;
 		this.context = context;
 		this.uri = uri;
@@ -128,9 +131,12 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
-		
+		if (MainTabActivity.isLightTheme(context)) {
+			textView.setTextColor(Color.BLACK);
+		}
+
 		textView.setText(cursor.getString(titleColumnPosition));
-		
+
 		TextView dateTextView = (TextView) view.findViewById(android.R.id.text2);
 		
 		final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
