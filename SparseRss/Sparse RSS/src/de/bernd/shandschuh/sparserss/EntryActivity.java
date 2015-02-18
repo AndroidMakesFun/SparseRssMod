@@ -459,6 +459,8 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 			loadInstapaper();
 		} else if (mAufrufart == AUFRUFART_READABILITY) {
 			loadReadability();
+		} else if (mAufrufart == AUFRUFART_WEBVIEW) {
+			loadWebview();
 		}
 		setHomeButtonActive();
 		// setWebViewListener();
@@ -474,6 +476,10 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		}
 	}
 
+	private void loadWebview() {
+		webView.loadUrl(link);
+	}
+	
 	private void loadReadability() {
 		webView.loadUrl("http://www.readability.com/m?url=" + link);
 	}
@@ -482,7 +488,7 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		// webView.getSettings().setJavaScriptEnabled(false);
 		// webView.getSettings().setDomStorageEnabled(true);
 		// webView.loadUrl("http://www.instapaper.com/m?u=" + link);
-		startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.instapaper.com/m?u=" + link)), 0);
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.instapaper.com/m?u=" + link)));
 	}
 
 	@SuppressLint("NewApi")
@@ -707,7 +713,7 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 					urlButton.setAlpha(BUTTON_ALPHA + 20);
 					urlButton.setOnClickListener(new OnClickListener() {
 						public void onClick(View view) {
-							startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(link)), 0);
+							startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
 						}
 					});
 
@@ -813,10 +819,10 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 
 	private void showEnclosure(Uri uri, String enclosure, int position1, int position2) {
 		try {
-			startActivityForResult(new Intent(Intent.ACTION_VIEW).setDataAndType(uri, enclosure.substring(position1 + 3, position2)), 0);
+			startActivity(new Intent(Intent.ACTION_VIEW).setDataAndType(uri, enclosure.substring(position1 + 3, position2)));
 		} catch (Exception e) {
 			try {
-				startActivityForResult(new Intent(Intent.ACTION_VIEW, uri), 0); // fallbackmode - let the browser handle this
+				startActivity(new Intent(Intent.ACTION_VIEW, uri)); // fallbackmode - let the browser handle this
 			} catch (Throwable t) {
 				Toast.makeText(EntryActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
 			}
@@ -960,7 +966,7 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 				// link = link.substring(0, link.length() - "feed/atom/".length());
 				// }
 				// Browser öffnen
-				startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(link)), 0);
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
 			}
 			break;
 		}
@@ -989,6 +995,11 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 			loadReadability();
 			break;
 		}
+
+//		case R.id.menu_webview: {
+//			loadWebview();
+//			break;
+//		}
 
 		case R.id.menu_copytoclipboard: {
 			if (link != null) {
@@ -1072,7 +1083,7 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 					// bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
 					// webView.loadUrl(newLink);
 					// Wiwo print im Browser öffnen
-					startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(newLink)), 0);
+					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(newLink)));
 					finish();
 					return null;
 				}
@@ -1194,7 +1205,7 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 						// bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
 						// webView.loadUrl(newLink);
 						// Wiwo print im Browser öffnen
-						startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(newLink)), 0);
+						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(newLink)));
 						finish();
 						return;
 					}
@@ -1473,6 +1484,12 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		scrollX = 0;
 		scrollY = 0;
 
+		if (animate && mAufrufart == 0) {
+			WebView dummy = webView; // switch reference
+			webView = webView0;
+			webView0 = dummy;
+		}
+
 		if (mAufrufart > 0) {
 			// link laden
 			Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
@@ -1499,6 +1516,15 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		} else {
 			reload();
 		}
+
+		if (animate && mAufrufart == 0) {
+			viewFlipper.setInAnimation(inAnimation);
+			viewFlipper.setOutAnimation(outAnimation);
+			viewFlipper.addView(webView, layoutParams);
+			viewFlipper.showNext();
+			viewFlipper.removeViewAt(0);
+		}
+
 	}
 
 	@SuppressLint("NewApi")
@@ -1508,8 +1534,8 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 			//durchsichtige Actionbar
 			ActionBar actionBar = getActionBar();
 //			actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#330000ff")));
-			actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
 //			actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#550000ff")));
+			actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
 
 		}
 	}

@@ -221,14 +221,14 @@ public class EntriesListActivity extends ListActivity {
 			link=EntryActivity.fixLink(link);
 			if (aufrufart == 1) {
 				// // Browser öffnen
-				startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(link)), 0);
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
 				return;
 			}
 			if (aufrufart == 3) {
 				//Problem Lesestatus !!
 				// // Browser öffnen
 				link = "http://www.instapaper.com/m?u=" + link;
-				startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(link)), 0);
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
 				return;
 			}
 

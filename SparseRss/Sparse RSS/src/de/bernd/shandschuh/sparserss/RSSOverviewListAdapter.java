@@ -34,6 +34,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
@@ -107,7 +108,10 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		TextView textView = ((TextView) view.findViewById(android.R.id.text1));
-		
+		if (MainTabActivity.isLightTheme(context)) {
+			textView.setTextColor(Color.BLACK);
+		}
+
 		textView.setSingleLine();
 		
 		Cursor countCursor = context.getContentResolver().query(FeedData.EntryColumns.CONTENT_URI(cursor.getString(idPosition)), new String[] {COUNT_UNREAD, COUNT}, null, null, null);

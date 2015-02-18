@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.bernd.shandschuh.sparserss"
     android:installLocation="auto"
-    android:versionCode="94"
-    android:versionName="1.94" >
+    android:versionCode="96"
+    android:versionName="1.96" >
 
     <uses-sdk
         android:minSdkVersion="11"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="21" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
