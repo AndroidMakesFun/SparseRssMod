@@ -12,9 +12,9 @@
 		android:showAsAction="always"/>
     
   	<item android:id="@+id/menu_readability"
-        android:icon="@android:drawable/ic_menu_gallery"
+        android:icon="@drawable/readability1"
         android:title="Readability" 
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="always"/>
 		
     <item android:id="@+id/menu_mobilize"
         android:icon="@android:drawable/ic_menu_zoom"
