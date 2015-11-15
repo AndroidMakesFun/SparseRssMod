@@ -60,6 +60,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
@@ -81,6 +82,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -227,23 +229,19 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		super.onCreate(savedInstanceState);
 
-//		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-//		setProgressBarIndeterminateVisibility(true);
-		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setSupportProgressBarIndeterminateVisibility(true);
-
-		// Hide on content scroll requires an overlay action bar, so request one
-		// supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
-		supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
-
 		setContentView(R.layout.entry);
-
+		
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
+		zeigeProgressBar(true);
+		
 		mActivity = this;
 
 		int titleId = -1;
 
 //		 canShowIcon = requestWindowFeature(Window.FEATURE_LEFT_ICON);
-		canShowIcon = true;
+		canShowIcon = false; // geht eh nicht mehr...
 
 		titleId = android.R.id.title;
 
@@ -451,10 +449,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void loadWebview() {
+		zeigeProgressBar(true);
 		webView.loadUrl(link);
 	}
 
 	private void loadReadability() {
+		zeigeProgressBar(true);
 		webView.loadUrl("http://www.readability.com/m?url=" + link);
 	}
 
@@ -466,6 +466,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void loadMoblize() {
+		zeigeProgressBar(true);
 		readUrl();
 	}
 
@@ -891,7 +892,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public String mNewLink = null;
 
 	private void readUrl() {
-		setProgressBarIndeterminateVisibility(true);
+		zeigeProgressBar(true);
 		new AsyncReadUrl().execute();
 	}
 
@@ -1232,13 +1233,15 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		@Override
 		public void onPageFinished(WebView view, String url) {
 			// animate(view);
-			setProgressBarIndeterminateVisibility(false);
+			zeigeProgressBar(false);
 			view.setVisibility(View.VISIBLE);
 			super.onPageFinished(view, url);
 		}
 	}
 
 	int mAnimationDirection = android.R.anim.slide_out_right;
+
+	private ProgressBar progressBar;
 
 	private void animate(final WebView view) {
 		Animation anim = AnimationUtils.loadAnimation(getBaseContext(), mAnimationDirection);
@@ -1248,7 +1251,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private void switchEntry(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
 
 		// webView.setVisibility(View.GONE);
-		setProgressBarIndeterminateVisibility(true);
+		zeigeProgressBar(true);
 
 		uri = parentUri.buildUpon().appendPath(id).build();
 		getIntent().setData(uri);
@@ -1300,7 +1303,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	public void setHomeButtonActive() {
 		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
-		actionBar7.setHideOnContentScrollEnabled(true);
+//		actionBar7.setHideOnContentScrollEnabled(true); //knallt mit Toolbar
 		actionBar7.setHomeButtonEnabled(true);
 		// durchsichtige Actionbar
 		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
@@ -1405,5 +1408,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void zeigeProgressBar(boolean zeigen){
+		if(zeigen){
+			progressBar.setVisibility(View.VISIBLE); 
+		}else{
+			progressBar.setVisibility(View.INVISIBLE);  
+		}
 	}
 }
