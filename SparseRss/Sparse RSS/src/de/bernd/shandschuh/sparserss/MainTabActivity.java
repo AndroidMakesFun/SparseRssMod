@@ -68,10 +68,6 @@ public class MainTabActivity extends TabActivity {
 	
 	public static MainTabActivity INSTANCE;
 	
-	public static final boolean POSTGINGERBREAD = !Build.VERSION.RELEASE.startsWith("1") &&
-		!Build.VERSION.RELEASE.startsWith("2"); // this way around is future save
-	
-	
 	private static Boolean LIGHTTHEME;
 	
 	public static boolean isLightTheme(Context context) {
@@ -217,21 +213,6 @@ public class MainTabActivity extends TabActivity {
 			tabHost.addTab(tabHost.newTabSpec(TAG_FAVORITE).setIndicator(getString(R.string.favorites), getResources().getDrawable(android.R.drawable.star_big_on)).setContent(new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.FAVORITES_CONTENT_URI).putExtra(EntriesListActivity.EXTRA_SHOWFEEDINFO, true).putExtra(EntriesListActivity.EXTRA_AUTORELOAD, true)));
 			tabsAdded = true;
 			getTabWidget().setVisibility(View.VISIBLE);
-		}
-		if (POSTGINGERBREAD) {
-			/* Change the menu also on ICS when tab is changed */
-			tabHost.setOnTabChangedListener(new OnTabChangeListener() {
-				public void onTabChanged(String tabId) {
-					if (menu != null) {
-						menu.clear();
-						onCreateOptionsMenu(menu);
-					}
-				}
-			});
-			if (menu != null) {
-				menu.clear();
-				onCreateOptionsMenu(menu);
-			}
 		}
 	}
 	

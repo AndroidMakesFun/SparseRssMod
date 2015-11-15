@@ -37,10 +37,6 @@ import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.NotificationManager;
@@ -54,13 +50,16 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
@@ -88,8 +87,7 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 
-@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class EntryActivity extends Activity implements android.widget.SeekBar.OnSeekBarChangeListener {
+public class EntryActivity extends AppCompatActivity implements android.widget.SeekBar.OnSeekBarChangeListener {
 
 	/*
 	 * private static final String NEWLINE = "\n";
@@ -212,7 +210,7 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 	private static final int AUFRUFART_READABILITY = 4;
 	private static final int AUFRUFART_WEBVIEW = 5;
 
-	private Activity mActivity = null;
+	private EntryActivity mActivity = null;
 
 	private long timestamp;
 
@@ -224,32 +222,30 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
 		if (mAufrufart != AUFRUFART_FEED) {
 			// gegen das flackern der ActionBar Inhalt hinter actionbar
-			getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);			
+			// getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		}
-		
+
 		super.onCreate(savedInstanceState);
+
+//		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+//		setProgressBarIndeterminateVisibility(true);
+		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setSupportProgressBarIndeterminateVisibility(true);
+
+		// Hide on content scroll requires an overlay action bar, so request one
+		// supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
+		supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
+
+		setContentView(R.layout.entry);
+
 		mActivity = this;
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setProgressBarIndeterminateVisibility(true);
 
 		int titleId = -1;
 
-		if (MainTabActivity.POSTGINGERBREAD) {
-			// getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-			canShowIcon = true;
-			setContentView(R.layout.entry);
+//		 canShowIcon = requestWindowFeature(Window.FEATURE_LEFT_ICON);
+		canShowIcon = true;
 
-			try {
-				/* This is a trick as com.android.internal.R.id.action_bar_title is not directly accessible */
-				titleId = (Integer) Class.forName("com.android.internal.R$id").getField("action_bar_title").get(null);
-			} catch (Exception exception) {
-
-			}
-		} else {
-			canShowIcon = requestWindowFeature(Window.FEATURE_LEFT_ICON);
-			setContentView(R.layout.entry);
-			titleId = android.R.id.title;
-		}
+		titleId = android.R.id.title;
 
 		try {
 			titleTextView = (TextView) findViewById(titleId);
@@ -267,9 +263,9 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
 		showRead = getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
 		iconBytes = getIntent().getByteArrayExtra(FeedData.FeedColumns.ICON);
-//		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
+		// mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
 		feedId = 0;
-		
+
 		Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
 
 		titlePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.TITLE);
@@ -338,8 +334,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 
 		final boolean gestures = preferences.getBoolean(Strings.SETTINGS_GESTURESENABLED, true);
 
-		// nicht schön, aber funkt für onDoubleTap
-		// final GestureDetector gestureDetector = new GestureDetector(this, new OnGestureListener() {
 		@SuppressWarnings("deprecation")
 		final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
 
@@ -366,12 +360,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 							}
 						}
 					}
-				} else { // mehr y als x
-					if (velocityY > 800) {
-						setNavVisibility(true);
-					} else if (velocityY < -800) {
-						setNavVisibility(false);
-					}
 				}
 				return false;
 			}
@@ -393,16 +381,20 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 				return false;
 			}
 
+			public boolean onSingleTapUp(MotionEvent e) {
+		        final ActionBar bar = mActivity.getSupportActionBar();
+                if (bar.isShowing()) {
+                    bar.hide();
+                } else {
+                    bar.show();
+                }
+				return false;
+			}
+
 			public void onShowPress(MotionEvent e) {
 
 			}
 
-			public boolean onSingleTapUp(MotionEvent e) {
-				// int curVis = webView.getSystemUiVisibility();
-				// setNavVisibility((curVis & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0);
-				setNavVisibility(!mNavVisible);
-				return false;
-			}
 		});
 
 		OnTouchListener onTouchListener = new OnTouchListener() {
@@ -425,22 +417,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		scrollX = 0;
 		scrollY = 0;
 
-		// OnSystemUiVisibilityChangeListener onSystemUiVisibilityChangeListener = new OnSystemUiVisibilityChangeListener(){
-		//
-		// @Override
-		// public void onSystemUiVisibilityChange(int visibility) {
-		// int diff = mLastSystemUiVis ^ visibility;
-		// mLastSystemUiVis = visibility;
-		// if ((diff&View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0
-		// && (visibility&View.SYSTEM_UI_FLAG_LOW_PROFILE) == 0) {
-		// setNavVisibility(true);
-		// }
-		// }
-		//
-		// };
-		// webView.setOnSystemUiVisibilityChangeListener(onSystemUiVisibilityChangeListener);
-		// displayFullscreen();
-
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
 
@@ -448,7 +424,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		MyWebViewClient myWebViewClient = new MyWebViewClient();
 		webView.setWebViewClient(myWebViewClient);
 		webView0.setWebViewClient(myWebViewClient);
-
 
 		// 1 Browser schon aus Liste herraus
 		if (mAufrufart == AUFRUFART_FEED) {
@@ -466,7 +441,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		// setWebViewListener();
 	}// onCreate
 
-	@SuppressLint("NewApi")
 	void setZoomsScale() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			webView.getSettings().setTextZoom(mIntScalePercent * 2); // % von 100 // API 14 !!
@@ -479,7 +453,7 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 	private void loadWebview() {
 		webView.loadUrl(link);
 	}
-	
+
 	private void loadReadability() {
 		webView.loadUrl("http://www.readability.com/m?url=" + link);
 	}
@@ -491,7 +465,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.instapaper.com/m?u=" + link)));
 	}
 
-	@SuppressLint("NewApi")
 	private void loadMoblize() {
 		readUrl();
 	}
@@ -510,9 +483,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		}
 		uri = getIntent().getData();
 		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
-		if (MainTabActivity.POSTGINGERBREAD) {
-			CompatibilityHelper.onResume(webView);
-		}
 
 		// wegen Absturz durch leere _nextId
 		setupButton(previousButton, false, timestamp);
@@ -535,25 +505,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 		setIntent(intent);
 	}
 
-	// DEAD -> EntriesListActivity
-	// public void markRead() {
-	//
-	// ContentValues values = new ContentValues();
-	// values.put(FeedData.EntryColumns.READDATE, System.currentTimeMillis());
-	//
-	// Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
-	// int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
-	//
-	// if (entryCursor.moveToFirst()) {
-	//
-	// if (entryCursor.isNull(readDatePosition)) {
-	// getContentResolver().update(uri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
-	// }
-	// }
-	// entryCursor.close();
-	// }
-
-	@SuppressLint("NewApi")
 	private void reload() {
 		if (_id != null && _id.equals(uri.getLastPathSegment())) {
 			return;
@@ -618,11 +569,12 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 								bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
 							}
 
-							if (MainTabActivity.POSTGINGERBREAD) {
-								CompatibilityHelper.setActionBarDrawable(this, new BitmapDrawable(bitmap));
-							} else {
-								setFeatureDrawable(Window.FEATURE_LEFT_ICON, new BitmapDrawable(bitmap));
-							}
+//							setFeatureDrawable(Window.FEATURE_LEFT_ICON, new BitmapDrawable(bitmap));
+//							getSupportActionBar().setIcon(new BitmapDrawable(bitmap));
+//							getSupportActionBar().setLogo(new BitmapDrawable(bitmap));
+//					        int flags = 0;
+//					        int change = getSupportActionBar().getDisplayOptions() ^ flags;
+//					        getSupportActionBar().setDisplayOptions(change, flags);
 						}
 					}
 				}
@@ -716,33 +668,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 							startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
 						}
 					});
-
-					// ////////////////////////// AUSWERTUNG AUFRUFART
-					// Uri feedUri=FeedData.EntryColumns.PARENT_URI(parentUri.getPath());
-					//
-					// int aufrufart=0;
-					// Cursor cursor = getContentResolver().query(feedUri, FeedConfigActivity.PROJECTION, null, null, null);
-					// if (cursor.moveToNext()) {
-					// aufrufart=cursor.getInt(3); // 0.. {"Feed", "Browser", "Mobilize", "Instapaper"};
-					// cursor.close();
-					// }
-					//
-					// if(aufrufart==1){
-					// // Browser öffnen
-					// startActivityForResult(new Intent(Intent.ACTION_VIEW, Uri.parse(link)), 0);
-					// entryCursor.close();
-					// return;
-					//
-					// }else if (aufrufart==2){
-					// readUrl();
-					// entryCursor.close();
-					// return;
-					//
-					// }else if (aufrufart==3){
-					// webView.loadUrl("http://www.instapaper.com/m?u="+link);
-					// entryCursor.close();
-					// return;
-					// }
 
 				} else {
 					urlButton.setEnabled(false);
@@ -933,9 +858,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (MainTabActivity.POSTGINGERBREAD) {
-			CompatibilityHelper.onPause(webView);
-		}
 		scrollX = webView.getScrollX();
 		scrollY = webView.getScrollY();
 	}
@@ -948,94 +870,20 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+//        MenuItem markasreadItem = menu.add(R.string.contextmenu_markasread); //@string/contextmenu_markasread
+        MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread); //@string/contextmenu_markasread
+        MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
+
+        MenuItem browserItem = menu.add(0,R.id.url_button,0,R.string.contextmenu_browser);
+        MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        browserItem.setIcon(android.R.drawable.ic_menu_view);
+
+        MenuItem readabilityItem = menu.add(0,R.id.menu_readability,0,"Readability");
+        MenuItemCompat.setShowAsAction(readabilityItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        readabilityItem.setIcon(R.drawable.readability_400);
+
 		getMenuInflater().inflate(R.menu.entry, menu);
-		return true;
-	}
-
-	@SuppressLint("NewApi")
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_markasread: {
-			finish();
-			break;
-		}
-		case R.id.url_button: {
-			if (link != null) {
-				// if (link.endsWith("feed/atom/")) {
-				// link = link.substring(0, link.length() - "feed/atom/".length());
-				// }
-				// Browser öffnen
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
-			}
-			break;
-		}
-		case R.id.menu_instapaper: {
-			if (link != null) {
-				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
-
-				loadInstapaper();
-			}
-			break;
-		}
-
-		case R.id.menu_feed: {
-			_id = null;
-			reload();
-			// readUrl(); // TODO ???
-			break;
-		}
-
-		case R.id.menu_mobilize: {
-			loadMoblize();
-			break;
-		}
-
-		case R.id.menu_readability: {
-			loadReadability();
-			break;
-		}
-
-//		case R.id.menu_webview: {
-//			loadWebview();
-//			break;
-//		}
-
-		case R.id.menu_copytoclipboard: {
-			if (link != null) {
-				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
-			}
-			break;
-		}
-		// case R.id.menu_delete: {
-		// getContentResolver().delete(uri, null, null);
-		// if (localPictures) {
-		// FeedData.deletePicturesOfEntry(_id);
-		// }
-		//
-		// if (nextButton.isEnabled()) {
-		// nextButton.performClick();
-		// } else {
-		// if (previousButton.isEnabled()) {
-		// previousButton.performClick();
-		// } else {
-		// finish();
-		// }
-		// }
-		// break;
-		// }
-		case R.id.menu_share: {
-			if (link != null) {
-				startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, link).setType(TEXTPLAIN), getString(R.string.menu_share)));
-			}
-			break;
-		}
-		case R.id.menu_text_scale: {
-			showSeekBarDialog();
-		}
-			break;
-
-		}
 		return true;
 	}
 
@@ -1051,7 +899,7 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			
+
 			try {
 				long start = System.currentTimeMillis();// 0
 				URL url = new URL(link);
@@ -1066,12 +914,12 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 				if (con.getURL().getHost().endsWith("golem.de")) {
 					String[] arr = con.getURL().getPath().split("-");
 					String newLink = "http://www.golem.de/pda/pda-" + arr[arr.length - 1];
-					mNewLink=newLink;
+					mNewLink = newLink;
 					return null;
 				}
 				if (con.getURL().getHost().endsWith("heise.de")) {
 					String newLink = baseUrl + con.getURL().getPath() + "?view=print";
-					mNewLink=newLink;
+					mNewLink = newLink;
 					return null;
 				}
 				if (con.getURL().getHost().endsWith("wiwo.de")) {
@@ -1151,24 +999,21 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 				e.printStackTrace();
 				Util.toastMessageLong(EntryActivity.this, "" + e);
 			}
-			
+
 			return null;
 		}
-		
+
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			if(mNewLink!=null){
+			if (mNewLink != null) {
 				webView.loadUrl(mNewLink);
-			}else if (bahtml!=null){
+			} else if (bahtml != null) {
 				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
 			}
 		}
 	}
 
-		
-	
-	
 	private void readUrl_alt() {
 
 		new Thread(new Runnable() {
@@ -1331,81 +1176,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 
 	boolean mNavVisible = true;
 
-	// OLD
-	void setNavVisibility(boolean visible) {
-		if (mNavVisible == visible) {
-			return;
-		}
-		mNavVisible = visible;
-		if (!visible) {
-			getActionBar().hide();
-		} else {
-			getActionBar().show();
-		}
-	}
-
-	// // NEW setNavVisibility
-	// // API 16
-	// int mBaseSystemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
-	// int mLastSystemUiVis;
-	//
-	// Runnable mNavHider = new Runnable() {
-	// @Override
-	// public void run() {
-	// setNavVisibility(false);
-	// }
-	// };
-	//
-	// @SuppressLint("InlinedApi")
-	// final void setNavVisibilityNew(boolean visible) {
-	// System.out.println("webView.getSystemUiVisibility:" + webView.getSystemUiVisibility());
-	// int newVis = mBaseSystemUiVisibility;
-	// if (!visible) {
-	// // API 14
-	// newVis |= View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE;
-	// }
-	// final boolean changed = newVis == webView.getSystemUiVisibility();
-	//
-	// // Unschedule any pending event to hide navigation if we are
-	// // changing the visibility, or making the UI visible.
-	// if (changed || visible) {
-	// Handler h = webView.getHandler();
-	// if (h != null) {
-	// h.removeCallbacks(mNavHider);
-	// }
-	// }
-	//
-	// // Set the new desired visibility.
-	// webView.setSystemUiVisibility(newVis);
-	// // // mTitleView.setVisibility(visible ? VISIBLE : INVISIBLE);
-	// }
-	//
-	// public void setWebViewListener() {
-	// webView.setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
-	//
-	// @Override
-	// public void onSystemUiVisibilityChange(int visibility) {
-	// // Detect when we go out of low-profile mode, to also go out
-	// // of full screen. We only do this when the low profile mode
-	// // is changing from its last state, and turning off.
-	// int diff = mLastSystemUiVis ^ visibility;
-	// mLastSystemUiVis = visibility;
-	// if ((diff & View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0 && (visibility & View.SYSTEM_UI_FLAG_LOW_PROFILE) == 0) {
-	// setNavVisibility(true);
-	// }
-	// }
-	//
-	// });
-	//
-	// // //zieht nciht -> onSingleTapUp
-	// // webView.setOnClickListener(new OnClickListener() {
-	// // public void onClick(View view) {
-	// // // When the user clicks, we toggle the visibility of navigation elements.
-	// // int curVis = webView.getSystemUiVisibility();
-	// // setNavVisibility((curVis&View.SYSTEM_UI_FLAG_LOW_PROFILE) != 0);
-	// // }
-	// // });
-	// }
 
 	private int mIntScalePercent = 50; // 0..100
 	// mSeekBar.setProgress(intLaufzeitPercent);
@@ -1424,7 +1194,6 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 	public void onStartTrackingTouch(SeekBar seekBar) {
 	}
 
-	@SuppressLint("NewApi")
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
 		setZoomsScale();
@@ -1434,6 +1203,8 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 	public static final String PREFERENCE_SCALE = "preference_scale_readability";
 	public final static String PREFS_NAME = "de.bernd.sparse.rss.preferences";
 
+	
+	// Scale the Text
 	private void showSeekBarDialog() {
 		View view = getLayoutInflater().inflate(R.layout.entry_seek_bar, null);
 		mSeekBar = (SeekBar) view.findViewById(R.id.seekBar);
@@ -1527,27 +1298,112 @@ public class EntryActivity extends Activity implements android.widget.SeekBar.On
 
 	}
 
-	@SuppressLint("NewApi")
 	public void setHomeButtonActive() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			getActionBar().setHomeButtonEnabled(true);
-			//durchsichtige Actionbar
-			ActionBar actionBar = getActionBar();
-//			actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#330000ff")));
-//			actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#550000ff")));
-			actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
-
+		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
+		actionBar7.setHideOnContentScrollEnabled(true);
+		actionBar7.setHomeButtonEnabled(true);
+		// durchsichtige Actionbar
+		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+		android.app.ActionBar actionBar = getActionBar();
+		if (actionBar != null) {
+			actionBar.hide(); //immer weil doppelt...
 		}
+
+		//Up Button, funkt per Default automatisch
+        int flags = 0;
+        flags = ActionBar.DISPLAY_HOME_AS_UP|ActionBar.DISPLAY_SHOW_TITLE;
+        int change = actionBar7.getDisplayOptions() ^ flags;
+        actionBar7.setDisplayOptions(change, flags);
+
+        
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
+		case android.R.id.home: {
 			finish();
 			return true;
 		}
+		case R.id.menu_markasread: {
+			finish();
+			break;
+		}
+		case R.id.url_button: {
+			if (link != null) {
+				// if (link.endsWith("feed/atom/")) {
+				// link = link.substring(0, link.length() - "feed/atom/".length());
+				// }
+				// Browser öffnen
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+			}
+			break;
+		}
+		case R.id.menu_instapaper: {
+			if (link != null) {
+				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
+
+				loadInstapaper();
+			}
+			break;
+		}
+
+		case R.id.menu_feed: {
+			_id = null;
+			reload();
+			// readUrl(); // TODO ???
+			break;
+		}
+
+		case R.id.menu_mobilize: {
+			loadMoblize();
+			break;
+		}
+
+		case R.id.menu_readability: {
+			loadReadability();
+			break;
+		}
+
+		// case R.id.menu_webview: {
+		// loadWebview();
+		// break;
+		// }
+
+		case R.id.menu_copytoclipboard: {
+			if (link != null) {
+				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
+			}
+			break;
+		}
+		// case R.id.menu_delete: {
+		// getContentResolver().delete(uri, null, null);
+		// if (localPictures) {
+		// FeedData.deletePicturesOfEntry(_id);
+		// }
+		//
+		// if (nextButton.isEnabled()) {
+		// nextButton.performClick();
+		// } else {
+		// if (previousButton.isEnabled()) {
+		// previousButton.performClick();
+		// } else {
+		// finish();
+		// }
+		// }
+		// break;
+		// }
+		case R.id.menu_share: {
+			if (link != null) {
+				startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, link).setType(TEXTPLAIN), getString(R.string.menu_share)));
+			}
+			break;
+		}
+		case R.id.menu_text_scale: {
+			showSeekBarDialog();
+		}
+			break;
+		}
 		return super.onOptionsItemSelected(item);
 	}
-
 }

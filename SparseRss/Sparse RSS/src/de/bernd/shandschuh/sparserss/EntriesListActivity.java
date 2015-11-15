@@ -106,13 +106,6 @@ public class EntriesListActivity extends ListActivity {
 			cursor.close();
 		}
 
-		if (!MainTabActivity.POSTGINGERBREAD && iconBytes != null && iconBytes.length > 0) { // we cannot insert the icon here because it would be overwritten, but we have to
-																								// reserve the icon here
-			if (!requestWindowFeature(Window.FEATURE_LEFT_ICON)) {
-				iconBytes = null;
-			}
-		}
-
 		setContentView(R.layout.entries);
 
 		uri = intent.getData();
@@ -131,11 +124,7 @@ public class EntriesListActivity extends ListActivity {
 					bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
 				}
 
-				if (MainTabActivity.POSTGINGERBREAD) {
-					CompatibilityHelper.setActionBarDrawable(this, new BitmapDrawable(bitmap));
-				} else {
-					setFeatureDrawable(Window.FEATURE_LEFT_ICON, new BitmapDrawable(bitmap));
-				}
+//				setFeatureDrawable(Window.FEATURE_LEFT_ICON, new BitmapDrawable(bitmap));
 			}
 		}
 		if (RSSOverview.notificationManager != null) {

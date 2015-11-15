@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--  
     <item android:id="@+id/menu_markasread"
     	android:icon="@android:drawable/ic_menu_revert"
         android:title="@string/contextmenu_markasread"
@@ -10,12 +11,14 @@
         android:icon="@android:drawable/ic_menu_view"
         android:title="@string/contextmenu_browser"
 		android:showAsAction="always"/>
+-->		
     
   	<item android:id="@+id/menu_readability"
-        android:icon="@drawable/readability1"
-        android:title="Readability" 
+        android:icon="@drawable/readability_400"
+        android:title="Readability"
+        android:visible="false" 
         android:showAsAction="always"/>
-		
+        
     <item android:id="@+id/menu_mobilize"
         android:icon="@android:drawable/ic_menu_zoom"
         android:title="Mobilize" 
