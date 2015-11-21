@@ -55,12 +55,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
@@ -82,7 +82,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -182,6 +181,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private ViewFlipper viewFlipper;
 
 	private ImageButton nextButton;
+	private ImageButton markAsReadButton;
+	private ImageButton readabilityButton;
 
 	private ImageButton urlButton;
 
@@ -229,19 +230,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		super.onCreate(savedInstanceState);
 
+//		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+//		setProgressBarIndeterminateVisibility(true);
+		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setSupportProgressBarIndeterminateVisibility(true);
+
+		// Hide on content scroll requires an overlay action bar, so request one
+		// supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
+		supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
+
 		setContentView(R.layout.entry);
-		
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
-		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
-		zeigeProgressBar(true);
-		
+
 		mActivity = this;
 
 		int titleId = -1;
 
 //		 canShowIcon = requestWindowFeature(Window.FEATURE_LEFT_ICON);
-		canShowIcon = false; // geht eh nicht mehr...
+		canShowIcon = true;
 
 		titleId = android.R.id.title;
 
@@ -289,6 +294,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 
 		nextButton = (ImageButton) findViewById(R.id.next_button);
+		markAsReadButton = (ImageButton) findViewById(R.id.menu_markasread2);
+		readabilityButton = (ImageButton) findViewById(R.id.menu_readability2);
 		urlButton = (ImageButton) findViewById(R.id.url_button);
 		urlButton.setAlpha(BUTTON_ALPHA + 30);
 		previousButton = (ImageButton) findViewById(R.id.prev_button);
@@ -296,8 +303,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		playButton.setAlpha(BUTTON_ALPHA);
 
 		// verbergen
-		findViewById(R.id.button_layout).setVisibility(View.GONE);
-		findViewById(R.id.entry_date_layout).setVisibility(View.GONE);
+//		findViewById(R.id.button_layout).setVisibility(View.GONE);
+//		findViewById(R.id.entry_date_layout).setVisibility(View.GONE);
 
 		viewFlipper = (ViewFlipper) findViewById(R.id.content_flipper);
 
@@ -327,7 +334,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		webView0 = new WebView(this);
 		webView0.setOnKeyListener(onKeyEventListener);
-
+		
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		final boolean gestures = preferences.getBoolean(Strings.SETTINGS_GESTURESENABLED, true);
@@ -383,8 +390,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		        final ActionBar bar = mActivity.getSupportActionBar();
                 if (bar.isShowing()) {
                     bar.hide();
+                    findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
+                    playButton.setVisibility(View.VISIBLE);
                 } else {
                     bar.show();
+                    findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
+                    playButton.setVisibility(View.VISIBLE);
                 }
 				return false;
 			}
@@ -419,7 +430,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
 
 		setZoomsScale();
-		MyWebViewClient myWebViewClient = new MyWebViewClient();
+		MyWebViewClient myWebViewClient = new MyWebViewClient(){
+			public void onPageFinished(WebView view, String url) {
+				view.scrollTo(0,0);
+			};
+		};
+
 		webView.setWebViewClient(myWebViewClient);
 		webView0.setWebViewClient(myWebViewClient);
 
@@ -436,6 +452,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			loadWebview();
 		}
 		setHomeButtonActive();
+		
+		markAsReadButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
+		
+		readabilityButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				loadReadability();
+			}
+		});
+		
 		// setWebViewListener();
 	}// onCreate
 
@@ -449,12 +482,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void loadWebview() {
-		zeigeProgressBar(true);
 		webView.loadUrl(link);
 	}
 
 	private void loadReadability() {
-		zeigeProgressBar(true);
 		webView.loadUrl("http://www.readability.com/m?url=" + link);
 	}
 
@@ -466,7 +497,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void loadMoblize() {
-		zeigeProgressBar(true);
 		readUrl();
 	}
 
@@ -892,7 +922,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public String mNewLink = null;
 
 	private void readUrl() {
-		zeigeProgressBar(true);
+		setProgressBarIndeterminateVisibility(true);
 		new AsyncReadUrl().execute();
 	}
 
@@ -1233,15 +1263,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		@Override
 		public void onPageFinished(WebView view, String url) {
 			// animate(view);
-			zeigeProgressBar(false);
+			setProgressBarIndeterminateVisibility(false);
 			view.setVisibility(View.VISIBLE);
 			super.onPageFinished(view, url);
 		}
 	}
 
 	int mAnimationDirection = android.R.anim.slide_out_right;
-
-	private ProgressBar progressBar;
 
 	private void animate(final WebView view) {
 		Animation anim = AnimationUtils.loadAnimation(getBaseContext(), mAnimationDirection);
@@ -1251,7 +1279,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private void switchEntry(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
 
 		// webView.setVisibility(View.GONE);
-		zeigeProgressBar(true);
+		setProgressBarIndeterminateVisibility(true);
 
 		uri = parentUri.buildUpon().appendPath(id).build();
 		getIntent().setData(uri);
@@ -1298,12 +1326,20 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			viewFlipper.showNext();
 			viewFlipper.removeViewAt(0);
 		}
-
+		
+//		new Handler().postDelayed(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                webView.scrollTo(0,0);
+//                System.out.println("Scrolled");
+//            }
+//        }, 1000);
 	}
 
 	public void setHomeButtonActive() {
 		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
-//		actionBar7.setHideOnContentScrollEnabled(true); //knallt mit Toolbar
+		actionBar7.setHideOnContentScrollEnabled(true);
 		actionBar7.setHomeButtonEnabled(true);
 		// durchsichtige Actionbar
 		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
@@ -1328,7 +1364,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			finish();
 			return true;
 		}
-		case R.id.menu_markasread: {
+		case R.id.menu_markasread:
+		case R.id.menu_markasread2: {
 			finish();
 			break;
 		}
@@ -1408,13 +1445,5 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			break;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-	
-	private void zeigeProgressBar(boolean zeigen){
-		if(zeigen){
-			progressBar.setVisibility(View.VISIBLE); 
-		}else{
-			progressBar.setVisibility(View.INVISIBLE);  
-		}
 	}
 }

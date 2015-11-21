@@ -1,6 +1,27 @@
 <resources>
-    <style name="Theme.Light" parent="android:Theme.Light"/>
-    <style name="ButtonBar" parent="android:ButtonBar"/>
-    <style name="Theme.Dialog" parent="@android:style/Theme.Dialog"/>
-    <style name="Widget.Button.Dialog" parent="@android:style/Widget.Button"/>
+
+    <style name="Theme.Light" parent="android:Theme.Light" />
+
+    <style name="ButtonBar" parent="android:ButtonBar" />
+
+    <style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
+
+    <style name="Widget.Button.Dialog" parent="@android:style/Widget.Button" />
+
+    <!-- http://stackoverflow.com/questions/27115455/unable-to-get-appcompat-actionbar-toolbar-to-become-an-overlay -->
+    <style name="CustomActionBar" parent="@style/ThemeOverlay.AppCompat.Light">
+        <item name="android:windowActionBarOverlay">true</item>
+        <!-- Support library compatibility -->
+        <item name="windowActionBarOverlay">true</item>
+    </style>
+
+    <style name="Theme.ArgleBargle" parent="@style/Theme.AppCompat.Light">
+        <item name="windowActionBar">false</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
 </resources>

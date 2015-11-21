@@ -1,99 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <android.support.v4.widget.NestedScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        >
-        
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
-    
-    <include layout="@layout/toolbar"/>
-
-    <LinearLayout
-        android:id="@+id/entry_date_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="4pt"
-        >
-
-        <TextView
-            android:id="@+id/entry_date"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_gravity="fill"
-            android:layout_weight="1"
-            android:autoLink="email"
-            android:paddingTop="2pt" />
-
-        <ImageView
-            android:id="@android:id/icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@android:drawable/title_bar" />
-
-    <RelativeLayout
-        android:id="@+id/entry_content"
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_gravity="fill"
-        android:layout_weight="1"
-        tools:ignore="NewApi" >
-
-        <ViewFlipper
-            android:id="@+id/content_flipper"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            />
+        android:scrollbars="vertical" >
 
         <LinearLayout
-            android:id="@+id/button_layout"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:orientation="horizontal" >
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
 
-            <ImageButton
-                android:id="@+id/prev_button"
-                android:layout_width="70dp"
-                android:layout_height="fill_parent"
-                android:background="#7C000000"
-                android:src="@android:drawable/ic_media_previous" />
-
-            <ImageButton
-                android:id="@+id/url_button"
-                android:layout_width="0dip"
+            <LinearLayout
+                android:id="@+id/entry_date_layout"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:paddingLeft="4pt" >
+
+                <TextView
+                    android:id="@+id/entry_date"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="fill"
+                    android:layout_weight="1"
+                    android:autoLink="email"
+                    android:paddingTop="2pt" />
+
+                <ImageView
+                    android:id="@android:id/icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="52dp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:drawable/title_bar" />
+
+            <RelativeLayout
+                android:id="@+id/entry_content"
+                android:layout_width="fill_parent"
+                android:layout_height="0dip"
                 android:layout_gravity="fill"
                 android:layout_weight="1"
-                android:background="#7C000000"
-                android:src="@android:drawable/ic_menu_view" />
+                tools:ignore="NewApi" >
 
-            <ImageButton
-                android:id="@+id/play_button"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:background="#7C000000"
-                android:src="@android:drawable/ic_media_play" />
-
-            <ImageButton
-                android:id="@+id/next_button"
-                android:layout_width="70dp"
-                android:layout_height="fill_parent"
-                android:background="#7C000000"
-                android:src="@android:drawable/ic_media_next" />
+                <ViewFlipper
+                    android:id="@+id/content_flipper"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" />
+            </RelativeLayout>
         </LinearLayout>
-    </RelativeLayout>
+    </android.support.v4.widget.NestedScrollView>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
 
-</android.support.v4.widget.NestedScrollView>
+        <ImageButton
+            android:id="@+id/prev_button"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:background="#7C000000"
+            android:src="@android:drawable/ic_media_previous" />
+
+        <ImageButton
+            android:id="@+id/url_button"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:layout_weight="1"
+            android:background="#7C000000"
+            android:src="@android:drawable/ic_menu_view" />
+
+        <ImageButton
+            android:id="@+id/play_button"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:background="#7C000000"
+            android:src="@android:drawable/ic_media_play" />
+
+        <ImageButton
+            android:id="@+id/menu_readability2"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:background="#7C000000"
+            android:src="@android:drawable/ic_menu_gallery" />
+        
+        <ImageButton
+            android:id="@+id/menu_markasread2"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:background="#7C000000"
+            android:src="@android:drawable/ic_menu_revert" />
+        
+        <ImageButton
+            android:id="@+id/next_button"
+            android:layout_width="80dp"
+            android:layout_height="50dp"
+            android:background="#7C000000"
+            android:src="@android:drawable/ic_media_next" />
+    </LinearLayout>
+
+</RelativeLayout>
