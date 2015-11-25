@@ -38,6 +38,8 @@ import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -96,6 +98,10 @@ public class MainTabActivity extends TabActivity {
 		
 		// We need to display progress information
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		
+		if (isLightTheme(this)) {
+			getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+		}
 		
 		setContentView(R.layout.tabs);
 		INSTANCE = this;

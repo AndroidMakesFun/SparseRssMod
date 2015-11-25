@@ -35,8 +35,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.ClipboardManager;
@@ -87,6 +89,9 @@ public class EntriesListActivity extends ListActivity {
 		}
 
 		super.onCreate(savedInstanceState);
+		if (MainTabActivity.isLightTheme(this)) {
+			getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+		}
 
 		String title = null;
 
@@ -239,16 +244,20 @@ public class EntriesListActivity extends ListActivity {
 		return true;
 	}
 
+	public void clickMarkAsRead(View view) { 
+		new Thread() { // the update process takes some time
+			public void run() {
+				getContentResolver().update(uri, RSSOverview.getReadContentValues(), null, null);
+			}
+		}.start();
+		entriesListAdapter.markAsRead();
+		finish();
+	}
+	
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_markasread: {
-			new Thread() { // the update process takes some time
-				public void run() {
-					getContentResolver().update(uri, RSSOverview.getReadContentValues(), null, null);
-				}
-			}.start();
-			entriesListAdapter.markAsRead();
-			finish();
+			clickMarkAsRead(null);
 			break;
 		}
 		case R.id.menu_markasunread: {

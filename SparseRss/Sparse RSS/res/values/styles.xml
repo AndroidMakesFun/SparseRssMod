@@ -1,12 +1,20 @@
 <resources>
 
-    <style name="Theme.Light" parent="android:Theme.Light" />
+    <style name="Theme.Light" parent="android:Theme.Light">
+    </style>
 
-    <style name="ButtonBar" parent="android:ButtonBar" />
-
+    
+    
     <style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
 
     <style name="Widget.Button.Dialog" parent="@android:style/Widget.Button" />
+
+    <!-- unused -->
+    <style name="ButtonBar" parent="android:ButtonBar" />
+
+    <style name="MyButtonBar" parent="ButtonBar">
+        <item name="background">@color/my_mid_light_grey</item>
+    </style>
 
     <!-- http://stackoverflow.com/questions/27115455/unable-to-get-appcompat-actionbar-toolbar-to-become-an-overlay -->
     <style name="CustomActionBar" parent="@style/ThemeOverlay.AppCompat.Light">

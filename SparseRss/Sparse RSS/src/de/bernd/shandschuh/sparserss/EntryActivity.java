@@ -40,6 +40,7 @@ import org.jsoup.select.Elements;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.NotificationManager;
+import android.app.PendingIntent.OnFinished;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -55,12 +56,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
@@ -75,13 +75,13 @@ import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -188,8 +188,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	private ImageButton previousButton;
 
-	private ImageButton playButton;
-
 	int scrollX;
 
 	int scrollY;
@@ -232,21 +230,26 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 //		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 //		setProgressBarIndeterminateVisibility(true);
-		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setSupportProgressBarIndeterminateVisibility(true);
+//		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+//		setSupportProgressBarIndeterminateVisibility(true);
 
 		// Hide on content scroll requires an overlay action bar, so request one
 		// supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
-		supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
+//		supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
 
 		setContentView(R.layout.entry);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
+		zeigeProgressBar(true);
 
 		mActivity = this;
 
 		int titleId = -1;
 
 //		 canShowIcon = requestWindowFeature(Window.FEATURE_LEFT_ICON);
-		canShowIcon = true;
+		canShowIcon = false;
 
 		titleId = android.R.id.title;
 
@@ -286,6 +289,14 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			link = entryCursor.getString(linkPosition);
 			link = fixLink(link);
 			timestamp = entryCursor.getLong(datePosition);
+			
+			//hierher kopiert - tilte immer ermitteln
+			Date date = new Date(timestamp);
+
+			StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date)).append(' ').append(DateFormat.getTimeFormat(this).format(date));
+
+			String txtTitel = entryCursor.getString(titlePosition);
+			((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
 		}
 
 		entryCursor.close();
@@ -295,18 +306,18 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		nextButton = (ImageButton) findViewById(R.id.next_button);
 		markAsReadButton = (ImageButton) findViewById(R.id.menu_markasread2);
+		markAsReadButton.setAlpha(BUTTON_ALPHA );
 		readabilityButton = (ImageButton) findViewById(R.id.menu_readability2);
 		urlButton = (ImageButton) findViewById(R.id.url_button);
 		urlButton.setAlpha(BUTTON_ALPHA + 30);
 		previousButton = (ImageButton) findViewById(R.id.prev_button);
-		playButton = (ImageButton) findViewById(R.id.play_button);
-		playButton.setAlpha(BUTTON_ALPHA);
 
 		// verbergen
 //		findViewById(R.id.button_layout).setVisibility(View.GONE);
 //		findViewById(R.id.entry_date_layout).setVisibility(View.GONE);
 
 		viewFlipper = (ViewFlipper) findViewById(R.id.content_flipper);
+		nestedScrollView = (View) findViewById(R.id.nested_scroll_view);
 
 		layoutParams = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 
@@ -391,11 +402,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                 if (bar.isShowing()) {
                     bar.hide();
                     findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
-                    playButton.setVisibility(View.VISIBLE);
                 } else {
                     bar.show();
                     findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
-                    playButton.setVisibility(View.VISIBLE);
                 }
 				return false;
 			}
@@ -432,7 +441,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		setZoomsScale();
 		MyWebViewClient myWebViewClient = new MyWebViewClient(){
 			public void onPageFinished(WebView view, String url) {
-				view.scrollTo(0,0);
+				nestedScrollView.scrollTo(0, 0);
+				zeigeProgressBar(false);
 			};
 		};
 
@@ -482,10 +492,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void loadWebview() {
+		zeigeProgressBar(true);
 		webView.loadUrl(link);
 	}
 
 	private void loadReadability() {
+		zeigeProgressBar(true);
 		webView.loadUrl("http://www.readability.com/m?url=" + link);
 	}
 
@@ -497,6 +509,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void loadMoblize() {
+		zeigeProgressBar(true);
 		readUrl();
 	}
 
@@ -622,25 +635,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					dateStringBuilder.append(BRACKET).append(author).append(')');
 				}
 
-				((TextView) findViewById(R.id.entry_date)).setText(dateStringBuilder);
-
-				final ImageView imageView = (ImageView) findViewById(android.R.id.icon);
+//				((TextView) findViewById(R.id.entry_date)).setText(dateStringBuilder);
+				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
 
 				favorite = entryCursor.getInt(favoritePosition) == 1;
 
-				imageView.setImageResource(favorite ? android.R.drawable.star_on : android.R.drawable.star_off);
-				imageView.setOnClickListener(new OnClickListener() {
-					public void onClick(View view) {
-						// if (!viewFulscreen) {
-						favorite = !favorite;
-						imageView.setImageResource(favorite ? android.R.drawable.star_on : android.R.drawable.star_off);
-						ContentValues values = new ContentValues();
-
-						values.put(FeedData.EntryColumns.FAVORITE, favorite ? 1 : 0);
-						getContentResolver().update(uri, values, null, null);
-						// }
-					}
-				});
 				// loadData does not recognize the encoding without correct html-header
 				localPictures = abstractText.indexOf(Strings.IMAGEID_REPLACEMENT) > -1;
 
@@ -705,61 +704,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					urlButton.setAlpha(80);
 				}
 
-				final String enclosure = entryCursor.getString(enclosurePosition);
-
-				if (enclosure != null && enclosure.length() > 6 && enclosure.indexOf(IMAGE_ENCLOSURE) == -1) {
-					playButton.setVisibility(View.VISIBLE);
-					playButton.setOnClickListener(new OnClickListener() {
-						public void onClick(View v) {
-							final int position1 = enclosure.indexOf(Strings.ENCLOSURE_SEPARATOR);
-
-							final int position2 = enclosure.indexOf(Strings.ENCLOSURE_SEPARATOR, position1 + 3);
-
-							final Uri uri = Uri.parse(enclosure.substring(0, position1));
-
-							if (preferences.getBoolean(Strings.SETTINGS_ENCLOSUREWARNINGSENABLED, true)) {
-								Builder builder = new AlertDialog.Builder(EntryActivity.this);
-
-								builder.setTitle(R.string.question_areyousure);
-								builder.setIcon(android.R.drawable.ic_dialog_alert);
-								if (position2 + 4 > enclosure.length()) {
-									builder.setMessage(getString(R.string.question_playenclosure, uri,
-											position2 + 4 > enclosure.length() ? Strings.QUESTIONMARKS : enclosure.substring(position2 + 3)));
-								} else {
-									try {
-										builder.setMessage(getString(R.string.question_playenclosure, uri, (Integer.parseInt(enclosure.substring(position2 + 3)) / 1024f)
-												+ getString(R.string.kb)));
-									} catch (Exception e) {
-										builder.setMessage(getString(R.string.question_playenclosure, uri, enclosure.substring(position2 + 3)));
-									}
-								}
-								builder.setCancelable(true);
-								builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										showEnclosure(uri, enclosure, position1, position2);
-									}
-								});
-								builder.setNeutralButton(R.string.button_alwaysokforall, new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										preferences.edit().putBoolean(Strings.SETTINGS_ENCLOSUREWARNINGSENABLED, false).commit();
-										showEnclosure(uri, enclosure, position1, position2);
-									}
-								});
-								builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int which) {
-										dialog.dismiss();
-									}
-								});
-								builder.show();
-							} else {
-								showEnclosure(uri, enclosure, position1, position2);
-							}
-						}
-					});
-				} else {
-					playButton.setVisibility(View.GONE);
-				}
-				entryCursor.close();
 				setupButton(previousButton, false, timestamp);
 				setupButton(nextButton, true, timestamp);
 				webView.scrollTo(scrollX, scrollY); // resets the scrolling
@@ -773,17 +717,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		 */
 	}
 
-	private void showEnclosure(Uri uri, String enclosure, int position1, int position2) {
-		try {
-			startActivity(new Intent(Intent.ACTION_VIEW).setDataAndType(uri, enclosure.substring(position1 + 3, position2)));
-		} catch (Exception e) {
-			try {
-				startActivity(new Intent(Intent.ACTION_VIEW, uri)); // fallbackmode - let the browser handle this
-			} catch (Throwable t) {
-				Toast.makeText(EntryActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-			}
-		}
-	}
 
 	private void setupButton(ImageButton button, final boolean successor, long date) {
 		StringBuilder queryString = new StringBuilder(DATE).append(date).append(AND_ID).append(successor ? '>' : '<').append(_id).append(')').append(OR_DATE)
@@ -922,7 +855,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public String mNewLink = null;
 
 	private void readUrl() {
-		setProgressBarIndeterminateVisibility(true);
+		zeigeProgressBar(true);
 		new AsyncReadUrl().execute();
 	}
 
@@ -1263,13 +1196,17 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		@Override
 		public void onPageFinished(WebView view, String url) {
 			// animate(view);
-			setProgressBarIndeterminateVisibility(false);
+			zeigeProgressBar(false);
 			view.setVisibility(View.VISIBLE);
 			super.onPageFinished(view, url);
 		}
 	}
 
 	int mAnimationDirection = android.R.anim.slide_out_right;
+	
+	private ProgressBar progressBar;
+
+	private View nestedScrollView;
 
 	private void animate(final WebView view) {
 		Animation anim = AnimationUtils.loadAnimation(getBaseContext(), mAnimationDirection);
@@ -1279,7 +1216,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private void switchEntry(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
 
 		// webView.setVisibility(View.GONE);
-		setProgressBarIndeterminateVisibility(true);
+		zeigeProgressBar(true);
 
 		uri = parentUri.buildUpon().appendPath(id).build();
 		getIntent().setData(uri);
@@ -1339,10 +1276,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	public void setHomeButtonActive() {
 		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
-		actionBar7.setHideOnContentScrollEnabled(true);
+//		actionBar7.setHideOnContentScrollEnabled(true); //knallt mit Toolbar
 		actionBar7.setHomeButtonEnabled(true);
 		// durchsichtige Actionbar
-		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+//		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
 		android.app.ActionBar actionBar = getActionBar();
 		if (actionBar != null) {
 			actionBar.hide(); //immer weil doppelt...
@@ -1445,5 +1382,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void zeigeProgressBar(boolean zeigen){
+		if(zeigen){
+			progressBar.setVisibility(View.VISIBLE); 
+		}else{
+			progressBar.setVisibility(View.INVISIBLE);  
+		}
 	}
 }
