@@ -214,6 +214,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private EntryActivity mActivity = null;
 
 	private long timestamp;
+	
+	private boolean isFirstEntry=true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -441,7 +443,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		setZoomsScale();
 		MyWebViewClient myWebViewClient = new MyWebViewClient(){
 			public void onPageFinished(WebView view, String url) {
-				nestedScrollView.scrollTo(0, 0);
+				if(!isFirstEntry){
+					nestedScrollView.scrollTo(0, 0);
+				}
 				zeigeProgressBar(false);
 			};
 		};
@@ -459,7 +463,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		} else if (mAufrufart == AUFRUFART_READABILITY) {
 			loadReadability();
 		} else if (mAufrufart == AUFRUFART_WEBVIEW) {
-			loadWebview();
+			loadWebview(null);
 		}
 		setHomeButtonActive();
 		
@@ -479,6 +483,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			}
 		});
 		
+		isFirstEntry=true;
 		// setWebViewListener();
 	}// onCreate
 
@@ -491,9 +496,16 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 	}
 
-	private void loadWebview() {
+//	public void clickMarkAsRead(View view) {
+//	+ android:onClick="loadWebview" 
+	public void loadWebview(View view) {
 		zeigeProgressBar(true);
 		webView.loadUrl(link);
+	}
+
+	public void loadBrowser(View view) {
+		//Browser öffnen
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
 	}
 
 	private void loadReadability() {
@@ -810,11 +822,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void nextEntry(boolean animate) {
+		isFirstEntry=false;
 		mAnimationDirection = android.R.anim.slide_out_right;
 		switchEntry(_nextId, animate, Animations.SLIDE_IN_RIGHT, Animations.SLIDE_OUT_LEFT);
 	}
 
 	private void previousEntry(boolean animate) {
+		isFirstEntry=false;
 		mAnimationDirection = android.R.anim.fade_out;
 		switchEntry(_previousId, animate, Animations.SLIDE_IN_LEFT, Animations.SLIDE_OUT_RIGHT);
 	}

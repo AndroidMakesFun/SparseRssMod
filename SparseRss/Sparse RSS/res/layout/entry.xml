@@ -83,6 +83,7 @@
             android:layout_height="50dp"
             android:layout_weight="1"
 	       	android:background="#00000000"
+            android:onClick="loadBrowser"
             android:src="@android:drawable/ic_menu_view" />
 
         <ImageButton
