@@ -74,7 +74,7 @@ public class MainTabActivity extends TabActivity {
 	
 	public static boolean isLightTheme(Context context) {
 		if (LIGHTTHEME == null) {
-			LIGHTTHEME = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_LIGHTTHEME, false);
+			LIGHTTHEME = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_LIGHTTHEME, true);
 		}
 		return LIGHTTHEME;
 	}
@@ -100,7 +100,7 @@ public class MainTabActivity extends TabActivity {
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		
 		if (isLightTheme(this)) {
-			getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+//			getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
 		}
 		
 		setContentView(R.layout.tabs);

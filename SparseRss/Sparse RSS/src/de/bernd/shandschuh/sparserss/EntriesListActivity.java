@@ -90,7 +90,7 @@ public class EntriesListActivity extends ListActivity {
 
 		super.onCreate(savedInstanceState);
 		if (MainTabActivity.isLightTheme(this)) {
-			getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+//			getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
 		}
 
 		String title = null;
