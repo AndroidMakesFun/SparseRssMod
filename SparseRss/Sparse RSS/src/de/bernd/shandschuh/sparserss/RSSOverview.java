@@ -424,21 +424,23 @@ public class RSSOverview extends ListActivity {
 				break;
 			}
 			case R.id.menu_import: {
-				if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ||Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
 					final AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					
-					builder.setTitle(R.string.select_file);
+//					builder.setTitle(R.string.select_file);
+					builder.setTitle("From " + this.getExternalFilesDir("rss"));
 					
 					try {
-						final String[] fileNames = Environment.getExternalStorageDirectory().list(new FilenameFilter() {
+						final String[] fileNames = this.getExternalFilesDir("rss").list(new FilenameFilter() {
 							public boolean accept(File dir, String filename) {
 								return new File(dir, filename).isFile();
 							}
 						});
+						
+						final RSSOverview rssOverview = this;
 						builder.setItems(fileNames, new DialogInterface.OnClickListener()  {
 							public void onClick(DialogInterface dialog, int which) {
 								try {
-									OPML.importFromFile(new StringBuilder(Environment.getExternalStorageDirectory().toString()).append(File.separator).append(fileNames[which]).toString(), RSSOverview.this);
+									OPML.importFromFile(new StringBuilder(rssOverview.getExternalFilesDir("rss").toString()).append(File.separator).append(fileNames[which]).toString(), RSSOverview.this);
 								} catch (Exception e) {
 									showDialog(DIALOG_ERROR_FEEDIMPORT);
 								}
@@ -448,25 +450,18 @@ public class RSSOverview extends ListActivity {
 					} catch (Exception e) {
 						showDialog(DIALOG_ERROR_FEEDIMPORT);
 					}
-				} else {
-					showDialog(DIALOG_ERROR_EXTERNALSTORAGENOTAVAILABLE);
-				}
-				
 				break;
 			}
 			case R.id.menu_export: {
-				if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ||Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
 					try {
-						String filename = new StringBuilder(Environment.getExternalStorageDirectory().toString()).append("/sparse_rss_").append(System.currentTimeMillis()).append(".opml").toString();
+						String folder=this.getExternalFilesDir("rss").toString();
+						String filename = new StringBuilder(folder).append("/sparse_rss_").append(System.currentTimeMillis()).append(".opml").toString();
 						
 						OPML.exportToFile(filename, this);
 						Toast.makeText(this, String.format(getString(R.string.message_exportedto), filename), Toast.LENGTH_LONG).show();
 					} catch (Exception e) {
 						showDialog(DIALOG_ERROR_FEEDEXPORT);
 					}
-				} else {
-					showDialog(DIALOG_ERROR_EXTERNALSTORAGENOTAVAILABLE);
-				}
 				break;
 			}
 			case R.id.menu_enablefeedsort: {
