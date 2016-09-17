@@ -136,6 +136,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		}
 
 		textView.setText(cursor.getString(titleColumnPosition));
+		float fsize=15.0f;
+		textView.setTextSize(fsize); // etwas größer
 
 		TextView dateTextView = (TextView) view.findViewById(android.R.id.text2);
 		

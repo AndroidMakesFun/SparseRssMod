@@ -42,7 +42,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
-import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 
 public class RSSOverviewListAdapter extends ResourceCursorAdapter {
@@ -135,6 +134,8 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 		} else {
 			updateTextView.setText(new StringBuilder(context.getString(R.string.error)).append(COLON).append(cursor.getString(errorPosition)));
 		}
+		float fsize=15.0f;
+		textView.setTextSize(fsize); // etwas größer
 		if (unreadCount > 0) {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
