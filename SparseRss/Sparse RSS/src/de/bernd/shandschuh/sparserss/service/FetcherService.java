@@ -63,6 +63,7 @@ import android.util.Xml;
 import de.bernd.shandschuh.sparserss.BASE64;
 import de.bernd.shandschuh.sparserss.MainTabActivity;
 import de.bernd.shandschuh.sparserss.R;
+import de.bernd.shandschuh.sparserss.RSSOverview;
 import de.bernd.shandschuh.sparserss.Strings;
 import de.bernd.shandschuh.sparserss.handler.RSSHandler;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
@@ -201,8 +202,10 @@ public class FetcherService extends IntentService {
 	
 	@Override
 	public void onDestroy() {
-		if (MainTabActivity.INSTANCE != null)
-			MainTabActivity.INSTANCE.setProgressBarIndeterminateVisibility(false);
+//		if (MainTabActivity.INSTANCE != null)
+//			MainTabActivity.INSTANCE.setProgressBarIndeterminateVisibility(false);
+		if(RSSOverview.INSTANCE!=null)
+			RSSOverview.INSTANCE.zeigeProgressBar(false);
 		super.onDestroy();
 	}
 	

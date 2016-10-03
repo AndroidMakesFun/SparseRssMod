@@ -30,10 +30,12 @@ import java.io.FilenameFilter;
 
 import android.app.Dialog;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -61,6 +63,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
@@ -105,24 +108,30 @@ public class RSSOverview extends AppCompatActivity  {
 	private RSSOverviewListAdapter listAdapter;
 	private ListView listview;
 	private TextView emptyview;
+	private ProgressBar progressBar;
+
+	public static RSSOverview INSTANCE;
 
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-//		if (MainTabActivity.isLightTheme(this)) {
+		if (Util.isLightTheme(this)) {
 			setTheme(R.style.MyTheme_Light);
-//		}
+		}
 		super.onCreate(savedInstanceState);
 		
 		if (notificationManager == null) {
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		}
 		setContentView(R.layout.main);
+		INSTANCE = this;
 		
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
-		setHomeButtonActive();
+//		setHomeButtonActive();
+		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
+
 
 		listview = (ListView) findViewById(android.R.id.list);
 		listAdapter = new RSSOverviewListAdapter(this);
@@ -270,9 +279,15 @@ public class RSSOverview extends AppCompatActivity  {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (RSSOverview.notificationManager != null) {
-			notificationManager.cancel(0);
-		}
+		
+//		setProgressBarIndeterminateVisibility(Util.isCurrentlyRefreshing(this));
+		zeigeProgressBar(Util.isCurrentlyRefreshing(this));
+		registerReceiver(refreshReceiver, new IntentFilter("de.bernd.shandschuh.sparserss.REFRESH"));
+
+		
+//		if (RSSOverview.notificationManager != null) {
+//			notificationManager.cancel(0);
+//		}
 	}
 
 	@Override
@@ -288,9 +303,7 @@ public class RSSOverview extends AppCompatActivity  {
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-//	public boolean onMenuItemSelected(int featureId, final MenuItem item) {
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		setFeedSortEnabled(false);
 		switch (item.getItemId()) {
@@ -672,5 +685,25 @@ public class RSSOverview extends AppCompatActivity  {
 
         
 	}
+
+	// Ersatz für setProgressBarIndeterminateVisibility
+	// public für FetcherService
+	public void zeigeProgressBar(boolean zeigen){
+		if(zeigen){
+			progressBar.setVisibility(View.VISIBLE);
+			System.out.println("zeigeProgressBar true");
+		}else{
+			progressBar.setVisibility(View.INVISIBLE);  
+			System.out.println("zeigeProgressBar false");
+		}
+	}
+
+	private BroadcastReceiver refreshReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+//			setProgressBarIndeterminateVisibility(true);
+			zeigeProgressBar(true);
+		}
+	};
 
 }
