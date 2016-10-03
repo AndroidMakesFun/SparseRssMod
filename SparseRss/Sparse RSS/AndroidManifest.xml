@@ -35,7 +35,7 @@
         android:allowClearUserData="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        		android:theme="@style/Theme.Light"
+        		android:theme="@style/MyTheme.Light"
         
         android:testOnly="false" >
         <service android:name="de.bernd.shandschuh.sparserss.service.RefreshService" />
@@ -47,20 +47,19 @@
             android:readPermission="de.bernd.shandschuh.sparserss.READFEEDS"
             android:writePermission="de.bernd.shandschuh.sparserss.WRITEFEEDS" />
 
+        
         <activity
-            android:name="de.bernd.shandschuh.sparserss.MainTabActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTask" >
+            android:name="de.bernd.shandschuh.sparserss.RSSOverview"
+            android:launchMode="singleTask" > 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="de.bernd.shandschuh.sparserss.RSSOverview"
-            android:launchMode="singleTask" />
+        
         <activity android:name="de.bernd.shandschuh.sparserss.EmptyActivity" />
+        
         <activity
             android:name="de.bernd.shandschuh.sparserss.EntriesListActivity"
             android:launchMode="singleTask" >

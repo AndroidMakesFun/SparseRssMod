@@ -28,10 +28,7 @@ package de.bernd.shandschuh.sparserss;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
-import android.app.ListActivity;
 import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -43,8 +40,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AlertDialog.Builder;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -57,6 +58,7 @@ import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -65,7 +67,7 @@ import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.OPML;
 import de.bernd.shandschuh.sparserss.service.RefreshService;
 
-public class RSSOverview extends ListActivity {
+public class RSSOverview extends AppCompatActivity  {
 	private static final int DIALOG_ERROR_FEEDIMPORT = 3;
 	
 	private static final int DIALOG_ERROR_FEEDEXPORT = 4;
@@ -101,22 +103,37 @@ public class RSSOverview extends ListActivity {
 	boolean feedSort;
 	
 	private RSSOverviewListAdapter listAdapter;
+	private ListView listview;
+	private TextView emptyview;
+
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		if (MainTabActivity.isLightTheme(this)) {
-			setTheme(R.style.Theme_Light);
-		}
+//		if (MainTabActivity.isLightTheme(this)) {
+			setTheme(R.style.MyTheme_Light);
+//		}
 		super.onCreate(savedInstanceState);
 		
 		if (notificationManager == null) {
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		}
 		setContentView(R.layout.main);
+		
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+		setHomeButtonActive();
+
+		listview = (ListView) findViewById(android.R.id.list);
 		listAdapter = new RSSOverviewListAdapter(this);
-		setListAdapter(listAdapter);
-		getListView().setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+		listview.setAdapter(listAdapter);
+		
+		emptyview = (TextView) findViewById(android.R.id.empty);
+		if(listAdapter.getCount()>0){
+			emptyview.setVisibility(View.INVISIBLE);
+		}
+
+		listview.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
 			public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
 				menu.setHeaderTitle(((TextView) ((AdapterView.AdapterContextMenuInfo) menuInfo).targetView.findViewById(android.R.id.text1)).getText());
 				menu.add(0, CONTEXTMENU_REFRESH_ID, Menu.NONE, R.string.contextmenu_refresh);
@@ -129,7 +146,7 @@ public class RSSOverview extends ListActivity {
 				menu.add(0, CONTEXTMENU_DELETE_ID, Menu.NONE, R.string.contextmenu_delete);
 			}
 		});
-		getListView().setOnTouchListener(new OnTouchListener() {
+		listview.setOnTouchListener(new OnTouchListener() {
 			private int dragedItem = -1;
 			
 			private ImageView dragedView;
@@ -140,7 +157,7 @@ public class RSSOverview extends ListActivity {
 			
 			private int minY = 25; // is the header size --> needs to be changed
 			
-			private ListView listView = getListView();
+//			private ListView listView = getListView();
 			
 			public boolean onTouch(View v, MotionEvent event) {
 				if (feedSort) {
@@ -151,11 +168,11 @@ public class RSSOverview extends ListActivity {
 						case MotionEvent.ACTION_MOVE: {
 							// this is the drag action
 							if (dragedItem == -1) {
-								dragedItem = listView.pointToPosition((int) event.getX(), (int) event.getY());
+								dragedItem =  listview.pointToPosition((int) event.getX(), (int) event.getY());
 								if (dragedItem > -1) {
-									dragedView = new ImageView(listView.getContext());
+									dragedView = new ImageView(listview.getContext());
 									
-									View item = listView.getChildAt(dragedItem - listView.getFirstVisiblePosition());
+									View item = listview.getChildAt(dragedItem - listview.getFirstVisiblePosition());
 									
 									if (item != null) {
 										View sortView = item.findViewById(R.id.sortitem);
@@ -179,7 +196,7 @@ public class RSSOverview extends ListActivity {
 									}
 								}
 							} else if (dragedView != null) {
-								layoutParams.y = Math.max(minY, Math.max(0, Math.min((int) event.getY(), listView.getHeight()-minY)));
+								layoutParams.y = Math.max(minY, Math.max(0, Math.min((int) event.getY(), listview.getHeight()-minY)));
 								windowManager.updateViewLayout(dragedView, layoutParams);
 							}
 							break;
@@ -190,16 +207,16 @@ public class RSSOverview extends ListActivity {
 							if (dragedItem > -1) {
 								windowManager.removeView(dragedView);
 								
-								int newPosition = listView.pointToPosition((int) event.getX(), (int) event.getY());
+								int newPosition = listview.pointToPosition((int) event.getX(), (int) event.getY());
 								
 								if (newPosition == -1) {
-									newPosition = listView.getCount()-1;
+									newPosition = listview.getCount()-1;
 								}
 								if (newPosition != dragedItem) {
 									ContentValues values = new ContentValues();
 									
 									values.put(FeedData.FeedColumns.PRIORITY, newPosition);
-									getContentResolver().update(FeedData.FeedColumns.CONTENT_URI(listView.getItemIdAtPosition(dragedItem)), values, null, null);
+									getContentResolver().update(FeedData.FeedColumns.CONTENT_URI(listview.getItemIdAtPosition(dragedItem)), values, null, null);
 								}
 								dragedItem = -1;
 								return true;
@@ -214,6 +231,21 @@ public class RSSOverview extends ListActivity {
 				}
 			}
 		});
+
+		listview.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				setFeedSortEnabled(false);
+				
+				Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
+				
+				intent.putExtra(FeedData.FeedColumns._ID, id);
+				startActivity(intent);
+			}
+			
+		});
+
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
 			startService(new Intent(this, RefreshService.class)); // starts the service independent to this activity
 		} else {
@@ -226,7 +258,14 @@ public class RSSOverview extends ListActivity {
 				}
 			}.start();
 		}
-	}
+		
+//		setHomeButtonActive();
+//		myActionBar().setDisplayShowTitleEnabled(false);
+//		myActionBar().setNavigationMode(android.support.v7.app.ActionBar.NAVIGATION_MODE_LIST);
+
+
+	} // onCreate
+	
 	
 	@Override
 	protected void onResume() {
@@ -251,7 +290,8 @@ public class RSSOverview extends ListActivity {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean onMenuItemSelected(int featureId, final MenuItem item) {
+//	public boolean onMenuItemSelected(int featureId, final MenuItem item) {
+	public boolean onOptionsItemSelected(final MenuItem item) {
 		setFeedSortEnabled(false);
 		switch (item.getItemId()) {
 			case R.id.menu_addfeed: {
@@ -297,7 +337,7 @@ public class RSSOverview extends ListActivity {
 						if (cursor.isNull(0) || cursor.getInt(0) == 0) {
 							thread.start();
 						} else {
-							Builder builder = new AlertDialog.Builder(this);
+							Builder builder = new AlertDialog.Builder(RSSOverview.this);
 							
 							builder.setIcon(android.R.drawable.ic_dialog_alert);
 							builder.setTitle(R.string.dialog_hint);
@@ -331,7 +371,7 @@ public class RSSOverview extends ListActivity {
 				
 				cursor.moveToFirst();
 				
-				Builder builder = new AlertDialog.Builder(this);
+				Builder builder = new AlertDialog.Builder(RSSOverview.this);
 				
 				builder.setIcon(android.R.drawable.ic_dialog_alert);
 				builder.setTitle(cursor.getString(0));
@@ -424,7 +464,7 @@ public class RSSOverview extends ListActivity {
 				break;
 			}
 			case R.id.menu_import: {
-					final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					final AlertDialog.Builder builder = new AlertDialog.Builder(RSSOverview.this);
 					
 //					builder.setTitle(R.string.select_file);
 					builder.setTitle("From " + this.getExternalFilesDir("rss"));
@@ -471,7 +511,8 @@ public class RSSOverview extends ListActivity {
 			case R.id.menu_deleteread: {
 				FeedData.deletePicturesOfFeedAsync(this, FeedData.EntryColumns.CONTENT_URI, Strings.READDATE_GREATERZERO);
 				getContentResolver().delete(FeedData.EntryColumns.CONTENT_URI, Strings.READDATE_GREATERZERO, null);
-				((RSSOverviewListAdapter) getListAdapter()).notifyDataSetChanged();
+//				((RSSOverviewListAdapter) getListAdapter()).notifyDataSetChanged();
+				listAdapter.notifyDataSetChanged();
 				break;
 			}
 			case R.id.menu_deleteallentries: {
@@ -505,15 +546,15 @@ public class RSSOverview extends ListActivity {
 		return values;
 	}
 
-	@Override
-	protected void onListItemClick(ListView listView, View view, int position, long id) {
-		setFeedSortEnabled(false);
-		
-		Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
-		
-		intent.putExtra(FeedData.FeedColumns._ID, id);
-		startActivity(intent);
-	}
+//	@Override
+//	protected void onListItemClick(ListView listView, View view, int position, long id) {
+//		setFeedSortEnabled(false);
+//		
+//		Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
+//		
+//		intent.putExtra(FeedData.FeedColumns._ID, id);
+//		startActivity(intent);
+//	}
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
@@ -537,11 +578,12 @@ public class RSSOverview extends ListActivity {
 				break;
 			}
 			case DIALOG_ABOUT: {
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(RSSOverview.this);
 				
 				builder.setIcon(android.R.drawable.ic_dialog_info);
 				builder.setTitle(R.string.menu_about);
-				MainTabActivity.INSTANCE.setupLicenseText(builder);
+				// TODO
+//				MainTabActivity.INSTANCE.setupLicenseText(builder);
 				builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.cancel();
@@ -560,7 +602,7 @@ public class RSSOverview extends ListActivity {
 	}
 	
 	private Dialog createErrorDialog(int messageId) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(RSSOverview.this);
 		
 		builder.setMessage(messageId);
 		builder.setTitle(R.string.error);
@@ -569,8 +611,9 @@ public class RSSOverview extends ListActivity {
 		return builder.create();
 	}
 	
-	private static void showDeleteAllEntriesQuestion(final Context context, final Uri uri) {
-		Builder builder = new AlertDialog.Builder(context);
+	private void showDeleteAllEntriesQuestion(final Context context, final Uri uri) {
+//		Builder builder = new AlertDialog.Builder(context);
+		Builder builder = new AlertDialog.Builder(RSSOverview.this);
 		
 		builder.setIcon(android.R.drawable.ic_dialog_alert);
 		builder.setTitle(R.string.contextmenu_deleteallentries);
@@ -597,5 +640,37 @@ public class RSSOverview extends ListActivity {
 			feedSort = enabled;
 		}
 	}
-	
+
+	public android.support.v7.app.ActionBar myActionBar() {
+		return getSupportActionBar();
+	}
+
+//	@SuppressLint("NewApi")
+//	public void setHomeButtonActive() {
+//		myActionBar().setDisplayHomeAsUpEnabled(true);
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+//			myActionBar().setHomeButtonEnabled(true);
+//		}
+//	}
+
+	public void setHomeButtonActive() {
+		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
+//		actionBar7.setHideOnContentScrollEnabled(true); //knallt mit Toolbar
+		actionBar7.setHomeButtonEnabled(true);
+		// durchsichtige Actionbar
+//		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+		android.app.ActionBar actionBar = getActionBar();
+		if (actionBar != null) {
+			actionBar.hide(); //immer weil doppelt...
+		}
+
+		//Up Button, funkt per Default automatisch
+        int flags = 0;
+        flags = ActionBar.DISPLAY_HOME_AS_UP|ActionBar.DISPLAY_SHOW_TITLE;
+        int change = actionBar7.getDisplayOptions() ^ flags;
+        actionBar7.setDisplayOptions(change, flags);
+
+        
+	}
+
 }
