@@ -84,12 +84,12 @@ public class EntriesListActivity extends ListActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		if (MainTabActivity.isLightTheme(this)) {
+		if (Util.isLightTheme(this)) {
 			setTheme(R.style.Theme_Light);
 		}
 
 		super.onCreate(savedInstanceState);
-		if (MainTabActivity.isLightTheme(this)) {
+		if (Util.isLightTheme(this)) {
 //			getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
 		}
 

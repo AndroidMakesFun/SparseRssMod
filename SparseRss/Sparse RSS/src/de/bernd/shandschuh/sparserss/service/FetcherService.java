@@ -153,7 +153,8 @@ public class FetcherService extends IntentService {
 							
 					String text = new StringBuilder().append(newCount).append(' ').append(getString(de.bernd.shandschuh.sparserss.R.string.newentries)).toString();
 					
-					Intent notificationIntent = new Intent(FetcherService.this, MainTabActivity.class);
+//					Intent notificationIntent = new Intent(FetcherService.this, MainTabActivity.class);
+					Intent notificationIntent = new Intent(FetcherService.this, RSSOverview.class);
 					
 					PendingIntent contentIntent = PendingIntent.getActivity(FetcherService.this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 							

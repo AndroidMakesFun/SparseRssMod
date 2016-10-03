@@ -131,7 +131,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
-		if (MainTabActivity.isLightTheme(context)) {
+		if (Util.isLightTheme(context)) {
 			textView.setTextColor(Color.BLACK);
 		}
 

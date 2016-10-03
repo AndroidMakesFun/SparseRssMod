@@ -37,8 +37,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.RemoteViews;
-import de.bernd.shandschuh.sparserss.MainTabActivity;
 import de.bernd.shandschuh.sparserss.R;
+import de.bernd.shandschuh.sparserss.RSSOverview;
 import de.bernd.shandschuh.sparserss.Strings;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 
@@ -88,7 +88,8 @@ public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 		
 		RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.homescreenwidget);
 		
-		views.setOnClickPendingIntent(R.id.feed_icon, PendingIntent.getActivity(context, 0, new Intent(context, MainTabActivity.class), 0));
+//		views.setOnClickPendingIntent(R.id.feed_icon, PendingIntent.getActivity(context, 0, new Intent(context, MainTabActivity.class), 0));
+		views.setOnClickPendingIntent(R.id.feed_icon, PendingIntent.getActivity(context, 0, new Intent(context, RSSOverview.class), 0));
 		
 		int k = 0;
 		

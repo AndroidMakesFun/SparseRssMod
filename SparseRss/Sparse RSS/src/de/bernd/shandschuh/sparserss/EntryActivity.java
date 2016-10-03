@@ -214,7 +214,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		if (MainTabActivity.isLightTheme(this)) {
+		if (Util.isLightTheme(this)) {
 			setTheme(R.style.Theme_Light);
 		}
 		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
@@ -673,7 +673,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				 * if (abstractText.indexOf('<') > -1 && abstractText.indexOf('>') > -1) { abstractText = abstractText.replace(NEWLINE, BR); }
 				 */
 
-				if (MainTabActivity.isLightTheme(this) || preferences.getBoolean(Strings.SETTINGS_BLACKTEXTONWHITE, false)) {
+				if (Util.isLightTheme(this) || preferences.getBoolean(Strings.SETTINGS_BLACKTEXTONWHITE, false)) {
 					if (fontsize > 0) {
 						webView.loadDataWithBaseURL(null,
 								new StringBuilder(CSS).append(FONTSIZE_START).append(fontsize).append(FONTSIZE_MIDDLE).append(abstractText).append(FONTSIZE_END).toString(),

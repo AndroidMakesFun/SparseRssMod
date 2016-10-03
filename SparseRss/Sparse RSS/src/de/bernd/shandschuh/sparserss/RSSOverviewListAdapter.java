@@ -40,7 +40,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
@@ -108,7 +107,7 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		TextView textView = ((TextView) view.findViewById(android.R.id.text1));
-		if (MainTabActivity.isLightTheme(context)) {
+		if (Util.isLightTheme(context)) {
 			textView.setTextColor(Color.BLACK);
 		}
 

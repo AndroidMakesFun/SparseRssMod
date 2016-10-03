@@ -42,7 +42,7 @@ import de.bernd.shandschuh.sparserss.service.RefreshService;
 public class ApplicationPreferencesActivity extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		if (MainTabActivity.isLightTheme(this)) {
+		if (Util.isLightTheme(this)) {
 			setTheme(R.style.Theme_Light);
 		}
 		super.onCreate(savedInstanceState);
@@ -66,15 +66,15 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
 			}
 		});
 		
-		preference = (Preference) findPreference(Strings.SETTINGS_SHOWTABS);
-		preference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
-			public boolean onPreferenceChange(Preference preference, Object newValue) {
-				if (MainTabActivity.INSTANCE != null ) {
-					MainTabActivity.INSTANCE.setTabWidgetVisible(Boolean.TRUE.equals(newValue));
-				}
-				return true;
-			}
-		});
+//		preference = (Preference) findPreference(Strings.SETTINGS_SHOWTABS);
+//		preference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+//			public boolean onPreferenceChange(Preference preference, Object newValue) {
+////				if (MainTabActivity.INSTANCE != null ) {
+////					MainTabActivity.INSTANCE.setTabWidgetVisible(Boolean.TRUE.equals(newValue));
+////				}
+//				return true;
+//			}
+//		});
 		
 		preference = (Preference) findPreference(Strings.SETTINGS_LIGHTTHEME);
 		preference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
