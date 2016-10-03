@@ -43,6 +43,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
@@ -292,6 +293,20 @@ public class RSSOverview extends AppCompatActivity  {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+
+		// Menues in die Toolbar, SHOW_AS_ACTION_ALWAYS zieht nur hier
+        MenuItem addFeedMenu = menu.add(0, R.id.menu_addfeed, 0, R.string.menu_addfeed); 
+        MenuItemCompat.setShowAsAction(addFeedMenu, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        addFeedMenu.setIcon(android.R.drawable.ic_menu_add);
+
+        MenuItem refreshMenu = menu.add(0, R.id.menu_refresh, 0, R.string.menu_refresh); 
+        MenuItemCompat.setShowAsAction(refreshMenu, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        refreshMenu.setIcon(android.R.drawable.ic_menu_rotate);
+
+//        MenuItem settingsMenu = menu.add(0, R.id.menu_settings, 0, R.string.menu_settings); 
+//        MenuItemCompat.setShowAsAction(settingsMenu, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+//        settingsMenu.setIcon(android.R.drawable.ic_menu_preferences);
+
 		getMenuInflater().inflate(R.menu.feedoverview, menu);
 		return true;
 	}
