@@ -32,8 +32,9 @@
 
 
     <item android:id="@+id/menu_feed"
-        android:icon="@android:drawable/ic_menu_crop"
+        android:icon="@drawable/ic_action_crop"
         android:title="Feed" 
+        android:visible="false" 
         android:showAsAction="ifRoom"/>
 
 <!--     

@@ -56,6 +56,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
@@ -612,6 +613,7 @@ public class RSSOverview extends AppCompatActivity  {
 				builder.setTitle(R.string.menu_about);
 				// TODO
 //				MainTabActivity.INSTANCE.setupLicenseText(builder);
+				setupLicenseText(builder);
 				builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.cancel();
@@ -720,5 +722,34 @@ public class RSSOverview extends AppCompatActivity  {
 			zeigeProgressBar(true);
 		}
 	};
+
+	void setupLicenseText(AlertDialog.Builder builder) {
+		View view = getLayoutInflater().inflate(R.layout.license, null);
+		
+		final TextView textView = (TextView) view.findViewById(R.id.license_text);
+		
+		textView.setTextColor(textView.getTextColors().getDefaultColor()); // disables color change on selection
+		textView.setText(new StringBuilder(getString(R.string.license_intro)).append(Strings.THREENEWLINES).append(getString(R.string.license)));
+		
+		final TextView contributorsTextView = (TextView) view.findViewById(R.id.contributors_togglebutton);
+		
+		contributorsTextView.setOnClickListener(new OnClickListener() {
+			boolean showingLicense = true;
+			
+			@Override
+			public void onClick(View view) {
+				if (showingLicense) {
+					textView.setText(R.string.contributors_list);
+					contributorsTextView.setText(R.string.license_word);
+				} else {
+					textView.setText(new StringBuilder(getString(R.string.license_intro)).append(Strings.THREENEWLINES).append(getString(R.string.license)));
+					contributorsTextView.setText(R.string.contributors);
+				}
+				showingLicense = !showingLicense;
+			}
+			
+		});
+		builder.setView(view);
+	}
 
 }

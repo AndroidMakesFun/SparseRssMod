@@ -856,6 +856,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         MenuItemCompat.setShowAsAction(readabilityItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         readabilityItem.setIcon(R.drawable.readability_400);
 
+        MenuItem feedItem = menu.add(0,R.id.menu_feed,0,"Readability");
+        MenuItemCompat.setShowAsAction(feedItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        feedItem.setIcon(R.drawable.ic_action_crop);
+
 		getMenuInflater().inflate(R.menu.entry, menu);
 		return true;
 	}
