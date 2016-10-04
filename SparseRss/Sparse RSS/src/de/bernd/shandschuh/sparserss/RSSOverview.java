@@ -114,7 +114,6 @@ public class RSSOverview extends AppCompatActivity  {
 
 	public static RSSOverview INSTANCE;
 
-	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -319,6 +318,13 @@ public class RSSOverview extends AppCompatActivity  {
 		return true;
 	}
 
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+//		return super.onContextItemSelected(item);
+		// Popup: Bearbeiten, etc.
+		return onOptionsItemSelected(item);
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		setFeedSortEnabled(false);
