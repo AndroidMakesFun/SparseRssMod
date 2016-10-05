@@ -67,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#30000000"
+        android:background="#00000000"
         android:orientation="horizontal" >
 
         <ImageButton
@@ -100,7 +100,7 @@
             android:padding="12dp"
 	       	android:background="#00000000"
 	       	android:scaleType="centerInside"
-            android:src="@drawable/readability_white" />
+            android:src="@drawable/readability_400" />
         
         <ImageButton
             android:id="@+id/next_button"
