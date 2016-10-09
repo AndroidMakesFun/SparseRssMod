@@ -7,33 +7,43 @@
 
     <include layout="@layout/toolbar" />
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical" >
-
-        <FrameLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+<!--     
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="vertical" 
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" 
+        >
+ -->
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
             android:orientation="vertical" >
 
-            <TextView
-                android:id="@android:id/empty"
+            <FrameLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:gravity="center"
-                android:text="@string/norssfeeds" />
+                android:orientation="vertical" >
 
-            <ListView
-                android:id="@android:id/list"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="fill"
-                android:background="#c0ffffff"
-                android:drawSelectorOnTop="false" />
-        </FrameLayout>
-    </LinearLayout>
+                <TextView
+                    android:id="@android:id/empty"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:text="@string/norssfeeds" />
+
+                <ListView
+                    android:id="@android:id/list"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="fill"
+                    android:background="#c0ffffff"
+                    android:drawSelectorOnTop="false" />
+            </FrameLayout>
+        </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

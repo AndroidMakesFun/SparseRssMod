@@ -1,13 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+	<include layout="@layout/toolbar"/>
+    
     <android.support.v4.widget.NestedScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+		app:layout_behavior="@string/appbar_scrolling_view_behavior" 
         android:scrollbars="vertical" >
 
         <LinearLayout
@@ -17,13 +21,13 @@
             android:layout_height="fill_parent"
             android:orientation="vertical" >
             
-            <include layout="@layout/toolbar"/>
 
             <LinearLayout
                 android:id="@+id/entry_date_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="4pt" >
+                android:paddingLeft="4pt" 
+                >
 
                 <TextView
                     android:id="@+id/entry_date"
@@ -66,7 +70,7 @@
         android:id="@+id/button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_gravity="end|bottom"
         android:background="#00000000"
         android:orientation="horizontal" >
 
@@ -110,4 +114,4 @@
             android:src="@android:drawable/ic_media_next" />
     </LinearLayout>
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>
