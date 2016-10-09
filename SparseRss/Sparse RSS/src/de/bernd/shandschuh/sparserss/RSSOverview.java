@@ -27,7 +27,7 @@ package de.bernd.shandschuh.sparserss;
 
 import java.io.File;
 import java.io.FilenameFilter;
-
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -115,6 +115,7 @@ public class RSSOverview extends AppCompatActivity  {
 	public static RSSOverview INSTANCE;
 
 	/** Called when the activity is first created. */
+	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
@@ -268,6 +269,9 @@ public class RSSOverview extends AppCompatActivity  {
 				}
 			}.start();
 		}
+		
+//		//ab api21!
+//		listview.setNestedScrollingEnabled(true);
 		
 //		setHomeButtonActive();
 //		myActionBar().setDisplayShowTitleEnabled(false);
