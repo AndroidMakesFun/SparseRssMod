@@ -41,6 +41,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.util.TypedValue;
 import android.view.ContextMenu;
@@ -53,11 +56,12 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedData.FeedColumns;
 
-public class EntriesListActivity extends ListActivity {
+public class EntriesListActivity extends AppCompatActivity {
 	private static final int CONTEXTMENU_MARKASREAD_ID = 6;
 
 	private static final int CONTEXTMENU_MARKASUNREAD_ID = 7;
@@ -82,10 +86,14 @@ public class EntriesListActivity extends ListActivity {
 
 	private byte[] iconBytes;
 
+	private ListView listview;
+	private TextView emptyview;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
-			setTheme(R.style.Theme_Light);
+//			setTheme(R.style.Theme_Light);
+			setTheme(R.style.MyTheme_Light);
 		}
 
 		super.onCreate(savedInstanceState);
@@ -112,11 +120,22 @@ public class EntriesListActivity extends ListActivity {
 		}
 
 		setContentView(R.layout.entries);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 
 		uri = intent.getData();
 
+		listview = (ListView) findViewById(android.R.id.list);
+
 		entriesListAdapter = new EntriesListAdapter(this, uri, intent.getBooleanExtra(EXTRA_SHOWFEEDINFO, false), intent.getBooleanExtra(EXTRA_AUTORELOAD, false));
-		setListAdapter(entriesListAdapter);
+		listview.setAdapter(entriesListAdapter);
+		
+		emptyview = (TextView) findViewById(android.R.id.empty);
+		if(entriesListAdapter.getCount()>0){
+			emptyview.setVisibility(View.INVISIBLE);
+		}
+
+
 
 		if (title != null) {
 			setTitle(title);
@@ -136,7 +155,7 @@ public class EntriesListActivity extends ListActivity {
 			RSSOverview.notificationManager.cancel(0);
 		}
 
-		getListView().setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+		listview.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
 			public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
 				menu.setHeaderTitle(((TextView) ((AdapterView.AdapterContextMenuInfo) menuInfo).targetView.findViewById(android.R.id.text1)).getText());
 				menu.add(0, CONTEXTMENU_MARKASREAD_ID, Menu.NONE, R.string.contextmenu_markasread).setIcon(android.R.drawable.ic_menu_manage);
@@ -145,95 +164,106 @@ public class EntriesListActivity extends ListActivity {
 				menu.add(0, CONTEXTMENU_COPYURL, Menu.NONE, R.string.contextmenu_copyurl).setIcon(android.R.drawable.ic_menu_share);
 			}
 		});
-	}
+		
+		listview.setOnItemClickListener(new OnItemClickListener() {
 
-	@Override
-	protected void onListItemClick(ListView listView, View view, int position, long id) {
-		TextView textView = (TextView) view.findViewById(android.R.id.text1);
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				TextView textView = (TextView) view.findViewById(android.R.id.text1);
 
-		textView.setTypeface(Typeface.DEFAULT);
-		textView.setEnabled(false);
-		view.findViewById(android.R.id.text2).setEnabled(false);
-		entriesListAdapter.neutralizeReadState();
+				textView.setTypeface(Typeface.DEFAULT);
+				textView.setEnabled(false);
+				view.findViewById(android.R.id.text2).setEnabled(false);
+				entriesListAdapter.neutralizeReadState();
 
-//		// AUFRUFART
-		int aufrufart = 0;
-//		Uri feedUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
-//		try {
-//			Cursor cursor = getContentResolver().query(feedUri, FeedConfigActivity.PROJECTION, null, null, null);
-//			if (cursor.moveToNext()) {
-//				aufrufart = cursor.getInt(3); // 0.. {"Feed", "Browser", "Mobilize", "Instapaper"};
-//				cursor.close();
-//			}
-//		} catch (Exception e) {
-//			Util.toastMessageLong(this, "feedUri:"+e);
-//			e.printStackTrace();
-//		}
+//				// AUFRUFART
+				int aufrufart = 0;
+//				Uri feedUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
+//				try {
+//					Cursor cursor = getContentResolver().query(feedUri, FeedConfigActivity.PROJECTION, null, null, null);
+//					if (cursor.moveToNext()) {
+//						aufrufart = cursor.getInt(3); // 0.. {"Feed", "Browser", "Mobilize", "Instapaper"};
+//						cursor.close();
+//					}
+//				} catch (Exception e) {
+//					Util.toastMessageLong(this, "feedUri:"+e);
+//					e.printStackTrace();
+//				}
 
-		// Link aus Content
-		Uri contenUri = ContentUris.withAppendedId(uri, id);
-		Cursor entryCursor = getContentResolver().query(contenUri, null, null, null, null);
-		String link = "";
-		if (entryCursor.moveToFirst()) {
-			int linkPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.LINK);
-			link = entryCursor.getString(linkPosition);
+				// Link aus Content
+				Uri contenUri = ContentUris.withAppendedId(uri, id);
+				Cursor entryCursor = getContentResolver().query(contenUri, null, null, null, null);
+				String link = "";
+				if (entryCursor.moveToFirst()) {
+					int linkPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.LINK);
+					link = entryCursor.getString(linkPosition);
 
-			int feedNr = entryCursor.getColumnIndex(FeedData.EntryColumns.FEED_ID);
-			long feedid = entryCursor.getLong(feedNr);
+					int feedNr = entryCursor.getColumnIndex(FeedData.EntryColumns.FEED_ID);
+					long feedid = entryCursor.getLong(feedNr);
 
-			
-			//mark read
-//			ContentValues values = new ContentValues();
-//			values.put(FeedData.EntryColumns.READDATE, System.currentTimeMillis());
-//			int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
-//			if (entryCursor.isNull(readDatePosition)) {
-//				getContentResolver().update(uri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
-//			}
-			entryCursor.close();
-			
-			// AUFRUFART
-//			String feedUri="content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/"+ feedid;
-			Uri feedUri = FeedColumns.CONTENT_URI(feedid);
-			try {
-				Cursor cursor = getContentResolver().query(feedUri, FeedConfigActivity.PROJECTION, null, null, null);
-				if (cursor.moveToNext()) {
-					aufrufart = cursor.getInt(3); // 0.. {"Feed", "Browser", "Mobilize", "Instapaper"};
-					cursor.close();
+					
+					//mark read
+//					ContentValues values = new ContentValues();
+//					values.put(FeedData.EntryColumns.READDATE, System.currentTimeMillis());
+//					int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
+//					if (entryCursor.isNull(readDatePosition)) {
+//						getContentResolver().update(uri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
+//					}
+					entryCursor.close();
+					
+					// AUFRUFART
+//					String feedUri="content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/"+ feedid;
+					Uri feedUri = FeedColumns.CONTENT_URI(feedid);
+					try {
+						Cursor cursor = getContentResolver().query(feedUri, FeedConfigActivity.PROJECTION, null, null, null);
+						if (cursor.moveToNext()) {
+							aufrufart = cursor.getInt(3); // 0.. {"Feed", "Browser", "Mobilize", "Instapaper"};
+							cursor.close();
+						}
+					} catch (Exception e) {
+						Util.toastMessageLong(EntriesListActivity.this, "feedUri:"+e);
+						e.printStackTrace();
+					}
+
+					
+					
+					
+					//mark read 2
+					getContentResolver().update(ContentUris.withAppendedId(uri, id), RSSOverview.getReadContentValues(), null, null);
+					entriesListAdapter.markAsRead(id);
+
+					link=EntryActivity.fixLink(link);
+					if (aufrufart == 1) {
+						// // Browser öffnen
+						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+						return;
+					}
+					if (aufrufart == 3) {
+						//Problem Lesestatus !!
+						// // Browser öffnen
+						link = "http://www.instapaper.com/m?u=" + link;
+						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+						return;
+					}
+
 				}
-			} catch (Exception e) {
-				Util.toastMessageLong(this, "feedUri:"+e);
-				e.printStackTrace();
+
+				startActivity(new Intent(Intent.ACTION_VIEW, contenUri).putExtra(EXTRA_SHOWREAD, entriesListAdapter.isShowRead()).putExtra(FeedData.FeedColumns.ICON, iconBytes)
+						.putExtra(EXTRA_AUFRUFART, aufrufart));
 			}
+		});
 
-			
-			
-			
-			//mark read 2
-			getContentResolver().update(ContentUris.withAppendedId(uri, id), RSSOverview.getReadContentValues(), null, null);
-			entriesListAdapter.markAsRead(id);
-
-			link=EntryActivity.fixLink(link);
-			if (aufrufart == 1) {
-				// // Browser öffnen
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
-				return;
-			}
-			if (aufrufart == 3) {
-				//Problem Lesestatus !!
-				// // Browser öffnen
-				link = "http://www.instapaper.com/m?u=" + link;
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
-				return;
-			}
-
-		}
-
-		startActivity(new Intent(Intent.ACTION_VIEW, contenUri).putExtra(EXTRA_SHOWREAD, entriesListAdapter.isShowRead()).putExtra(FeedData.FeedColumns.ICON, iconBytes)
-				.putExtra(EXTRA_AUFRUFART, aufrufart));
-	}
+		
+	} // onCreate
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		
+		// Menues in die Toolbar, SHOW_AS_ACTION_ALWAYS zieht nur hier
+        MenuItem markAsRead = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread); 
+        MenuItemCompat.setShowAsAction(markAsRead, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        markAsRead.setIcon(android.R.drawable.ic_menu_revert);
+		
 		getMenuInflater().inflate(R.menu.entrylist, menu);
 		return true;
 	}
@@ -254,7 +284,7 @@ public class EntriesListActivity extends ListActivity {
 		finish();
 	}
 	
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+	public boolean onMenuItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_markasread: {
 			clickMarkAsRead(null);
