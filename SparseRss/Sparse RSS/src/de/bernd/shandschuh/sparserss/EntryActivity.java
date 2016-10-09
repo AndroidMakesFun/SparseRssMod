@@ -395,14 +395,19 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			}
 
 			public boolean onSingleTapUp(MotionEvent e) {
-		        final ActionBar bar = mActivity.getSupportActionBar();
-                if (bar.isShowing()) {
-                    bar.hide();
-                    findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
-                } else {
-                    bar.show();
-                    findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
-                }
+//		        final ActionBar bar = mActivity.getSupportActionBar();
+//                if (bar.isShowing()) {
+//                    bar.hide();
+//                    findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
+//                } else {
+//                    bar.show();
+//                    findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
+//                }
+				if (mAufrufart == AUFRUFART_FEED) {
+					loadReadability();
+					return true;
+				}
+
 				return false;
 			}
 
@@ -856,7 +861,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         MenuItemCompat.setShowAsAction(readabilityItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         readabilityItem.setIcon(R.drawable.readability_400);
 
-        MenuItem feedItem = menu.add(0,R.id.menu_feed,0,"Readability");
+        MenuItem feedItem = menu.add(0,R.id.menu_feed,0,"Feed");
         MenuItemCompat.setShowAsAction(feedItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         feedItem.setIcon(R.drawable.ic_action_crop);
 
