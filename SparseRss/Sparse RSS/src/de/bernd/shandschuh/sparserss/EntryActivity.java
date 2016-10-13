@@ -395,20 +395,21 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			}
 
 			public boolean onSingleTapUp(MotionEvent e) {
-//		        final ActionBar bar = mActivity.getSupportActionBar();
-//                if (bar.isShowing()) {
-//                    bar.hide();
-//                    findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
-//                } else {
-//                    bar.show();
-//                    findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
-//                }
-				if (mAufrufart == AUFRUFART_FEED) {
-					loadReadability();
-					return true;
-				}
+		        final ActionBar bar = mActivity.getSupportActionBar();
+                if (bar.isShowing()) {
+                    bar.hide();
+                    findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
+                } else {
+                    bar.show();
+                    findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
+                }
+//				if (mAufrufart == AUFRUFART_FEED) {
+//					loadReadability();
+//					return true;
+//				}
 
-				return false;
+//				return false;
+				return true;
 			}
 
 			public void onShowPress(MotionEvent e) {
