@@ -284,6 +284,11 @@ public class EntriesListActivity extends AppCompatActivity {
 		finish();
 	}
 	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		return onMenuItemSelected(item);
+	}
+
+		
 	public boolean onMenuItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_markasread: {
@@ -379,5 +384,4 @@ public class EntriesListActivity extends AppCompatActivity {
 		}
 		return true;
 	}
-
 }

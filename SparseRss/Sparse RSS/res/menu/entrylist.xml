@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:id="@+id/menu_group_0">
-        <item android:id="@+id/menu_markasread"
-            android:icon="@android:drawable/ic_menu_revert"
-            android:title="@string/contextmenu_markasread"
-            android:showAsAction="ifRoom"/>
         
         <item android:id="@+id/menu_markasunread"
             android:icon="@android:drawable/ic_menu_set_as"
