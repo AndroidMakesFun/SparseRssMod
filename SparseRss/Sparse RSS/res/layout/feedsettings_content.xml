@@ -1,45 +1,60 @@
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
+    android:layout_height="wrap_content" >
+
     <LinearLayout
-        android:padding="10dip"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:orientation="vertical"
-    android:layout_width="300dp"
-    android:layout_height="300dp"
-         >
+        android:padding="10dp"
+        >
+
         <TextView
-            android:text="@string/feed_url"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="@string/feed_url" />
+
         <EditText
-            android:inputType="textUri"
-            android:hint="@string/websiteorfeed"
-            android:singleLine="true"
-            android:text=""
             android:id="@+id/feed_url"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:hint="@string/websiteorfeed"
+            android:inputType="textUri"
+            android:singleLine="true"
+            android:text="" />
+
         <TextView
-            android:text="@string/feed_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="@string/feed_title" />
+
         <EditText
-            android:hint="@string/optional"
             android:id="@+id/feed_title"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:singleLine="true"/>
+            android:hint="@string/optional"
+            android:singleLine="true" />
+
         <CheckBox
-            android:text="@string/refreshonwifionly"
+	        android:layout_margin="5dp"
             android:id="@+id/wifionlycheckbox"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"/>
-        <Spinner android:id="@+id/spinner1"
+            android:layout_height="wrap_content"
+            android:text="@string/refreshonwifionly" />
+
+        <Spinner
+	        android:layout_margin="10dp"
+            android:id="@+id/spinner1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawSelectorOnTop="true"
-            />
-        </LinearLayout>
+            android:drawSelectorOnTop="true" />
+
+        <CheckBox
+	        android:layout_margin="5dp"
+            android:id="@+id/listviewcheckbox"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="List View" />
+    </LinearLayout>
+
 </ScrollView>

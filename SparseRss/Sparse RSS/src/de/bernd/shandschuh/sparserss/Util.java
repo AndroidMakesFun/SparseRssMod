@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
@@ -64,5 +65,19 @@ public class Util {
 		}
 		return LIGHTTHEME;
 	}
-	
+
+	public static final String PREFERENCE_TEST_LIST_PREFS = "PREFERENCE_TEST_LIST_PREFS";
+
+	public static void setTestListPrefs(Context context, boolean wert) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(PREFERENCE_TEST_LIST_PREFS, wert);
+		editor.commit();
+	}
+
+	public static boolean getTestListPrefs(Context context) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		return prefs.getBoolean(PREFERENCE_TEST_LIST_PREFS, true);
+	}
+
 }

@@ -51,6 +51,7 @@ public class FeedConfigActivity extends Activity {
 	private EditText urlEditText;
 	
 	private CheckBox refreshOnlyWifiCheckBox;
+	private CheckBox listViewCheckBox;
 	
 	private Spinner spinner;
 	
@@ -66,6 +67,9 @@ public class FeedConfigActivity extends Activity {
 		nameEditText = (EditText) findViewById(R.id.feed_title);
 		urlEditText = (EditText) findViewById(R.id.feed_url);
 		refreshOnlyWifiCheckBox = (CheckBox) findViewById(R.id.wifionlycheckbox);
+		listViewCheckBox = (CheckBox) findViewById(R.id.listviewcheckbox);
+		listViewCheckBox.setChecked(Util.getTestListPrefs(getApplicationContext()));
+		
 		spinner = (Spinner) findViewById(R.id.spinner1);
 		
 	    String[] mStrings = {"Feed", "Browser", "Mobilize", "Instapaper", "Readability"};
@@ -154,6 +158,9 @@ public class FeedConfigActivity extends Activity {
 						values.put(FeedData.FeedColumns.BEIMLADEN, spinner.getSelectedItemPosition() );
 						values.put(FeedData.FeedColumns.ERROR, (String) null);
 						getContentResolver().update(getIntent().getData(), values, null, null);
+						
+						//listViewCheckBox erstmal ohne db über alle Feeds
+						Util.setTestListPrefs(getApplicationContext(), listViewCheckBox.isChecked());
 						
 						setResult(RESULT_OK);
 						finish();

@@ -17,4 +17,9 @@
             android:title="@string/menu_refresh"/>
     </group>
 
+            <item android:id="@+id/menu_markasread"
+            android:icon="@android:drawable/ic_menu_revert"
+            android:title="@string/contextmenu_markasread"
+            android:showAsAction="ifRoom"/>
+    
 </menu>

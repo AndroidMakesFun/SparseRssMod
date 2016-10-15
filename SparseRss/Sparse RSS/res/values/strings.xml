@@ -23,7 +23,7 @@
  
  Note for translators: only include the strings that differ from the 
  English version. Translations will only be included in the Sparse RSS 
- program, if they are licensed under the MIT license.
+ program, if they are licensed under the MIT license.
 -->
 <resources>
 
@@ -226,7 +226,7 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
 
-        <!-- LOG  -->
+    <!-- LOG -->
     <string name="action_log">Log</string>
     <string name="title_activity_send_log">SendLogActivity</string>
     <string name="message_subject">Android device log</string>
@@ -235,7 +235,7 @@
     <string name="failed_to_get_log_message">"Failed to get the log from the system."</string>
     <string name="main_dialog_text">"This application will attempt to collect the device log.
 The collected log will be sent using an application of your choice.
-You also will have an opportunity to see and modify the data being sent."
-	</string>
-    
+You also will have an opportunity to see and modify the data being sent."</string>
+    <string name="title_activity_recycle_list">RecycleListActivity</string>
+
 </resources>

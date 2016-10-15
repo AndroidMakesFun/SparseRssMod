@@ -27,6 +27,7 @@ package de.bernd.shandschuh.sparserss;
 
 import java.io.File;
 import java.io.FilenameFilter;
+
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -68,6 +69,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import de.bernd.shandschuh.sparserss.endlessscroll.RecycleListActivity;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.OPML;
 import de.bernd.shandschuh.sparserss.service.RefreshService;
@@ -103,7 +105,7 @@ public class RSSOverview extends AppCompatActivity  {
 	
 	private static final Uri CANGELOG_URI = Uri.parse("http://code.google.com/p/sparserss/wiki/Changelog");
 	
-	static NotificationManager notificationManager; // package scope
+	public static NotificationManager notificationManager; // package scope
 	
 	boolean feedSort;
 	
@@ -249,10 +251,16 @@ public class RSSOverview extends AppCompatActivity  {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				setFeedSortEnabled(false);
 				
-				Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
-				
-				intent.putExtra(FeedData.FeedColumns._ID, id);
-				startActivity(intent);
+				if(Util.getTestListPrefs(getApplicationContext())){
+					Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
+					intent.putExtra(FeedData.FeedColumns._ID, id);
+					startActivity(intent);
+				}else{
+					Intent intent = new Intent(getApplicationContext(), RecycleListActivity.class);
+					intent.setData(FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
+					intent.putExtra(FeedData.FeedColumns._ID, id);
+					startActivity(intent);
+				}
 			}
 			
 		});
