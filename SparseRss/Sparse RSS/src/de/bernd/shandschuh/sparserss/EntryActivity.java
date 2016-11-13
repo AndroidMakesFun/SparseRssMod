@@ -348,7 +348,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		final boolean gestures = preferences.getBoolean(Strings.SETTINGS_GESTURESENABLED, true);
 
 		@SuppressWarnings("deprecation")
-		final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
+		final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
 
 			public boolean onDown(MotionEvent e) {
 				return false;
