@@ -27,6 +27,7 @@ package de.bernd.shandschuh.sparserss;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
@@ -82,6 +83,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
+import net.etuldan.sparss.utils.ArticleTextExtractor;
+import net.etuldan.sparss.utils.HtmlUtils;
 
 public class EntryActivity extends AppCompatActivity implements android.widget.SeekBar.OnSeekBarChangeListener {
 
@@ -105,7 +108,38 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	private static final String DESC = "date desc, _id asc limit 1";
 
-	private static final String CSS = "<head><style type=\"text/css\">body {max-width: 100%}\nimg {max-width: 100%; height: auto;}\ndiv[style] {max-width: 100%;}\npre {white-space: pre-wrap;}</style></head>";
+//	private static final String CSS = "<head><style type=\"text/css\">body {max-width: 100%}\nimg {max-width: 100%; height: auto;}\ndiv[style] {max-width: 100%;}\npre {white-space: pre-wrap;}</style></head>";
+// aus /sparss/src/net/etuldan/sparss/view/EntryView.java 
+    private static final String FONT_SANS_SERIF = "font-family: sans-serif;";
+    private static final String TEXT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#000000" : "#C0C0C0";
+    private static final String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
+    private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
+    private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6" : "#383b3f";
+    private static final String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd" : "solid #303030";
+    private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
+    private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
+
+	
+    private static final String CSS = "<head><style type='text/css'> "
+            + "body {max-width: 100%; margin: 0.3cm; "+  FONT_SANS_SERIF + " color: " + TEXT_COLOR + "; background-color:" + BACKGROUND_COLOR + "; line-height: 150%} "
+            + "* {max-width: 100%; word-break: break-word}"
+            + "h1, h2 {font-weight: normal; line-height: 130%} "
+            + "h1 {font-size: 140%; margin-bottom: 0.1em} "
+            + "h2 {font-size: 120%} "
+            + "a {color: #0099CC}"
+            + "h1 a {color: inherit; text-decoration: none}"
+            + "img {height: auto} "
+            + "pre {white-space: pre-wrap;} "
+            + "blockquote {border-left: thick solid " + QUOTE_LEFT_COLOR + "; background-color:" + QUOTE_BACKGROUND_COLOR + "; margin: 0.5em 0 0.5em 0em; padding: 0.5em} "
+            + "p {margin: 0.8em 0 0.8em 0} "
+            + "p.subtitle {color: " + SUBTITLE_COLOR + "; border-top:1px " + SUBTITLE_BORDER_COLOR + "; border-bottom:1px " + SUBTITLE_BORDER_COLOR + "; padding-top:2px; padding-bottom:2px; font-weight:800 } "
+            + "ul, ol {margin: 0 0 0.8em 0.6em; padding: 0 0 0 1em} "
+            + "ul li, ol li {margin: 0 0 0.8em 0; padding: 0} "
+            + "div.button-section {padding: 0.4cm 0; margin: 0; text-align: center} "
+            + ".button-section p {margin: 0.1cm 0 0.2cm 0}"
+            + ".button-section p.marginfix {margin: 0.5cm 0 0.5cm 0}"
+            + ".button-section input, .button-section a {font-family: sans-serif-light; font-size: 100%; color: #FFFFFF; background-color: " + BUTTON_COLOR + "; text-decoration: none; border: none; border-radius:0.2cm; padding: 0.3cm} "
+            + "</style><meta name='viewport' content='width=device-width, initial-scale=1'/></head>";
 
 	private static final String FONT_START = CSS + "<body link=\"#97ACE5\" text=\"#C0C0C0\">";
 
@@ -394,23 +428,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				return false;
 			}
 
-			public boolean onSingleTapUp(MotionEvent e) {
-		        final ActionBar bar = mActivity.getSupportActionBar();
-                if (bar.isShowing()) {
-                    bar.hide();
-                    findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
-                } else {
-                    bar.show();
-                    findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
-                }
-//				if (mAufrufart == AUFRUFART_FEED) {
-//					loadReadability();
-//					return true;
-//				}
-
-//				return false;
-				return true;
-			}
+//			public boolean onSingleTapUp(MotionEvent e) {
+//		        final ActionBar bar = mActivity.getSupportActionBar();
+//                if (bar.isShowing()) {
+//                    bar.hide();
+//                    findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
+//                } else {
+//                    bar.show();
+//                    findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
+//                }
+////				if (mAufrufart == AUFRUFART_FEED) {
+////					loadReadability();
+////					return true;
+////				}
+//
+////				return false;
+//				return true;
+//			}
 
 			public void onShowPress(MotionEvent e) {
 
@@ -511,7 +545,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	private void loadReadability() {
 		zeigeProgressBar(true);
-		webView.loadUrl("http://www.readability.com/m?url=" + link);
+//		webView.loadUrl("http://www.readability.com/m?url=" + link);
+		new AsyncNewReadability().execute();
 	}
 
 	private void loadInstapaper() {
@@ -1410,4 +1445,73 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			progressBar.setVisibility(View.INVISIBLE);  
 		}
 	}
+	
+	class AsyncNewReadability extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			
+            try {
+				HttpURLConnection connection = null;
+				URL url = new URL(link);
+				connection = (HttpURLConnection)url.openConnection();
+				// connection = NetworkUtils.setupConnection(link,cookieName, cookieValue,httpAuthLoginValue, httpAuthPassValue);
+//                String mobilizedHtml = ArticleTextExtractor.extractContent(connection.getInputStream(), contentIndicator);
+				// todo bah contentIndicator ist auszug aus feed !
+                String mobilizedHtml = ArticleTextExtractor.extractContent(connection.getInputStream(), null);
+
+                if (mobilizedHtml != null) {
+                    mobilizedHtml = HtmlUtils.improveHtmlContent(mobilizedHtml, getBaseUrl(link));
+                    bahtml=mobilizedHtml;
+                }else{
+                	bahtml=null;
+                }
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			if (bahtml != null) {
+//				webView.getSettings().setJavaScriptEnabled(true);
+//				webView.getSettings().setUseWideViewPort(true);
+//				webView0.getSettings().setUseWideViewPort(true);
+
+				// Bilder auf 100% runter sizen
+			       // content is the content of the HTML or XML.
+		        String stringToAdd = "width=\"100%\" height=\"auto\" ";
+		        // Create a StringBuilder to insert string in the middle of content.
+		        StringBuilder sb = new StringBuilder(bahtml);
+		        int i = 0;
+		        int cont = 0;
+		        // Check for the "src" substring, if it exists, take the index where 
+		        // it appears and insert the stringToAdd there, then increment a counter
+		        // because the string gets altered and you should sum the length of the inserted substring
+		        while(i != -1){
+		            i = bahtml.indexOf("src", i + 1);
+		            if(i != -1) sb.insert(i + (cont * stringToAdd.length()), stringToAdd );
+		            ++cont;
+		        }
+		        bahtml=sb.toString();
+				
+				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
+			}
+		}
+	}
+
+	// aus net.etuldan.sparss.utils.NetworkUtils
+    public static String getBaseUrl(String link) {
+        String baseUrl = link;
+        int index = link.indexOf('/', 8); // this also covers https://
+        if (index > -1) {
+            baseUrl = link.substring(0, index);
+        }
+
+        return baseUrl;
+    }
+
 }

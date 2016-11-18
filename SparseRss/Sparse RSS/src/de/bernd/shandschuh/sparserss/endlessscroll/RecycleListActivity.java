@@ -59,12 +59,23 @@ public class RecycleListActivity extends AppCompatActivity {
 		entriesListAdapter = new EntriesListAdapter(this, uri, getIntent().getBooleanExtra(EXTRA_SHOWFEEDINFO, false), getIntent().getBooleanExtra(EXTRA_AUTORELOAD, false));
 		listview.setAdapter(entriesListAdapter);
 		
+//		listview.setOnScrollListener(new EndlessScrollListener() {
+//	          @Override
+//	          public boolean onLoadMore(int page, int totalItemsCount) {
+//	              // Triggered only when new data needs to be appended to the list
+//	              // Add whatever code is needed to append new items to your AdapterView
+//	              customLoadMoreDataFromApi(page); 
+//	              // or customLoadMoreDataFromApi(totalItemsCount); 
+//	              return true; // ONLY if more data is actually being loaded; false otherwise.
+//	          }
+//	        });
+		
 		emptyview = (TextView) findViewById(android.R.id.empty);
 		if(entriesListAdapter.getCount()>0){
 			emptyview.setVisibility(View.INVISIBLE);
 		}
 		if (title != null) {
-			setTitle("endless" + title);
+			setTitle("endless " + title);
 		}
 		if (iconBytes != null && iconBytes.length > 0) {
 			int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
