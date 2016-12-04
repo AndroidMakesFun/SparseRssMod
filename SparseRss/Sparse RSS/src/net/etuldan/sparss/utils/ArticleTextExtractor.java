@@ -51,6 +51,10 @@ public class ArticleTextExtractor {
         return extractContent(Jsoup.parse(input, null, ""), contentIndicator);
     }
 
+    public static String extractContent(String strInput, String contentIndicator) throws Exception {
+        return extractContent(Jsoup.parse(strInput, ""), contentIndicator);
+    }
+
     public static String extractContent(Document doc, String contentIndicator) {
         if (doc == null)
             throw new NullPointerException("missing document");
@@ -62,6 +66,20 @@ public class ArticleTextExtractor {
         Collection<Element> nodes = getNodes(doc);
         int maxWeight = 0;
         Element bestMatchElement = null;
+        
+//        for (Element entry : nodes) {
+////            for (Element child : rootEl.children()) {
+////                String text = child.text();
+//                String text = entry.text();
+//                if(text!=null){
+////                	if (text.contains(contentIndicator)){
+//                	if (text.startsWith(contentIndicator)){
+//                		System.out.println("Treffer:" + text);
+//                		return entry.toString();
+//                	}
+//                }
+//
+//        }
 
         for (Element entry : nodes) {
             int currentWeight = getWeight(entry, contentIndicator);

@@ -30,6 +30,11 @@
         android:title="@string/contextmenu_instapaper" 
         android:showAsAction="ifRoom"/>
 
+	<item android:id="@+id/menu_amp"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:title="AMP" 
+        android:showAsAction="ifRoom"/>
+	
 
     <item android:id="@+id/menu_feed"
         android:icon="@drawable/ic_action_crop"

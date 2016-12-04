@@ -60,6 +60,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
+import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.TypedValue;
@@ -83,6 +84,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
+import de.jetwick.snacktory.HtmlFetcher;
+import de.jetwick.snacktory.JResult;
 import net.etuldan.sparss.utils.ArticleTextExtractor;
 import net.etuldan.sparss.utils.HtmlUtils;
 
@@ -238,11 +241,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private static final int AUFRUFART_MOBILIZE = 2;
 	private static final int AUFRUFART_INSTAPAPER = 3;
 	private static final int AUFRUFART_READABILITY = 4;
-	private static final int AUFRUFART_WEBVIEW = 5;
+	private static final int AUFRUFART_AMP = 5;
+	private static final int AUFRUFART_WEBVIEW = 6;  // Leiche ?
 
 	private EntryActivity mActivity = null;
 
 	private long timestamp;
+	private String abstractText;
 	
 	private boolean isFirstEntry=true;
 
@@ -320,6 +325,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			link = entryCursor.getString(linkPosition);
 			link = fixLink(link);
 			timestamp = entryCursor.getLong(datePosition);
+			abstractText = entryCursor.getString(abstractPosition);
 			
 			//hierher kopiert - tilte immer ermitteln
 			Date date = new Date(timestamp);
@@ -499,6 +505,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			loadReadability();
 		} else if (mAufrufart == AUFRUFART_WEBVIEW) {
 			loadWebview(null);
+		} else if (mAufrufart == AUFRUFART_AMP) {
+			loadAmp();
 		}
 		setHomeButtonActive();
 		
@@ -547,6 +555,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		zeigeProgressBar(true);
 //		webView.loadUrl("http://www.readability.com/m?url=" + link);
 		new AsyncNewReadability().execute();
+	}
+
+	private void loadAmp() {
+		zeigeProgressBar(true);
+		new AsyncAmpRead().execute();
 	}
 
 	private void loadInstapaper() {
@@ -1290,6 +1303,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				link = entryCursor.getString(linkPosition);
 				link = fixLink(link);
 				timestamp = entryCursor.getLong(datePosition);
+				abstractText = entryCursor.getString(abstractPosition);
 			}
 			entryCursor.close();
 
@@ -1396,6 +1410,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			break;
 		}
 
+		case R.id.menu_amp: {
+			loadAmp();
+			break;
+		}
+
 		// case R.id.menu_webview: {
 		// loadWebview();
 		// break;
@@ -1452,13 +1471,104 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		protected Void doInBackground(Void... params) {
 			
             try {
+            	
+                HtmlFetcher fetcher2 = new HtmlFetcher();
+                fetcher2.setMaxTextLength(50000);
+            	JResult res = fetcher2.fetchAndExtract(link, 2000, true);
+            	String text = res.getText(); 
+            	String title = res.getTitle(); 
+            	String imageUrl = res.getImageUrl();
+
+            	if(text!=null){
+            		bahtml=text;
+            		return null;
+            	}
+
+            	
+            	
 				HttpURLConnection connection = null;
 				URL url = new URL(link);
 				connection = (HttpURLConnection)url.openConnection();
 				// connection = NetworkUtils.setupConnection(link,cookieName, cookieValue,httpAuthLoginValue, httpAuthPassValue);
+				
+                String contentIndicator = null;
+                if (!TextUtils.isEmpty(abstractText)) {
+                	abstractText = Html.fromHtml(abstractText).toString();
+                    if (abstractText.length() > 60) {
+                        contentIndicator = abstractText.substring(20, 40);
+                    }
+                }
+
+                // str für amp
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF8")); 
+
+				// baseUrl wechselt ab con.getInputStream (open?)
+				String baseUrl = connection.getURL().getProtocol() + "://" + connection.getURL().getHost();
+
+				String line = bufferedReader.readLine();
+				while (line != null) {
+					line = bufferedReader.readLine();
+					bahtml += line;
+				}
+				bufferedReader.close();
+				
+				int posAmphtml = bahtml.indexOf("\"amphtml\"");
+				if(posAmphtml>=0){
+					
+					// AMP
+					
+					int posHref = bahtml.indexOf("href=\"", posAmphtml);
+					System.out.println("posAmphtml " +posAmphtml + " " + posHref );
+					posHref=posHref+6;
+					int posEnd=bahtml.indexOf("\"", posHref);
+					String ampLink=bahtml.substring(posHref, posEnd);
+					if (ampLink.startsWith("/")){
+						mNewLink=baseUrl + ampLink;					
+					}else{
+						mNewLink=ampLink;
+					}
+					
+//	                HtmlFetcher fetcher = new HtmlFetcher();
+//	            	JResult res = fetcher.fetchAndExtract(mNewLink, 2000, true);
+//	            	String text = res.getText(); 
+//	            	String title = res.getTitle(); 
+//	            	String imageUrl = res.getImageUrl();
+//
+//	            	if(text!=null){
+//	            		bahtml=text;
+//	            		return null;
+//	            	}
+					
+					
+					url = new URL(mNewLink);
+					connection = (HttpURLConnection)url.openConnection();
+					bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF8")); 
+
+					String ampContent="";
+					line = bufferedReader.readLine();
+					while (line != null) {
+						line = bufferedReader.readLine();
+						ampContent += line;
+					}
+					bufferedReader.close();
+					
+					int posBody=ampContent.indexOf("<body>");
+					if(posBody>=0){
+						ampContent=ampContent.substring(posBody+6);
+					}
+					
+					bahtml=ampContent;
+					Util.toastMessage(EntryActivity.this, "amp");
+					return null;
+				}
+
+				
+				
+				
+
 //                String mobilizedHtml = ArticleTextExtractor.extractContent(connection.getInputStream(), contentIndicator);
-				// todo bah contentIndicator ist auszug aus feed !
-                String mobilizedHtml = ArticleTextExtractor.extractContent(connection.getInputStream(), null);
+                String mobilizedHtml = ArticleTextExtractor.extractContent(bahtml, contentIndicator);
+                
 
                 if (mobilizedHtml != null) {
                     mobilizedHtml = HtmlUtils.improveHtmlContent(mobilizedHtml, getBaseUrl(link));
@@ -1466,6 +1576,22 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                 }else{
                 	bahtml=null;
                 }
+                
+                
+//                HtmlFetcher fetcher = new HtmlFetcher();
+//            	JResult res = fetcher.fetchAndExtract(link, 5000, true);
+//            	String text = res.getText(); 
+//            	String title = res.getTitle(); 
+//            	String imageUrl = res.getImageUrl();
+//            	
+//            	if(text!=null){
+//            		bahtml=text;
+//            	}else{
+//                	bahtml=null;
+//            	}
+
+                
+                
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1499,6 +1625,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		        bahtml=sb.toString();
 				
 				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
+//				webView.loadDataWithBaseURL(mNewLink, bahtml, "text/html; charset=UTF-8", null, null);
 			}
 		}
 	}
@@ -1514,4 +1641,63 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         return baseUrl;
     }
 
+    
+	class AsyncAmpRead extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			
+            try {
+            	bahtml="";
+            	mNewLink=null;
+				HttpURLConnection connection = null;
+				URL url = new URL(link);
+				connection = (HttpURLConnection)url.openConnection();
+
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF8")); 
+
+				// baseUrl wechselt ab con.getInputStream (open?)
+				String baseUrl = connection.getURL().getProtocol() + "://" + connection.getURL().getHost();
+
+				String line = bufferedReader.readLine();
+				while (line != null) {
+					line = bufferedReader.readLine();
+					bahtml += line;
+				}
+				bufferedReader.close();
+
+				int posAmphtml = bahtml.indexOf("\"amphtml\"");
+				if(posAmphtml<0){
+					// kein AMP -> Default == reload/Feed
+					return null;
+				}
+				int posHref = bahtml.indexOf("href=\"", posAmphtml);
+				System.out.println("posAmphtml " +posAmphtml + " " + posHref );
+				posHref=posHref+6;
+				int posEnd=bahtml.indexOf("\"", posHref);
+				String ampLink=bahtml.substring(posHref, posEnd);
+				if (ampLink.startsWith("/")){
+					mNewLink=baseUrl + ampLink;					
+				}else{
+					mNewLink=ampLink;
+				}
+                
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			if (mNewLink != null) {
+				webView.loadUrl(mNewLink);
+			}else{
+				Util.toastMessage(EntryActivity.this, "No amphtml");
+				reload();
+			}
+		}
+	}
+    
 }
