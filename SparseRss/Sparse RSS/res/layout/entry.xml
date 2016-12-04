@@ -4,14 +4,61 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-	<include layout="@layout/toolbar"/>
-    
+    <!-- <include layout="@layout/toolbar"/> -->
+
+    <android.support.design.widget.AppBarLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="256dp"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" >
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="24dp" >
+
+            <ImageView
+                android:id="@+id/backdrop"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:fitsSystemWindows="true"
+                app:layout_collapseMode="parallax" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:layout_collapseMode="pin" >
+            
+                <ProgressBar
+                    android:id="@+id/progress_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:indeterminate="true"
+                    android:visibility="gone" />
+                
+            </android.support.v7.widget.Toolbar>
+            
+        </android.support.design.widget.CollapsingToolbarLayout>
+        
+    </android.support.design.widget.AppBarLayout>
+
     <android.support.v4.widget.NestedScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-		app:layout_behavior="@string/appbar_scrolling_view_behavior" 
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:scrollbars="vertical" >
 
         <LinearLayout
@@ -20,29 +67,27 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical" >
-            
 
             <LinearLayout
                 android:id="@+id/entry_date_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="4pt" 
-                >
+                android:paddingLeft="4pt" >
 
                 <TextView
                     android:id="@+id/entry_date"
-                    android:singleLine="true"
-	                android:layout_width="fill_parent"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="fill"
                     android:layout_weight="1"
-                    android:paddingTop="2pt" />
-<!-- 
-                <ImageView
+                    android:paddingTop="2pt"
+                    android:singleLine="true" />
+                <!--
+                ImageView
                     android:id="@android:id/icon"
                     android:layout_width="wrap_content"
-                    android:layout_height="52dp" />
- -->                    
+                    android:layout_height="52dp"
+                -->
             </LinearLayout>
 
             <View
@@ -78,7 +123,7 @@
             android:id="@+id/prev_button"
             android:layout_width="80dp"
             android:layout_height="50dp"
-	       	android:background="#00000000"
+            android:background="#00000000"
             android:src="@android:drawable/ic_media_previous" />
 
         <ImageButton
@@ -86,7 +131,7 @@
             android:layout_width="70dp"
             android:layout_height="50dp"
             android:layout_weight="1"
-	       	android:background="#00000000"
+            android:background="#00000000"
             android:onClick="loadBrowser"
             android:src="@android:drawable/ic_menu_view" />
 
@@ -94,23 +139,23 @@
             android:id="@+id/menu_markasread2"
             android:layout_width="80dp"
             android:layout_height="50dp"
-	       	android:background="#00000000"
+            android:background="#00000000"
             android:src="@android:drawable/ic_menu_revert" />
-        
+
         <ImageButton
             android:id="@+id/menu_readability2"
             android:layout_width="70dp"
             android:layout_height="50dp"
+            android:background="#00000000"
             android:padding="12dp"
-	       	android:background="#00000000"
-	       	android:scaleType="centerInside"
+            android:scaleType="centerInside"
             android:src="@drawable/readability_400" />
-        
+
         <ImageButton
             android:id="@+id/next_button"
             android:layout_width="80dp"
             android:layout_height="50dp"
-	       	android:background="#00000000"
+            android:background="#00000000"
             android:src="@android:drawable/ic_media_next" />
     </LinearLayout>
 

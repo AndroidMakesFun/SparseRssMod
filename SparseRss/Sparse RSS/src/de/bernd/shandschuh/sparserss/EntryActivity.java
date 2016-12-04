@@ -28,6 +28,7 @@ package de.bernd.shandschuh.sparserss;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
@@ -37,6 +38,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
+
+import com.bumptech.glide.Glide;
 
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -50,11 +53,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -79,6 +84,7 @@ import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -276,7 +282,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		setContentView(R.layout.entry);
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+
 		setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		setHomeButtonActive();
+
 		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
 		zeigeProgressBar(true);
 
@@ -334,6 +345,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 			String txtTitel = entryCursor.getString(titlePosition);
 			((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
+			collapsingToolbar.setTitle(txtTitel);
 		}
 
 		entryCursor.close();
@@ -508,7 +520,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		} else if (mAufrufart == AUFRUFART_AMP) {
 			loadAmp();
 		}
-		setHomeButtonActive();
 		
 		markAsReadButton.setOnClickListener(new OnClickListener() {
 			
@@ -897,6 +908,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.entry, menu);
 //        MenuItem markasreadItem = menu.add(R.string.contextmenu_markasread); //@string/contextmenu_markasread
         MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread); //@string/contextmenu_markasread
         MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
@@ -914,7 +926,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         MenuItemCompat.setShowAsAction(feedItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         feedItem.setIcon(R.drawable.ic_action_crop);
 
-		getMenuInflater().inflate(R.menu.entry, menu);
 		return true;
 	}
 
@@ -1272,6 +1283,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	int mAnimationDirection = android.R.anim.slide_out_right;
 	
 	private ProgressBar progressBar;
+    private CollapsingToolbarLayout collapsingToolbar;
+
 
 	private View nestedScrollView;
 
@@ -1347,7 +1360,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 //		actionBar7.setHideOnContentScrollEnabled(true); //knallt mit Toolbar
 		actionBar7.setHomeButtonEnabled(true);
 		// durchsichtige Actionbar
-//		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
 		android.app.ActionBar actionBar = getActionBar();
 		if (actionBar != null) {
 			actionBar.hide(); //immer weil doppelt...
@@ -1474,10 +1487,17 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
             	
                 HtmlFetcher fetcher2 = new HtmlFetcher();
                 fetcher2.setMaxTextLength(50000);
-            	JResult res = fetcher2.fetchAndExtract(link, 2000, true);
+            	JResult res = fetcher2.fetchAndExtract(link, 10000, true);
             	String text = res.getText(); 
             	String title = res.getTitle(); 
             	String imageUrl = res.getImageUrl();
+            	System.out.println("image " + imageUrl);
+            	
+            	collapsingToolbar.setTitle(title);
+            	
+            	if(imageUrl!=null && !"".equals(imageUrl)){
+            		mNewLink=imageUrl;
+            	}
 
             	if(text!=null){
             		bahtml=text;
@@ -1626,6 +1646,20 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				
 				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
 //				webView.loadDataWithBaseURL(mNewLink, bahtml, "text/html; charset=UTF-8", null, null);
+				
+				if(mNewLink!=null){
+					
+	                final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
+//	              Glide.with(EntryActivity.this).load(Cheeses.getRandomCheeseDrawable()).centerCrop().into(imageView);
+	                URL url;
+					try {
+						url = new URL(mNewLink);
+		                Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);;
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					}
+				}
+
 			}
 		}
 	}
