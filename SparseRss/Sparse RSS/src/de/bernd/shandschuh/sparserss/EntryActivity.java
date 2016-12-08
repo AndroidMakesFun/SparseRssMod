@@ -1317,6 +1317,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				link = fixLink(link);
 				timestamp = entryCursor.getLong(datePosition);
 				abstractText = entryCursor.getString(abstractPosition);
+
+				Date date = new Date(timestamp);
+				StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date)).append(' ').append(DateFormat.getTimeFormat(this).format(date));
+				String txtTitel = entryCursor.getString(titlePosition);
+				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
+
 			}
 			entryCursor.close();
 
@@ -1491,16 +1497,17 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
             	String text = res.getText(); 
             	String title = res.getTitle(); 
             	String imageUrl = res.getImageUrl();
-            	System.out.println("image " + imageUrl);
+//            	System.out.println("image " + imageUrl);
             	
-            	collapsingToolbar.setTitle(title);
+//            	collapsingToolbar.setTitle(title);
+            	collapsingToolbar.setTitle("");
             	
             	if(imageUrl!=null && !"".equals(imageUrl)){
             		mNewLink=imageUrl;
             	}
 
             	if(text!=null){
-            		bahtml=text;
+            		bahtml=text+ "<br>";
             		return null;
             	}
 
@@ -1627,22 +1634,22 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 //				webView.getSettings().setUseWideViewPort(true);
 //				webView0.getSettings().setUseWideViewPort(true);
 
-				// Bilder auf 100% runter sizen
-			       // content is the content of the HTML or XML.
-		        String stringToAdd = "width=\"100%\" height=\"auto\" ";
-		        // Create a StringBuilder to insert string in the middle of content.
-		        StringBuilder sb = new StringBuilder(bahtml);
-		        int i = 0;
-		        int cont = 0;
-		        // Check for the "src" substring, if it exists, take the index where 
-		        // it appears and insert the stringToAdd there, then increment a counter
-		        // because the string gets altered and you should sum the length of the inserted substring
-		        while(i != -1){
-		            i = bahtml.indexOf("src", i + 1);
-		            if(i != -1) sb.insert(i + (cont * stringToAdd.length()), stringToAdd );
-		            ++cont;
-		        }
-		        bahtml=sb.toString();
+//				// Bilder auf 100% runter sizen
+//			       // content is the content of the HTML or XML.
+//		        String stringToAdd = "width=\"100%\" height=\"auto\" ";
+//		        // Create a StringBuilder to insert string in the middle of content.
+//		        StringBuilder sb = new StringBuilder(bahtml);
+//		        int i = 0;
+//		        int cont = 0;
+//		        // Check for the "src" substring, if it exists, take the index where 
+//		        // it appears and insert the stringToAdd there, then increment a counter
+//		        // because the string gets altered and you should sum the length of the inserted substring
+//		        while(i != -1){
+//		            i = bahtml.indexOf("src", i + 1);
+//		            if(i != -1) sb.insert(i + (cont * stringToAdd.length()), stringToAdd );
+//		            ++cont;
+//		        }
+//		        bahtml=sb.toString();
 				
 				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
 //				webView.loadDataWithBaseURL(mNewLink, bahtml, "text/html; charset=UTF-8", null, null);

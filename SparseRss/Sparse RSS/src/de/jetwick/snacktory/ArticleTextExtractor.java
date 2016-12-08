@@ -315,10 +315,17 @@ public class ArticleTextExtractor {
             if (ownTextLength < 20)
                 continue;
 
+            if(ownText.startsWith("Nutzungsbedingungen Embedding ")){
+            	setScore(child,-500);
+            	setScore(rootEl,-500);
+            	return -500;
+            }
+            
             if (ownTextLength > 200)
                 weight += Math.max(50, ownTextLength / 10);
 
             if (child.tagName().equals("h1") || child.tagName().equals("h2")) {
+                addScore(child, 50); // bah komplett dazu
                 weight += 30;
             } else if (child.tagName().equals("div") || child.tagName().equals("p")) {
                 weight += calcWeightForChild(child, ownText);
@@ -327,7 +334,10 @@ public class ArticleTextExtractor {
 
                 if (child.className().toLowerCase().equals("caption"))
                     caption = child;
+            }else if (child.tagName().equals("strong")) { // bah
+                weight += 30;  // bah
             }
+
         }
 
         // use caption and image
@@ -338,7 +348,7 @@ public class ArticleTextExtractor {
             for (Element subEl : rootEl.children()) {
                 if ("h1;h2;h3;h4;h5;h6".contains(subEl.tagName())) {
                     weight += 20;
-                    addScore(subEl, 50); // bah komplett dazu
+//                    addScore(subEl, 50); // bah komplett dazu
                     
                     // headerEls.add(subEl);
                 } else if ("table;li;td;th".contains(subEl.tagName())) {
