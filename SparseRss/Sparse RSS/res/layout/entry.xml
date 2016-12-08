@@ -18,11 +18,10 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+			app:layout_scrollFlags="scroll|enterAlways"
+			app:statusBarScrim="@android:color/transparent"
             android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginEnd="64dp"
-            app:expandedTitleMarginStart="24dp" >
+            >
 
             <ImageView
                 android:id="@+id/backdrop"
