@@ -1,5 +1,7 @@
 package de.bernd.shandschuh.sparserss;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -80,4 +82,19 @@ public class Util {
 		return prefs.getBoolean(PREFERENCE_TEST_LIST_PREFS, true);
 	}
 
+	private static File imageFolder=null;
+	
+	public static File getImageFolderFile(Context context){
+		if(imageFolder!=null){
+			return imageFolder;
+		}
+		if(context == null){
+			return null;
+		}
+		imageFolder=context.getExternalFilesDir("images");
+		if(!imageFolder.exists()){
+			imageFolder.mkdir();
+		}
+		return imageFolder;
+	}
 }

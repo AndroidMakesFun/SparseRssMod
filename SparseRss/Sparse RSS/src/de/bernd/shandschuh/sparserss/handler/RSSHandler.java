@@ -49,6 +49,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import de.bernd.shandschuh.sparserss.Strings;
+import de.bernd.shandschuh.sparserss.Util;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
@@ -67,6 +68,7 @@ public class RSSHandler extends DefaultHandler {
 	private static final String TAG_ITEM = "item";
 	
 	private static final String TAG_UPDATED = "updated";
+	private static final String TAG_IMAGE = "image";  // bah
 	
 	private static final String TAG_TITLE = "title";
 	
@@ -214,7 +216,9 @@ public class RSSHandler extends DefaultHandler {
 	private StringBuilder author;
 	
 	private boolean nameTagEntered;
-	
+
+	private boolean imageTagEntered=false;
+
 	public RSSHandler(Context context) {
 		KEEP_TIME = Long.parseLong(PreferenceManager.getDefaultSharedPreferences(context).getString(Strings.SETTINGS_KEEPTIME, "4"))*86400000l;
 		this.context = context;
@@ -366,6 +370,10 @@ public class RSSHandler extends DefaultHandler {
 			}
 		} else if (TAG_NAME.equals(localName)) {
 			nameTagEntered = true;
+		} else if (TAG_IMAGE.equals(localName)) {
+			System.out.println("TAG_IMAGE ");
+			imageTagEntered=true;
+
 		}
 	}
 	
@@ -414,6 +422,11 @@ public class RSSHandler extends DefaultHandler {
 			guid.append(ch, start, length);
 		} else if (authorTagEntered && nameTagEntered) {
 			author.append(ch, start, length);
+			
+		} else if (imageTagEntered) {
+			StringBuilder test=new StringBuilder();
+			test.append(ch, start, length);
+			System.out.println("TAG_IMAGE Content " + test);
 		}
 	}
 	
@@ -474,7 +487,7 @@ public class RSSHandler extends DefaultHandler {
 								String match = matcher.group(1).replace(Strings.SPACE, Strings.URL_SPACE);
 								
 								images.add(match);
-								descriptionString = descriptionString.replace(match, new StringBuilder(Strings.FILEURL).append(FeedDataContentProvider.IMAGEFOLDER).append(Strings.IMAGEID_REPLACEMENT).append(match.substring(match.lastIndexOf('/')+1)).toString());
+								descriptionString = descriptionString.replace(match, new StringBuilder(Strings.FILEURL).append(Util.getImageFolderFile(context).toString()).append("/").append(Strings.IMAGEID_REPLACEMENT).append(match.substring(match.lastIndexOf('/')+1)).toString());
 							}
 						}
 						values.put(FeedData.EntryColumns.ABSTRACT, descriptionString);
@@ -531,21 +544,23 @@ public class RSSHandler extends DefaultHandler {
 					//insert/save
 					String entryId = context.getContentResolver().insert(feedEntiresUri, values).getLastPathSegment();
 					
+					
 					if (fetchImages) {
-						FeedDataContentProvider.IMAGEFOLDER_FILE.mkdir(); // create images dir
+						if(Util.getImageFolderFile(context)!=null){
 						for (int n = 0, i = images != null ? images.size() : 0; n < i; n++) {
 							try {
 								String match = images.get(n);
 								
 								byte[] data = FetcherService.getBytes(new URL(images.get(n)).openStream());
 								
-								FileOutputStream fos = new FileOutputStream(new StringBuilder(FeedDataContentProvider.IMAGEFOLDER).append(entryId).append(Strings.IMAGEFILE_IDSEPARATOR).append(match.substring(match.lastIndexOf('/')+1)).toString());
+								FileOutputStream fos = new FileOutputStream(new StringBuilder(Util.getImageFolderFile(context).toString()).append("/").append(entryId).append(Strings.IMAGEFILE_IDSEPARATOR).append(match.substring(match.lastIndexOf('/')+1)).toString());
 								
 								fos.write(data);
 								fos.close();
 							} catch (Exception e) {
 
 							}
+						}
 						}
 					}
 					
@@ -569,6 +584,9 @@ public class RSSHandler extends DefaultHandler {
 			nameTagEntered = false;
 		} else if (TAG_AUTHOR.equals(localName)) {
 			authorTagEntered = false;
+		} else if (TAG_IMAGE.equals(localName)) {
+			System.out.println("TAG_IMAGE END");
+			imageTagEntered=false;
 		}
 	}
 	

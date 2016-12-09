@@ -26,6 +26,7 @@
 package de.bernd.shandschuh.sparserss;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -60,6 +61,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -89,6 +91,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
+import de.bernd.shandschuh.sparserss.handler.PictureFilenameFilter;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
@@ -117,38 +120,38 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	private static final String DESC = "date desc, _id asc limit 1";
 
-//	private static final String CSS = "<head><style type=\"text/css\">body {max-width: 100%}\nimg {max-width: 100%; height: auto;}\ndiv[style] {max-width: 100%;}\npre {white-space: pre-wrap;}</style></head>";
-// aus /sparss/src/net/etuldan/sparss/view/EntryView.java 
-    private static final String FONT_SANS_SERIF = "font-family: sans-serif;";
-    private static final String TEXT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#000000" : "#C0C0C0";
-    private static final String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
-    private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
-    private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6" : "#383b3f";
-    private static final String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd" : "solid #303030";
-    private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
-    private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
+	// private static final String CSS = "<head><style type=\"text/css\">body
+	// {max-width: 100%}\nimg {max-width: 100%; height: auto;}\ndiv[style]
+	// {max-width: 100%;}\npre {white-space: pre-wrap;}</style></head>";
+	// aus /sparss/src/net/etuldan/sparss/view/EntryView.java
+	private static final String FONT_SANS_SERIF = "font-family: sans-serif;";
+	private static final String TEXT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#000000" : "#C0C0C0";
+	private static final String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
+	private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
+	private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6"
+			: "#383b3f";
+	private static final String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd"
+			: "solid #303030";
+	private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
+	private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
 
-	
-    private static final String CSS = "<head><style type='text/css'> "
-            + "body {max-width: 100%; margin: 0.3cm; "+  FONT_SANS_SERIF + " color: " + TEXT_COLOR + "; background-color:" + BACKGROUND_COLOR + "; line-height: 150%} "
-            + "* {max-width: 100%; word-break: break-word}"
-            + "h1, h2 {font-weight: normal; line-height: 130%} "
-            + "h1 {font-size: 140%; margin-bottom: 0.1em} "
-            + "h2 {font-size: 120%} "
-            + "a {color: #0099CC}"
-            + "h1 a {color: inherit; text-decoration: none}"
-            + "img {height: auto} "
-            + "pre {white-space: pre-wrap;} "
-            + "blockquote {border-left: thick solid " + QUOTE_LEFT_COLOR + "; background-color:" + QUOTE_BACKGROUND_COLOR + "; margin: 0.5em 0 0.5em 0em; padding: 0.5em} "
-            + "p {margin: 0.8em 0 0.8em 0} "
-            + "p.subtitle {color: " + SUBTITLE_COLOR + "; border-top:1px " + SUBTITLE_BORDER_COLOR + "; border-bottom:1px " + SUBTITLE_BORDER_COLOR + "; padding-top:2px; padding-bottom:2px; font-weight:800 } "
-            + "ul, ol {margin: 0 0 0.8em 0.6em; padding: 0 0 0 1em} "
-            + "ul li, ol li {margin: 0 0 0.8em 0; padding: 0} "
-            + "div.button-section {padding: 0.4cm 0; margin: 0; text-align: center} "
-            + ".button-section p {margin: 0.1cm 0 0.2cm 0}"
-            + ".button-section p.marginfix {margin: 0.5cm 0 0.5cm 0}"
-            + ".button-section input, .button-section a {font-family: sans-serif-light; font-size: 100%; color: #FFFFFF; background-color: " + BUTTON_COLOR + "; text-decoration: none; border: none; border-radius:0.2cm; padding: 0.3cm} "
-            + "</style><meta name='viewport' content='width=device-width, initial-scale=1'/></head>";
+	private static final String CSS = "<head><style type='text/css'> " + "body {max-width: 100%; margin: 0.3cm; "
+			+ FONT_SANS_SERIF + " color: " + TEXT_COLOR + "; background-color:" + BACKGROUND_COLOR
+			+ "; line-height: 150%} " + "* {max-width: 100%; word-break: break-word}"
+			+ "h1, h2 {font-weight: normal; line-height: 130%} " + "h1 {font-size: 140%; margin-bottom: 0.1em} "
+			+ "h2 {font-size: 120%} " + "a {color: #0099CC}" + "h1 a {color: inherit; text-decoration: none}"
+			+ "img {height: auto} " + "pre {white-space: pre-wrap;} " + "blockquote {border-left: thick solid "
+			+ QUOTE_LEFT_COLOR + "; background-color:" + QUOTE_BACKGROUND_COLOR
+			+ "; margin: 0.5em 0 0.5em 0em; padding: 0.5em} " + "p {margin: 0.8em 0 0.8em 0} " + "p.subtitle {color: "
+			+ SUBTITLE_COLOR + "; border-top:1px " + SUBTITLE_BORDER_COLOR + "; border-bottom:1px "
+			+ SUBTITLE_BORDER_COLOR + "; padding-top:2px; padding-bottom:2px; font-weight:800 } "
+			+ "ul, ol {margin: 0 0 0.8em 0.6em; padding: 0 0 0 1em} "
+			+ "ul li, ol li {margin: 0 0 0.8em 0; padding: 0} "
+			+ "div.button-section {padding: 0.4cm 0; margin: 0; text-align: center} "
+			+ ".button-section p {margin: 0.1cm 0 0.2cm 0}" + ".button-section p.marginfix {margin: 0.5cm 0 0.5cm 0}"
+			+ ".button-section input, .button-section a {font-family: sans-serif-light; font-size: 100%; color: #FFFFFF; background-color: "
+			+ BUTTON_COLOR + "; text-decoration: none; border: none; border-radius:0.2cm; padding: 0.3cm} "
+			+ "</style><meta name='viewport' content='width=device-width, initial-scale=1'/></head>";
 
 	private static final String FONT_START = CSS + "<body link=\"#97ACE5\" text=\"#C0C0C0\">";
 
@@ -213,6 +216,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private byte[] iconBytes;
 
 	private WebView webView;
+	private ImageView imageView;
 
 	private WebView webView0; // only needed for the animation
 
@@ -248,14 +252,14 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private static final int AUFRUFART_INSTAPAPER = 3;
 	private static final int AUFRUFART_READABILITY = 4;
 	private static final int AUFRUFART_AMP = 5;
-	private static final int AUFRUFART_WEBVIEW = 6;  // Leiche ?
+	private static final int AUFRUFART_WEBVIEW = 6; // Leiche ?
 
 	private EntryActivity mActivity = null;
 
 	private long timestamp;
 	private String abstractText;
-	
-	private boolean isFirstEntry=true;
+
+	private boolean isFirstEntry = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -270,22 +274,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		super.onCreate(savedInstanceState);
 
-//		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-//		setProgressBarIndeterminateVisibility(true);
-//		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-//		setSupportProgressBarIndeterminateVisibility(true);
+		// supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		// setProgressBarIndeterminateVisibility(true);
+		// supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		// setSupportProgressBarIndeterminateVisibility(true);
 
 		// Hide on content scroll requires an overlay action bar, so request one
 		// supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
-//		supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
+		// supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
 
 		setContentView(R.layout.entry);
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+		collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+		imageView = (ImageView) findViewById(R.id.backdrop);
 
 		setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		// getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		setHomeButtonActive();
 
 		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
@@ -295,7 +300,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		int titleId = -1;
 
-//		 canShowIcon = requestWindowFeature(Window.FEATURE_LEFT_ICON);
+		// canShowIcon = requestWindowFeature(Window.FEATURE_LEFT_ICON);
 		canShowIcon = false;
 
 		titleId = android.R.id.title;
@@ -316,7 +321,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
 		showRead = getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
 		iconBytes = getIntent().getByteArrayExtra(FeedData.FeedColumns.ICON);
-		// mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
+		// mAufrufart =
+		// getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
 		feedId = 0;
 
 		Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
@@ -337,15 +343,15 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			link = fixLink(link);
 			timestamp = entryCursor.getLong(datePosition);
 			abstractText = entryCursor.getString(abstractPosition);
-			
-			//hierher kopiert - tilte immer ermitteln
+
+			// hierher kopiert - tilte immer ermitteln
 			Date date = new Date(timestamp);
 
-			StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date)).append(' ').append(DateFormat.getTimeFormat(this).format(date));
+			StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date)).append(' ')
+					.append(DateFormat.getTimeFormat(this).format(date));
 
 			String txtTitel = entryCursor.getString(titlePosition);
 			((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
-			collapsingToolbar.setTitle(txtTitel);
 		}
 
 		entryCursor.close();
@@ -355,15 +361,15 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		nextButton = (ImageButton) findViewById(R.id.next_button);
 		markAsReadButton = (ImageButton) findViewById(R.id.menu_markasread2);
-		markAsReadButton.setAlpha(BUTTON_ALPHA );
+		markAsReadButton.setAlpha(BUTTON_ALPHA);
 		readabilityButton = (ImageButton) findViewById(R.id.menu_readability2);
 		urlButton = (ImageButton) findViewById(R.id.url_button);
 		urlButton.setAlpha(BUTTON_ALPHA + 30);
 		previousButton = (ImageButton) findViewById(R.id.prev_button);
 
 		// verbergen
-//		findViewById(R.id.button_layout).setVisibility(View.GONE);
-//		findViewById(R.id.entry_date_layout).setVisibility(View.GONE);
+		// findViewById(R.id.button_layout).setVisibility(View.GONE);
+		// findViewById(R.id.entry_date_layout).setVisibility(View.GONE);
 
 		viewFlipper = (ViewFlipper) findViewById(R.id.content_flipper);
 		nestedScrollView = (View) findViewById(R.id.nested_scroll_view);
@@ -394,81 +400,82 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		webView0 = new WebView(this);
 		webView0.setOnKeyListener(onKeyEventListener);
-		
+
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		final boolean gestures = preferences.getBoolean(Strings.SETTINGS_GESTURESENABLED, true);
 
 		@SuppressWarnings("deprecation")
-		final GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+		final GestureDetector gestureDetector = new GestureDetector(this,
+				new GestureDetector.SimpleOnGestureListener() {
 
-			public boolean onDown(MotionEvent e) {
-				return false;
-			}
+					public boolean onDown(MotionEvent e) {
+						return false;
+					}
 
-			public boolean onDoubleTap(MotionEvent e) {
-				// setNavVisibility(false);
-				finish();
-				return false;
-			}
+					public boolean onDoubleTap(MotionEvent e) {
+						// setNavVisibility(false);
+						finish();
+						return false;
+					}
 
-			public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-				if (Math.abs(velocityY) < Math.abs(velocityX)) {
-					if (gestures) {
-						if (velocityX > 800) {
-							if (previousButton.isEnabled()) {
-								previousEntry(true);
-							}
-						} else if (velocityX < -800) {
-							if (nextButton.isEnabled()) {
-								nextEntry(true);
+					public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+						if (Math.abs(velocityY) < Math.abs(velocityX)) {
+							if (gestures) {
+								if (velocityX > 800) {
+									if (previousButton.isEnabled()) {
+										previousEntry(true);
+									}
+								} else if (velocityX < -800) {
+									if (nextButton.isEnabled()) {
+										nextEntry(true);
+									}
+								}
 							}
 						}
+						return false;
 					}
-				}
-				return false;
-			}
 
-			public void onLongPress(MotionEvent e) {
+					public void onLongPress(MotionEvent e) {
 
-			}
-
-			public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-				if (distanceY > 0.0) {
-					if (Math.abs(distanceY) > 30) {
-						// setNavVisibility(false);
 					}
-				} else {
-					if (Math.abs(distanceY) > 30) {
-						// setNavVisibility(true);
+
+					public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+						if (distanceY > 0.0) {
+							if (Math.abs(distanceY) > 30) {
+								// setNavVisibility(false);
+							}
+						} else {
+							if (Math.abs(distanceY) > 30) {
+								// setNavVisibility(true);
+							}
+						}
+						return false;
 					}
-				}
-				return false;
-			}
 
-//			public boolean onSingleTapUp(MotionEvent e) {
-//		        final ActionBar bar = mActivity.getSupportActionBar();
-//                if (bar.isShowing()) {
-//                    bar.hide();
-//                    findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
-//                } else {
-//                    bar.show();
-//                    findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
-//                }
-////				if (mAufrufart == AUFRUFART_FEED) {
-////					loadReadability();
-////					return true;
-////				}
-//
-////				return false;
-//				return true;
-//			}
+					// public boolean onSingleTapUp(MotionEvent e) {
+					// final ActionBar bar = mActivity.getSupportActionBar();
+					// if (bar.isShowing()) {
+					// bar.hide();
+					// findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
+					// } else {
+					// bar.show();
+					// findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
+					// }
+					//// if (mAufrufart == AUFRUFART_FEED) {
+					//// loadReadability();
+					//// return true;
+					//// }
+					//
+					//// return false;
+					// return true;
+					// }
 
-			public void onShowPress(MotionEvent e) {
+					public void onShowPress(MotionEvent e) {
 
-			}
+					}
 
-		});
+				});
 
 		OnTouchListener onTouchListener = new OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
@@ -494,9 +501,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
 
 		setZoomsScale();
-		MyWebViewClient myWebViewClient = new MyWebViewClient(){
+		MyWebViewClient myWebViewClient = new MyWebViewClient() {
 			public void onPageFinished(WebView view, String url) {
-				if(!isFirstEntry){
+				if (!isFirstEntry) {
 					nestedScrollView.scrollTo(0, 0);
 				}
 				zeigeProgressBar(false);
@@ -520,51 +527,61 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		} else if (mAufrufart == AUFRUFART_AMP) {
 			loadAmp();
 		}
-		
+
 		markAsReadButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				finish();
 			}
 		});
-		
+
 		readabilityButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				loadReadability();
 			}
 		});
-		
-		isFirstEntry=true;
+
+		isFirstEntry = true;
 		// setWebViewListener();
 	}// onCreate
 
 	void setZoomsScale() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			webView.getSettings().setTextZoom(mIntScalePercent * 2); // % von 100 // API 14 !!
+			webView.getSettings().setTextZoom(mIntScalePercent * 2); // % von
+																		// 100
+																		// //
+																		// API
+																		// 14 !!
 			if (webView0 != null) {
-				webView0.getSettings().setTextZoom(mIntScalePercent * 2); // % von 100 // API 14 !!
+				webView0.getSettings().setTextZoom(mIntScalePercent * 2); // %
+																			// von
+																			// 100
+																			// //
+																			// API
+																			// 14
+																			// !!
 			}
 		}
 	}
 
-//	public void clickMarkAsRead(View view) {
-//	+ android:onClick="loadWebview" 
+	// public void clickMarkAsRead(View view) {
+	// + android:onClick="loadWebview"
 	public void loadWebview(View view) {
 		zeigeProgressBar(true);
 		webView.loadUrl(link);
 	}
 
 	public void loadBrowser(View view) {
-		//Browser öffnen
+		// Browser öffnen
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
 	}
 
 	private void loadReadability() {
 		zeigeProgressBar(true);
-//		webView.loadUrl("http://www.readability.com/m?url=" + link);
+		// webView.loadUrl("http://www.readability.com/m?url=" + link);
 		new AsyncNewReadability().execute();
 	}
 
@@ -638,7 +655,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			String abstractText = entryCursor.getString(abstractPosition);
 
 			if (entryCursor.isNull(readDatePosition)) {
-				getContentResolver().update(uri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
+				getContentResolver().update(uri, values,
+						new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
 			}
 			if (abstractText == null) {
 				String link = entryCursor.getString(linkPosition);
@@ -649,11 +667,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 			} else {
 				String txtTitel = entryCursor.getString(titlePosition);
-				setTitle(txtTitel);
+				// setTitle(txtTitel);
 				if (titleTextView != null) {
 					titleTextView.requestFocus(); // restart ellipsize
 				}
-				// TextView titelTextView=(TextView) findViewById(R.id.entry_titel);
+				// TextView titelTextView=(TextView)
+				// findViewById(R.id.entry_titel);
 				// titelTextView.setSingleLine();
 				// titelTextView.setText(txtTitel);
 
@@ -668,7 +687,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 				if (canShowIcon) {
 					if (iconBytes == null || iconBytes.length == 0) {
-						Cursor iconCursor = getContentResolver().query(FeedData.FeedColumns.CONTENT_URI(Integer.toString(feedId)),
+						Cursor iconCursor = getContentResolver().query(
+								FeedData.FeedColumns.CONTENT_URI(Integer.toString(feedId)),
 								new String[] { FeedData.FeedColumns._ID, FeedData.FeedColumns.ICON }, null, null, null);
 
 						if (iconCursor.moveToFirst()) {
@@ -678,19 +698,25 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					}
 
 					if (iconBytes != null && iconBytes.length > 0) {
-						int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
+						int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f,
+								getResources().getDisplayMetrics());
 						Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
 						if (bitmap != null) {
 							if (bitmap.getHeight() != bitmapSizeInDip) {
 								bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
 							}
-
-//							setFeatureDrawable(Window.FEATURE_LEFT_ICON, new BitmapDrawable(bitmap));
-//							getSupportActionBar().setIcon(new BitmapDrawable(bitmap));
-//							getSupportActionBar().setLogo(new BitmapDrawable(bitmap));
-//					        int flags = 0;
-//					        int change = getSupportActionBar().getDisplayOptions() ^ flags;
-//					        getSupportActionBar().setDisplayOptions(change, flags);
+							// setFeatureDrawable(Window.FEATURE_LEFT_ICON, new
+							// BitmapDrawable(bitmap));
+							// getSupportActionBar().setIcon(new
+							// BitmapDrawable(bitmap));
+							// getSupportActionBar().setLogo(new
+							// BitmapDrawable(bitmap));
+							// int flags = 0;
+							// int change =
+							// getSupportActionBar().getDisplayOptions() ^
+							// flags;
+							// getSupportActionBar().setDisplayOptions(change,
+							// flags);
 						}
 					}
 				}
@@ -699,7 +725,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 				Date date = new Date(timestamp);
 
-				StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date)).append(' ').append(DateFormat.getTimeFormat(this).format(date));
+				StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date))
+						.append(' ').append(DateFormat.getTimeFormat(this).format(date));
 
 				String author = entryCursor.getString(authorPosition);
 
@@ -707,16 +734,19 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					dateStringBuilder.append(BRACKET).append(author).append(')');
 				}
 
-//				((TextView) findViewById(R.id.entry_date)).setText(dateStringBuilder);
+				// ((TextView)
+				// findViewById(R.id.entry_date)).setText(dateStringBuilder);
 				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
 
 				favorite = entryCursor.getInt(favoritePosition) == 1;
 
-				// loadData does not recognize the encoding without correct html-header
+				// loadData does not recognize the encoding without correct
+				// html-header
 				localPictures = abstractText.indexOf(Strings.IMAGEID_REPLACEMENT) > -1;
 
 				if (localPictures) {
-					abstractText = abstractText.replace(Strings.IMAGEID_REPLACEMENT, _id + Strings.IMAGEFILE_IDSEPARATOR);
+					abstractText = abstractText.replace(Strings.IMAGEID_REPLACEMENT,
+							_id + Strings.IMAGEFILE_IDSEPARATOR);
 				}
 
 				if (preferences.getBoolean(Strings.SETTINGS_DISABLEPICTURES, false)) {
@@ -725,35 +755,73 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				} else {
 					if (webView.getSettings().getBlockNetworkImage()) {
 						/*
-						 * setBlockNetwortImage(false) calls postSync, which takes time, so we clean up the html first and change the value afterwards
+						 * setBlockNetwortImage(false) calls postSync, which
+						 * takes time, so we clean up the html first and change
+						 * the value afterwards
 						 */
 						webView.loadData(Strings.EMPTY, TEXT_HTML, UTF8);
 						webView.getSettings().setBlockNetworkImage(false);
 					}
 				}
 
+				// alt erstmal online _erstes_ Bild
+				int posImg = abstractText.indexOf("src=\"");
+				if (posImg > 0) {
+					posImg += 5;
+					int posImgEnde = abstractText.indexOf('"', posImg);
+					if (posImgEnde > 0) {
+						mNewLink = abstractText.substring(posImg, posImgEnde);
+						System.out.println("gliedeHeader:" + mNewLink);
+						URL url;
+						try {
+							url = new URL(mNewLink);
+							Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);
+							;
+						} catch (MalformedURLException e) {
+							e.printStackTrace();
+						}
+					}
+
+					// sonst ein anderes aus dem Artikel, wenn Bilder geladen
+					// wurden...
+				} else if (Util.getImageFolderFile(this) != null && Util.getImageFolderFile(this).exists()) {
+					PictureFilenameFilter filenameFilter = new PictureFilenameFilter(_id);
+
+					File[] files = Util.getImageFolderFile(this).listFiles(filenameFilter);
+					if (files != null && files.length > 0) {
+						Glide.with(EntryActivity.this).load(files[0]).centerCrop().into(imageView);
+					}
+				}
+
 				int fontsize = Integer.parseInt(preferences.getString(Strings.SETTINGS_FONTSIZE, Strings.ONE));
 
 				/*
-				 * if (abstractText.indexOf('<') > -1 && abstractText.indexOf('>') > -1) { abstractText = abstractText.replace(NEWLINE, BR); }
+				 * if (abstractText.indexOf('<') > -1 &&
+				 * abstractText.indexOf('>') > -1) { abstractText =
+				 * abstractText.replace(NEWLINE, BR); }
 				 */
 
 				if (Util.isLightTheme(this) || preferences.getBoolean(Strings.SETTINGS_BLACKTEXTONWHITE, false)) {
 					if (fontsize > 0) {
-						webView.loadDataWithBaseURL(null,
-								new StringBuilder(CSS).append(FONTSIZE_START).append(fontsize).append(FONTSIZE_MIDDLE).append(abstractText).append(FONTSIZE_END).toString(),
+						webView.loadDataWithBaseURL(
+								null, new StringBuilder(CSS).append(FONTSIZE_START).append(fontsize)
+										.append(FONTSIZE_MIDDLE).append(abstractText).append(FONTSIZE_END).toString(),
 								TEXT_HTML, UTF8, null);
 					} else {
-						webView.loadDataWithBaseURL(null, new StringBuilder(CSS).append(BODY_START).append(abstractText).append(BODY_END).toString(), TEXT_HTML, UTF8, null);
+						webView.loadDataWithBaseURL(null, new StringBuilder(CSS).append(BODY_START).append(abstractText)
+								.append(BODY_END).toString(), TEXT_HTML, UTF8, null);
 					}
 					webView.setBackgroundColor(Color.WHITE);
 					content.setBackgroundColor(Color.WHITE);
 				} else {
 					if (fontsize > 0) {
-						webView.loadDataWithBaseURL(null, new StringBuilder(FONT_FONTSIZE_START).append(fontsize).append(FONTSIZE_MIDDLE).append(abstractText).append(FONT_END)
-								.toString(), TEXT_HTML, UTF8, null);
+						webView.loadDataWithBaseURL(null, new StringBuilder(FONT_FONTSIZE_START).append(fontsize)
+								.append(FONTSIZE_MIDDLE).append(abstractText).append(FONT_END).toString(), TEXT_HTML,
+								UTF8, null);
 					} else {
-						webView.loadDataWithBaseURL(null, new StringBuilder(FONT_START).append(abstractText).append(BODY_END).toString(), TEXT_HTML, UTF8, null);
+						webView.loadDataWithBaseURL(null,
+								new StringBuilder(FONT_START).append(abstractText).append(BODY_END).toString(),
+								TEXT_HTML, UTF8, null);
 					}
 					webView.setBackgroundColor(Color.BLACK);
 					content.setBackgroundColor(Color.BLACK);
@@ -785,20 +853,21 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 
 		/*
-		 * new Thread() { public void run() { sendBroadcast(new Intent(Strings.ACTION_UPDATEWIDGET)); // this is slow } }.start();
+		 * new Thread() { public void run() { sendBroadcast(new
+		 * Intent(Strings.ACTION_UPDATEWIDGET)); // this is slow } }.start();
 		 */
 	}
 
-
 	private void setupButton(ImageButton button, final boolean successor, long date) {
-		StringBuilder queryString = new StringBuilder(DATE).append(date).append(AND_ID).append(successor ? '>' : '<').append(_id).append(')').append(OR_DATE)
-				.append(successor ? '<' : '>').append(date);
+		StringBuilder queryString = new StringBuilder(DATE).append(date).append(AND_ID).append(successor ? '>' : '<')
+				.append(_id).append(')').append(OR_DATE).append(successor ? '<' : '>').append(date);
 
 		if (!showRead) {
 			queryString.append(Strings.DB_AND).append(EntriesListAdapter.READDATEISNULL);
 		}
 
-		Cursor cursor = getContentResolver().query(parentUri, new String[] { FeedData.EntryColumns._ID }, queryString.toString(), null, successor ? DESC : ASC);
+		Cursor cursor = getContentResolver().query(parentUri, new String[] { FeedData.EntryColumns._ID },
+				queryString.toString(), null, successor ? DESC : ASC);
 
 		if (cursor.moveToFirst()) {
 			button.setEnabled(true);
@@ -864,7 +933,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			}
 
 			// markRead 2
-			getContentResolver().update(uri, RSSOverview.getReadContentValues(), new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
+			getContentResolver().update(uri, RSSOverview.getReadContentValues(),
+					new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
 
 			setupButton(previousButton, false, timestamp);
 			setupButton(nextButton, true, timestamp);
@@ -882,13 +952,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void nextEntry(boolean animate) {
-		isFirstEntry=false;
+		isFirstEntry = false;
 		mAnimationDirection = android.R.anim.slide_out_right;
 		switchEntry(_nextId, animate, Animations.SLIDE_IN_RIGHT, Animations.SLIDE_OUT_LEFT);
 	}
 
 	private void previousEntry(boolean animate) {
-		isFirstEntry=false;
+		isFirstEntry = false;
 		mAnimationDirection = android.R.anim.fade_out;
 		switchEntry(_previousId, animate, Animations.SLIDE_IN_LEFT, Animations.SLIDE_OUT_RIGHT);
 	}
@@ -909,22 +979,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.entry, menu);
-//        MenuItem markasreadItem = menu.add(R.string.contextmenu_markasread); //@string/contextmenu_markasread
-        MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread); //@string/contextmenu_markasread
-        MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-        markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
+		// MenuItem markasreadItem = menu.add(R.string.contextmenu_markasread);
+		// //@string/contextmenu_markasread
+		MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread); // @string/contextmenu_markasread
+		MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+		markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
 
-        MenuItem browserItem = menu.add(0,R.id.url_button,0,R.string.contextmenu_browser);
-        MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-        browserItem.setIcon(android.R.drawable.ic_menu_view);
+		MenuItem browserItem = menu.add(0, R.id.url_button, 0, R.string.contextmenu_browser);
+		MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+		browserItem.setIcon(android.R.drawable.ic_menu_view);
 
-        MenuItem readabilityItem = menu.add(0,R.id.menu_readability,0,"Readability");
-        MenuItemCompat.setShowAsAction(readabilityItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-        readabilityItem.setIcon(R.drawable.readability_400);
+		MenuItem readabilityItem = menu.add(0, R.id.menu_readability, 0, "Readability");
+		MenuItemCompat.setShowAsAction(readabilityItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+		readabilityItem.setIcon(R.drawable.readability_400);
 
-        MenuItem feedItem = menu.add(0,R.id.menu_feed,0,"Feed");
-        MenuItemCompat.setShowAsAction(feedItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-        feedItem.setIcon(R.drawable.ic_action_crop);
+		MenuItem feedItem = menu.add(0, R.id.menu_feed, 0, "Feed");
+		MenuItemCompat.setShowAsAction(feedItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+		feedItem.setIcon(R.drawable.ic_action_crop);
 
 		return true;
 	}
@@ -968,9 +1039,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					String newLink = baseUrl + con.getURL().getPath();
 					int pos = newLink.lastIndexOf('/');
 					if (pos > 0) {
-						newLink = newLink.substring(0, pos) + "/v_detail_tab_print/" + newLink.substring(pos, newLink.length());
+						newLink = newLink.substring(0, pos) + "/v_detail_tab_print/"
+								+ newLink.substring(pos, newLink.length());
 					}
-					// bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+					// bufferedReader = new BufferedReader(new
+					// InputStreamReader(con.getInputStream(), "UTF8"));
 					// webView.loadUrl(newLink);
 					// Wiwo print im Browser öffnen
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(newLink)));
@@ -978,7 +1051,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					return null;
 				}
 
-				// BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+				// BufferedReader bufferedReader = new BufferedReader(new
+				// InputStreamReader(is));
 				String line = bufferedReader.readLine();
 				while (line != null) {
 					line = bufferedReader.readLine();
@@ -988,18 +1062,22 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				System.out.println("d" + (System.currentTimeMillis() - start));
 
 				// bahtml = Jsoup.clean(bahtml, Whitelist.basicWithImages());
-				// String baseUrl = con.getURL().getProtocol() + "://" + con.getURL().getHost();
+				// String baseUrl = con.getURL().getProtocol() + "://" +
+				// con.getURL().getHost();
 				System.out.println("e" + (System.currentTimeMillis() - start));
 
 				// long u=System.currentTimeMillis();
 				// int pBody=bahtml.indexOf("<body");
 				// System.out.println("pBody"+(System.currentTimeMillis() - u));
 				// int classCon=bahtml.indexOf("class=\"con\"",pBody);
-				// System.out.println("classCon"+(System.currentTimeMillis() - u));
+				// System.out.println("classCon"+(System.currentTimeMillis() -
+				// u));
 				// bahtml=bahtml.substring(classCon);
-				// System.out.println("f0 " + (System.currentTimeMillis() - start));
+				// System.out.println("f0 " + (System.currentTimeMillis() -
+				// start));
 
-				Document dirty = Jsoup.parseBodyFragment(bahtml, baseUrl); // 2300ms !!
+				Document dirty = Jsoup.parseBodyFragment(bahtml, baseUrl); // 2300ms
+																			// !!
 				System.out.println("f" + (System.currentTimeMillis() - start));
 				Elements elements = dirty.getElementsByClass("content");
 				System.out.println("g" + (System.currentTimeMillis() - start));
@@ -1018,7 +1096,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 							bahtml = elements.first().html();
 							dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
 							// } else {
-							// elements = dirty.getElementsByClass("hcf-content"); // Wiwo - nope, unsused!!
+							// elements =
+							// dirty.getElementsByClass("hcf-content"); // Wiwo
+							// - nope, unsused!!
 							// if (elements.size() > 0) {
 							// bahtml = elements.first().html();
 							// dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
@@ -1068,7 +1148,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					// InputStream is = url.openStream();
 					URLConnection con = url.openConnection();
 					System.out.println("b" + (System.currentTimeMillis() - start));
-					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8")); // 950ms
+					BufferedReader bufferedReader = new BufferedReader(
+							new InputStreamReader(con.getInputStream(), "UTF8")); // 950ms
 					System.out.println("c" + (System.currentTimeMillis() - start));
 					// baseUrl wechselt ab con.getInputStream (open?)
 					String baseUrl = con.getURL().getProtocol() + "://" + con.getURL().getHost();
@@ -1087,9 +1168,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 						String newLink = baseUrl + con.getURL().getPath();
 						int pos = newLink.lastIndexOf('/');
 						if (pos > 0) {
-							newLink = newLink.substring(0, pos) + "/v_detail_tab_print/" + newLink.substring(pos, newLink.length());
+							newLink = newLink.substring(0, pos) + "/v_detail_tab_print/"
+									+ newLink.substring(pos, newLink.length());
 						}
-						// bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+						// bufferedReader = new BufferedReader(new
+						// InputStreamReader(con.getInputStream(), "UTF8"));
 						// webView.loadUrl(newLink);
 						// Wiwo print im Browser öffnen
 						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(newLink)));
@@ -1097,7 +1180,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 						return;
 					}
 
-					// BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+					// BufferedReader bufferedReader = new BufferedReader(new
+					// InputStreamReader(is));
 					String line = bufferedReader.readLine();
 					while (line != null) {
 						line = bufferedReader.readLine();
@@ -1106,19 +1190,25 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					bufferedReader.close();
 					System.out.println("d" + (System.currentTimeMillis() - start));
 
-					// bahtml = Jsoup.clean(bahtml, Whitelist.basicWithImages());
-					// String baseUrl = con.getURL().getProtocol() + "://" + con.getURL().getHost();
+					// bahtml = Jsoup.clean(bahtml,
+					// Whitelist.basicWithImages());
+					// String baseUrl = con.getURL().getProtocol() + "://" +
+					// con.getURL().getHost();
 					System.out.println("e" + (System.currentTimeMillis() - start));
 
 					// long u=System.currentTimeMillis();
 					// int pBody=bahtml.indexOf("<body");
-					// System.out.println("pBody"+(System.currentTimeMillis() - u));
+					// System.out.println("pBody"+(System.currentTimeMillis() -
+					// u));
 					// int classCon=bahtml.indexOf("class=\"con\"",pBody);
-					// System.out.println("classCon"+(System.currentTimeMillis() - u));
+					// System.out.println("classCon"+(System.currentTimeMillis()
+					// - u));
 					// bahtml=bahtml.substring(classCon);
-					// System.out.println("f0 " + (System.currentTimeMillis() - start));
+					// System.out.println("f0 " + (System.currentTimeMillis() -
+					// start));
 
-					Document dirty = Jsoup.parseBodyFragment(bahtml, baseUrl); // 2300ms !!
+					Document dirty = Jsoup.parseBodyFragment(bahtml, baseUrl); // 2300ms
+																				// !!
 					System.out.println("f" + (System.currentTimeMillis() - start));
 					Elements elements = dirty.getElementsByClass("content");
 					System.out.println("g" + (System.currentTimeMillis() - start));
@@ -1137,16 +1227,20 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 								bahtml = elements.first().html();
 								dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
 								// } else {
-								// elements = dirty.getElementsByClass("hcf-content"); // Wiwo - nope, unsused!!
+								// elements =
+								// dirty.getElementsByClass("hcf-content"); //
+								// Wiwo - nope, unsused!!
 								// if (elements.size() > 0) {
 								// bahtml = elements.first().html();
-								// dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
+								// dirty = Jsoup.parseBodyFragment(bahtml,
+								// baseUrl);
 								// }
 							}
 						}
 					}
 					Whitelist whitelist = Whitelist.basic(); // 500ms
-					// Whitelist whitelist = Whitelist.basicWithImages(); // 500ms
+					// Whitelist whitelist = Whitelist.basicWithImages(); //
+					// 500ms
 					whitelist.addTags("h1", "h2", "h3");
 					System.out.println("x" + (System.currentTimeMillis() - start));
 					Cleaner cleaner2 = new Cleaner(whitelist);
@@ -1164,7 +1258,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				final TextView view = (TextView) findViewById(R.id.entry_date);
 				view.post(new Runnable() {
 					public void run() {
-						// bahtml="<html><body>You scored <b>192</b> points.</body></html>";
+						// bahtml="<html><body>You scored <b>192</b>
+						// points.</body></html>";
 						// android.text.Html.fromHtml(instruction).toString()
 						// Spanned spanned = android.text.Html.fromHtml(bahtml);
 						// view.setText(spanned.toString());
@@ -1218,7 +1313,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	boolean mNavVisible = true;
 
-
 	private int mIntScalePercent = 50; // 0..100
 	// mSeekBar.setProgress(intLaufzeitPercent);
 	SeekBar mSeekBar;
@@ -1245,7 +1339,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public static final String PREFERENCE_SCALE = "preference_scale_readability";
 	public final static String PREFS_NAME = "de.bernd.sparse.rss.preferences";
 
-	
 	// Scale the Text
 	private void showSeekBarDialog() {
 		View view = getLayoutInflater().inflate(R.layout.entry_seek_bar, null);
@@ -1267,7 +1360,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	/**
-	 * Für onPageFinished um ProzessBar an/aus zu knipsen da webview aSyncron die animation trasht
+	 * Für onPageFinished um ProzessBar an/aus zu knipsen da webview aSyncron
+	 * die animation trasht
 	 */
 	private class MyWebViewClient extends WebViewClient {
 
@@ -1281,10 +1375,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	int mAnimationDirection = android.R.anim.slide_out_right;
-	
-	private ProgressBar progressBar;
-    private CollapsingToolbarLayout collapsingToolbar;
 
+	private ProgressBar progressBar;
+	private CollapsingToolbarLayout collapsingToolbar;
 
 	private View nestedScrollView;
 
@@ -1319,7 +1412,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				abstractText = entryCursor.getString(abstractPosition);
 
 				Date date = new Date(timestamp);
-				StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date)).append(' ').append(DateFormat.getTimeFormat(this).format(date));
+				StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date))
+						.append(' ').append(DateFormat.getTimeFormat(this).format(date));
 				String txtTitel = entryCursor.getString(titlePosition);
 				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
 
@@ -1335,7 +1429,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			}
 
 			// markRead 2
-			getContentResolver().update(uri, RSSOverview.getReadContentValues(), new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
+			getContentResolver().update(uri, RSSOverview.getReadContentValues(),
+					new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
 
 			setupButton(previousButton, false, timestamp);
 			setupButton(nextButton, true, timestamp);
@@ -1350,35 +1445,34 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			viewFlipper.showNext();
 			viewFlipper.removeViewAt(0);
 		}
-		
-//		new Handler().postDelayed(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                webView.scrollTo(0,0);
-//                System.out.println("Scrolled");
-//            }
-//        }, 1000);
+
+		// new Handler().postDelayed(new Runnable() {
+		//
+		// @Override
+		// public void run() {
+		// webView.scrollTo(0,0);
+		// System.out.println("Scrolled");
+		// }
+		// }, 1000);
 	}
 
 	public void setHomeButtonActive() {
 		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
-//		actionBar7.setHideOnContentScrollEnabled(true); //knallt mit Toolbar
+		// actionBar7.setHideOnContentScrollEnabled(true); //knallt mit Toolbar
 		actionBar7.setHomeButtonEnabled(true);
 		// durchsichtige Actionbar
 		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
 		android.app.ActionBar actionBar = getActionBar();
 		if (actionBar != null) {
-			actionBar.hide(); //immer weil doppelt...
+			actionBar.hide(); // immer weil doppelt...
 		}
 
-		//Up Button, funkt per Default automatisch
-        int flags = 0;
-        flags = ActionBar.DISPLAY_HOME_AS_UP|ActionBar.DISPLAY_SHOW_TITLE;
-        int change = actionBar7.getDisplayOptions() ^ flags;
-        actionBar7.setDisplayOptions(change, flags);
+		// Up Button, funkt per Default automatisch
+		int flags = 0;
+		flags = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE;
+		int change = actionBar7.getDisplayOptions() ^ flags;
+		actionBar7.setDisplayOptions(change, flags);
 
-        
 	}
 
 	@Override
@@ -1396,7 +1490,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		case R.id.url_button: {
 			if (link != null) {
 				// if (link.endsWith("feed/atom/")) {
-				// link = link.substring(0, link.length() - "feed/atom/".length());
+				// link = link.substring(0, link.length() -
+				// "feed/atom/".length());
 				// }
 				// Browser öffnen
 				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
@@ -1464,7 +1559,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		// }
 		case R.id.menu_share: {
 			if (link != null) {
-				startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, link).setType(TEXTPLAIN), getString(R.string.menu_share)));
+				startActivity(Intent.createChooser(
+						new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, link).setType(TEXTPLAIN),
+						getString(R.string.menu_share)));
 			}
 			break;
 		}
@@ -1475,59 +1572,59 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	private void zeigeProgressBar(boolean zeigen){
-		if(zeigen){
-			progressBar.setVisibility(View.VISIBLE); 
-		}else{
-			progressBar.setVisibility(View.INVISIBLE);  
+
+	private void zeigeProgressBar(boolean zeigen) {
+		if (zeigen) {
+			progressBar.setVisibility(View.VISIBLE);
+		} else {
+			progressBar.setVisibility(View.INVISIBLE);
 		}
 	}
-	
+
 	class AsyncNewReadability extends AsyncTask<Void, Void, Void> {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			
-            try {
-            	
-                HtmlFetcher fetcher2 = new HtmlFetcher();
-                fetcher2.setMaxTextLength(50000);
-            	JResult res = fetcher2.fetchAndExtract(link, 10000, true);
-            	String text = res.getText(); 
-            	String title = res.getTitle(); 
-            	String imageUrl = res.getImageUrl();
-//            	System.out.println("image " + imageUrl);
-            	
-//            	collapsingToolbar.setTitle(title);
-            	collapsingToolbar.setTitle("");
-            	
-            	if(imageUrl!=null && !"".equals(imageUrl)){
-            		mNewLink=imageUrl;
-            	}
 
-            	if(text!=null){
-            		bahtml=text+ "<br>";
-            		return null;
-            	}
+			try {
 
-            	
-            	
+				HtmlFetcher fetcher2 = new HtmlFetcher();
+				fetcher2.setMaxTextLength(50000);
+				JResult res = fetcher2.fetchAndExtract(link, 10000, true);
+				String text = res.getText();
+				String title = res.getTitle();
+				String imageUrl = res.getImageUrl();
+				// System.out.println("image " + imageUrl);
+
+				// collapsingToolbar.setTitle(title);
+				collapsingToolbar.setTitle("");
+
+				if (imageUrl != null && !"".equals(imageUrl)) {
+					mNewLink = imageUrl;
+				}
+
+				if (text != null) {
+					bahtml = text + "<br>";
+					return null;
+				}
+
 				HttpURLConnection connection = null;
 				URL url = new URL(link);
-				connection = (HttpURLConnection)url.openConnection();
-				// connection = NetworkUtils.setupConnection(link,cookieName, cookieValue,httpAuthLoginValue, httpAuthPassValue);
-				
-                String contentIndicator = null;
-                if (!TextUtils.isEmpty(abstractText)) {
-                	abstractText = Html.fromHtml(abstractText).toString();
-                    if (abstractText.length() > 60) {
-                        contentIndicator = abstractText.substring(20, 40);
-                    }
-                }
+				connection = (HttpURLConnection) url.openConnection();
+				// connection = NetworkUtils.setupConnection(link,cookieName,
+				// cookieValue,httpAuthLoginValue, httpAuthPassValue);
 
-                // str für amp
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF8")); 
+				String contentIndicator = null;
+				if (!TextUtils.isEmpty(abstractText)) {
+					abstractText = Html.fromHtml(abstractText).toString();
+					if (abstractText.length() > 60) {
+						contentIndicator = abstractText.substring(20, 40);
+					}
+				}
+
+				// str für amp
+				BufferedReader bufferedReader = new BufferedReader(
+						new InputStreamReader(connection.getInputStream(), "UTF8"));
 
 				// baseUrl wechselt ab con.getInputStream (open?)
 				String baseUrl = connection.getURL().getProtocol() + "://" + connection.getURL().getHost();
@@ -1538,87 +1635,81 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					bahtml += line;
 				}
 				bufferedReader.close();
-				
-				int posAmphtml = bahtml.indexOf("\"amphtml\"");
-				if(posAmphtml>=0){
-					
-					// AMP
-					
-					int posHref = bahtml.indexOf("href=\"", posAmphtml);
-					System.out.println("posAmphtml " +posAmphtml + " " + posHref );
-					posHref=posHref+6;
-					int posEnd=bahtml.indexOf("\"", posHref);
-					String ampLink=bahtml.substring(posHref, posEnd);
-					if (ampLink.startsWith("/")){
-						mNewLink=baseUrl + ampLink;					
-					}else{
-						mNewLink=ampLink;
-					}
-					
-//	                HtmlFetcher fetcher = new HtmlFetcher();
-//	            	JResult res = fetcher.fetchAndExtract(mNewLink, 2000, true);
-//	            	String text = res.getText(); 
-//	            	String title = res.getTitle(); 
-//	            	String imageUrl = res.getImageUrl();
-//
-//	            	if(text!=null){
-//	            		bahtml=text;
-//	            		return null;
-//	            	}
-					
-					
-					url = new URL(mNewLink);
-					connection = (HttpURLConnection)url.openConnection();
-					bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF8")); 
 
-					String ampContent="";
+				int posAmphtml = bahtml.indexOf("\"amphtml\"");
+				if (posAmphtml >= 0) {
+
+					// AMP
+
+					int posHref = bahtml.indexOf("href=\"", posAmphtml);
+					System.out.println("posAmphtml " + posAmphtml + " " + posHref);
+					posHref = posHref + 6;
+					int posEnd = bahtml.indexOf("\"", posHref);
+					String ampLink = bahtml.substring(posHref, posEnd);
+					if (ampLink.startsWith("/")) {
+						mNewLink = baseUrl + ampLink;
+					} else {
+						mNewLink = ampLink;
+					}
+
+					// HtmlFetcher fetcher = new HtmlFetcher();
+					// JResult res = fetcher.fetchAndExtract(mNewLink, 2000,
+					// true);
+					// String text = res.getText();
+					// String title = res.getTitle();
+					// String imageUrl = res.getImageUrl();
+					//
+					// if(text!=null){
+					// bahtml=text;
+					// return null;
+					// }
+
+					url = new URL(mNewLink);
+					connection = (HttpURLConnection) url.openConnection();
+					bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF8"));
+
+					String ampContent = "";
 					line = bufferedReader.readLine();
 					while (line != null) {
 						line = bufferedReader.readLine();
 						ampContent += line;
 					}
 					bufferedReader.close();
-					
-					int posBody=ampContent.indexOf("<body>");
-					if(posBody>=0){
-						ampContent=ampContent.substring(posBody+6);
+
+					int posBody = ampContent.indexOf("<body>");
+					if (posBody >= 0) {
+						ampContent = ampContent.substring(posBody + 6);
 					}
-					
-					bahtml=ampContent;
+
+					bahtml = ampContent;
 					Util.toastMessage(EntryActivity.this, "amp");
 					return null;
 				}
 
-				
-				
-				
+				// String mobilizedHtml =
+				// ArticleTextExtractor.extractContent(connection.getInputStream(),
+				// contentIndicator);
+				String mobilizedHtml = ArticleTextExtractor.extractContent(bahtml, contentIndicator);
 
-//                String mobilizedHtml = ArticleTextExtractor.extractContent(connection.getInputStream(), contentIndicator);
-                String mobilizedHtml = ArticleTextExtractor.extractContent(bahtml, contentIndicator);
-                
+				if (mobilizedHtml != null) {
+					mobilizedHtml = HtmlUtils.improveHtmlContent(mobilizedHtml, getBaseUrl(link));
+					bahtml = mobilizedHtml;
+				} else {
+					bahtml = null;
+				}
 
-                if (mobilizedHtml != null) {
-                    mobilizedHtml = HtmlUtils.improveHtmlContent(mobilizedHtml, getBaseUrl(link));
-                    bahtml=mobilizedHtml;
-                }else{
-                	bahtml=null;
-                }
-                
-                
-//                HtmlFetcher fetcher = new HtmlFetcher();
-//            	JResult res = fetcher.fetchAndExtract(link, 5000, true);
-//            	String text = res.getText(); 
-//            	String title = res.getTitle(); 
-//            	String imageUrl = res.getImageUrl();
-//            	
-//            	if(text!=null){
-//            		bahtml=text;
-//            	}else{
-//                	bahtml=null;
-//            	}
+				// HtmlFetcher fetcher = new HtmlFetcher();
+				// JResult res = fetcher.fetchAndExtract(link, 5000, true);
+				// String text = res.getText();
+				// String title = res.getTitle();
+				// String imageUrl = res.getImageUrl();
+				//
+				// if(text!=null){
+				// bahtml=text;
+				// }else{
+				// bahtml=null;
+				// }
 
-                
-                
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1630,38 +1721,44 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			if (bahtml != null) {
-//				webView.getSettings().setJavaScriptEnabled(true);
-//				webView.getSettings().setUseWideViewPort(true);
-//				webView0.getSettings().setUseWideViewPort(true);
+				// webView.getSettings().setJavaScriptEnabled(true);
+				// webView.getSettings().setUseWideViewPort(true);
+				// webView0.getSettings().setUseWideViewPort(true);
 
-//				// Bilder auf 100% runter sizen
-//			       // content is the content of the HTML or XML.
-//		        String stringToAdd = "width=\"100%\" height=\"auto\" ";
-//		        // Create a StringBuilder to insert string in the middle of content.
-//		        StringBuilder sb = new StringBuilder(bahtml);
-//		        int i = 0;
-//		        int cont = 0;
-//		        // Check for the "src" substring, if it exists, take the index where 
-//		        // it appears and insert the stringToAdd there, then increment a counter
-//		        // because the string gets altered and you should sum the length of the inserted substring
-//		        while(i != -1){
-//		            i = bahtml.indexOf("src", i + 1);
-//		            if(i != -1) sb.insert(i + (cont * stringToAdd.length()), stringToAdd );
-//		            ++cont;
-//		        }
-//		        bahtml=sb.toString();
-				
+				// // Bilder auf 100% runter sizen
+				// // content is the content of the HTML or XML.
+				// String stringToAdd = "width=\"100%\" height=\"auto\" ";
+				// // Create a StringBuilder to insert string in the middle of
+				// content.
+				// StringBuilder sb = new StringBuilder(bahtml);
+				// int i = 0;
+				// int cont = 0;
+				// // Check for the "src" substring, if it exists, take the
+				// index where
+				// // it appears and insert the stringToAdd there, then
+				// increment a counter
+				// // because the string gets altered and you should sum the
+				// length of the inserted substring
+				// while(i != -1){
+				// i = bahtml.indexOf("src", i + 1);
+				// if(i != -1) sb.insert(i + (cont * stringToAdd.length()),
+				// stringToAdd );
+				// ++cont;
+				// }
+				// bahtml=sb.toString();
+
 				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
-//				webView.loadDataWithBaseURL(mNewLink, bahtml, "text/html; charset=UTF-8", null, null);
-				
-				if(mNewLink!=null){
-					
-	                final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
-//	              Glide.with(EntryActivity.this).load(Cheeses.getRandomCheeseDrawable()).centerCrop().into(imageView);
-	                URL url;
+				// webView.loadDataWithBaseURL(mNewLink, bahtml, "text/html;
+				// charset=UTF-8", null, null);
+
+				if (mNewLink != null) {
+
+					// Glide.with(EntryActivity.this).load(Cheeses.getRandomCheeseDrawable()).centerCrop().into(imageView);
+					URL url;
 					try {
 						url = new URL(mNewLink);
-		                Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);;
+						Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);
+						;
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
 					}
@@ -1672,30 +1769,30 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	// aus net.etuldan.sparss.utils.NetworkUtils
-    public static String getBaseUrl(String link) {
-        String baseUrl = link;
-        int index = link.indexOf('/', 8); // this also covers https://
-        if (index > -1) {
-            baseUrl = link.substring(0, index);
-        }
+	public static String getBaseUrl(String link) {
+		String baseUrl = link;
+		int index = link.indexOf('/', 8); // this also covers https://
+		if (index > -1) {
+			baseUrl = link.substring(0, index);
+		}
 
-        return baseUrl;
-    }
+		return baseUrl;
+	}
 
-    
 	class AsyncAmpRead extends AsyncTask<Void, Void, Void> {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			
-            try {
-            	bahtml="";
-            	mNewLink=null;
+
+			try {
+				bahtml = "";
+				mNewLink = null;
 				HttpURLConnection connection = null;
 				URL url = new URL(link);
-				connection = (HttpURLConnection)url.openConnection();
+				connection = (HttpURLConnection) url.openConnection();
 
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF8")); 
+				BufferedReader bufferedReader = new BufferedReader(
+						new InputStreamReader(connection.getInputStream(), "UTF8"));
 
 				// baseUrl wechselt ab con.getInputStream (open?)
 				String baseUrl = connection.getURL().getProtocol() + "://" + connection.getURL().getHost();
@@ -1708,21 +1805,21 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				bufferedReader.close();
 
 				int posAmphtml = bahtml.indexOf("\"amphtml\"");
-				if(posAmphtml<0){
+				if (posAmphtml < 0) {
 					// kein AMP -> Default == reload/Feed
 					return null;
 				}
 				int posHref = bahtml.indexOf("href=\"", posAmphtml);
-				System.out.println("posAmphtml " +posAmphtml + " " + posHref );
-				posHref=posHref+6;
-				int posEnd=bahtml.indexOf("\"", posHref);
-				String ampLink=bahtml.substring(posHref, posEnd);
-				if (ampLink.startsWith("/")){
-					mNewLink=baseUrl + ampLink;					
-				}else{
-					mNewLink=ampLink;
+				System.out.println("posAmphtml " + posAmphtml + " " + posHref);
+				posHref = posHref + 6;
+				int posEnd = bahtml.indexOf("\"", posHref);
+				String ampLink = bahtml.substring(posHref, posEnd);
+				if (ampLink.startsWith("/")) {
+					mNewLink = baseUrl + ampLink;
+				} else {
+					mNewLink = ampLink;
 				}
-                
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1734,11 +1831,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			super.onPostExecute(result);
 			if (mNewLink != null) {
 				webView.loadUrl(mNewLink);
-			}else{
+			} else {
 				Util.toastMessage(EntryActivity.this, "No amphtml");
 				reload();
 			}
 		}
 	}
-    
+
 }

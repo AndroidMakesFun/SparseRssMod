@@ -27,6 +27,7 @@ package de.bernd.shandschuh.sparserss.provider;
 
 import java.io.File;
 
+import de.bernd.shandschuh.sparserss.Util;
 import de.bernd.shandschuh.sparserss.handler.PictureFilenameFilter;
 
 import android.content.Context;
@@ -133,7 +134,7 @@ public class FeedData {
 	private static String[] IDPROJECTION = new String[] {FeedData.EntryColumns._ID};
 	
 	public static void deletePicturesOfFeedAsync(final Context context, final Uri entriesUri, final String selection) {
-		if (FeedDataContentProvider.IMAGEFOLDER_FILE.exists()) {
+		if (Util.getImageFolderFile(context)!=null && Util.getImageFolderFile(context).exists()) {
 			new Thread() {
 				public void run() {
 					deletePicturesOfFeed(context, entriesUri, selection);
@@ -143,7 +144,7 @@ public class FeedData {
 	}
 	
 	public static synchronized void deletePicturesOfFeed(Context context, Uri entriesUri, String selection) {
-		if (FeedDataContentProvider.IMAGEFOLDER_FILE.exists()) {
+		if (Util.getImageFolderFile(context)!=null && Util.getImageFolderFile(context).exists()) {
 			PictureFilenameFilter filenameFilter = new PictureFilenameFilter();
 			
 			Cursor cursor = context.getContentResolver().query(entriesUri, IDPROJECTION, selection, null, null);
@@ -151,7 +152,7 @@ public class FeedData {
 			while (cursor.moveToNext()) {
 				filenameFilter.setEntryId(cursor.getString(0));
 				
-				File[] files = FeedDataContentProvider.IMAGEFOLDER_FILE.listFiles(filenameFilter);
+				File[] files = Util.getImageFolderFile(context).listFiles(filenameFilter);
 				
 				for (int n = 0, i = files != null ? files.length : 0; n < i; n++) {
 					files[n].delete();
@@ -162,10 +163,10 @@ public class FeedData {
 	}
 	
 	public static synchronized void deletePicturesOfEntry(String entryId) {
-		if (FeedDataContentProvider.IMAGEFOLDER_FILE.exists()) {
+		if (Util.getImageFolderFile(null)!=null && Util.getImageFolderFile(null).exists()) {
 			PictureFilenameFilter filenameFilter = new PictureFilenameFilter(entryId);
 			
-			File[] files = FeedDataContentProvider.IMAGEFOLDER_FILE.listFiles(filenameFilter);
+			File[] files = Util.getImageFolderFile(null).listFiles(filenameFilter);
 			
 			for (int n = 0, i = files != null ? files.length : 0; n < i; n++) {
 				files[n].delete();

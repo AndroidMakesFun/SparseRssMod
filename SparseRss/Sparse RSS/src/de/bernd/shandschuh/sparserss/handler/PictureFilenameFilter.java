@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.regex.Pattern;
 
+import de.bernd.shandschuh.sparserss.Util;
 import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
 
 public class PictureFilenameFilter implements FilenameFilter {
@@ -49,7 +50,7 @@ public class PictureFilenameFilter implements FilenameFilter {
 	}
 
 	public boolean accept(File dir, String filename) {
-		if (dir != null && dir.equals(FeedDataContentProvider.IMAGEFOLDER_FILE)) { // this should be always true but lets check it anyway
+		if (dir != null && dir.equals(Util.getImageFolderFile(null))) { // this should be always true but lets check it anyway
 			return pattern.matcher(filename).find();
 		} else {
 			return false;

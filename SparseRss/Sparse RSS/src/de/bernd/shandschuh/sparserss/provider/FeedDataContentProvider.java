@@ -76,9 +76,10 @@ public class FeedDataContentProvider extends ContentProvider {
 	
 	private static final String EQUALS_ONE = "=1";
 
-	public static final String IMAGEFOLDER = Environment.getExternalStorageDirectory()+"/sparserss/images/"; // faster than FOLDER+"images/"
+//	public static final String IMAGEFOLDER = Environment.getExternalStorageDirectory()+"/sparserss/images/"; // faster than FOLDER+"images/"
+//	public static final String IMAGEFOLDER = Environment.getDataDirectory().toString()+"/images";
 	
-	public static final File IMAGEFOLDER_FILE = new File(IMAGEFOLDER);
+//	public static final File IMAGEFOLDER_FILE = new File(IMAGEFOLDER);
 	
 	private static final String BACKUPOPML = Environment.getExternalStorageDirectory()+"/sparserss/backup.opml";
 	
