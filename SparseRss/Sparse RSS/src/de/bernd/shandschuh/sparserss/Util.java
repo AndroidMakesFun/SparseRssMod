@@ -97,4 +97,23 @@ public class Util {
 		}
 		return imageFolder;
 	}
+
+	public static final String PREFERENCE_VIEWER_PREFS = "PREFERENCE_VIEWER_PREFS";
+
+	/**
+	 * Konfiguriert den Viewer je Feed per Prefs
+	 * @param viewerInt
+	 */
+	public static void setViewerPrefs(Context context, String FeedId, int viewerInt) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putInt(PREFERENCE_VIEWER_PREFS+ FeedId, viewerInt);
+		editor.commit();
+	}
+
+	public static int getViewerPrefs(Context context, String FeedId) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		return prefs.getInt(PREFERENCE_VIEWER_PREFS + FeedId, 0);  // 0 Feed
+	}
+
 }

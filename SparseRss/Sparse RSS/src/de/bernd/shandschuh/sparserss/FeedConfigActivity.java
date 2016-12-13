@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -72,7 +73,7 @@ public class FeedConfigActivity extends Activity {
 		
 		spinner = (Spinner) findViewById(R.id.spinner1);
 		
-	    String[] mStrings = {"Feed", "Browser", "Mobilize", "Instapaper", "Readability", "AMP"};
+	    String[] mStrings = {"Feed", "Browser", "Mobilize", "Instapaper", "Readability", "AMP"};  // 0..5
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, mStrings);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -108,7 +109,10 @@ public class FeedConfigActivity extends Activity {
 						if (name.trim().length() > 0) {
 							values.put(FeedData.FeedColumns.NAME, name);
 						}
-						getContentResolver().insert(FeedData.FeedColumns.CONTENT_URI, values);
+						Uri insert = getContentResolver().insert(FeedData.FeedColumns.CONTENT_URI, values);
+						
+						Util.setViewerPrefs(FeedConfigActivity.this, insert.getLastPathSegment(), spinner.getSelectedItemPosition());
+
 						setResult(RESULT_OK);
 						finish();
 					}
@@ -158,7 +162,11 @@ public class FeedConfigActivity extends Activity {
 						values.put(FeedData.FeedColumns.BEIMLADEN, spinner.getSelectedItemPosition() );
 						values.put(FeedData.FeedColumns.ERROR, (String) null);
 						getContentResolver().update(getIntent().getData(), values, null, null);
-						
+
+						// getIntent().getData() content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/2
+						// getIntent().getData().getLastPathSegment()   2, der Pk des Datensatzes
+						Util.setViewerPrefs(FeedConfigActivity.this, getIntent().getData().getLastPathSegment(), spinner.getSelectedItemPosition());
+
 						//listViewCheckBox erstmal ohne db über alle Feeds
 						Util.setTestListPrefs(getApplicationContext(), listViewCheckBox.isChecked());
 						

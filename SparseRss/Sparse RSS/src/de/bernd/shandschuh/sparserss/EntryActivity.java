@@ -60,6 +60,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.MenuItemCompat;
@@ -287,6 +288,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+		appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
 		imageView = (ImageView) findViewById(R.id.backdrop);
 
 		setSupportActionBar(toolbar);
@@ -343,6 +345,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			link = fixLink(link);
 			timestamp = entryCursor.getLong(datePosition);
 			abstractText = entryCursor.getString(abstractPosition);
+			feedId = entryCursor.getInt(feedIdPosition); // bah
 
 			// hierher kopiert - tilte immer ermitteln
 			Date date = new Date(timestamp);
@@ -764,6 +767,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					}
 				}
 
+				boolean keineBilder=true;
 				// alt erstmal online _erstes_ Bild
 				int posImg = abstractText.indexOf("src=\"");
 				if (posImg > 0) {
@@ -776,6 +780,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 						try {
 							url = new URL(mNewLink);
 							Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);
+							keineBilder=false;
 							;
 						} catch (MalformedURLException e) {
 							e.printStackTrace();
@@ -790,8 +795,17 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					File[] files = Util.getImageFolderFile(this).listFiles(filenameFilter);
 					if (files != null && files.length > 0) {
 						Glide.with(EntryActivity.this).load(files[0]).centerCrop().into(imageView);
+						keineBilder=false;
 					}
 				}
+
+				if(keineBilder){
+//					System.out.println(appBarLayout.getMinimumHeight());
+//					appBarLayout.setMinimumHeight(100);
+//					System.out.println(imageView.getMinimumHeight());
+//					imageView.setMinimumHeight(2);
+				}
+
 
 				int fontsize = Integer.parseInt(preferences.getString(Strings.SETTINGS_FONTSIZE, Strings.ONE));
 
@@ -1378,6 +1392,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	private ProgressBar progressBar;
 	private CollapsingToolbarLayout collapsingToolbar;
+	private AppBarLayout appBarLayout;
 
 	private View nestedScrollView;
 
@@ -1501,6 +1516,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		case R.id.menu_instapaper: {
 			if (link != null) {
 				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
+				Util.setViewerPrefs(this, ""+feedId, AUFRUFART_INSTAPAPER);
 
 				loadInstapaper();
 			}
@@ -1509,22 +1525,26 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		case R.id.menu_feed: {
 			_id = null;
+			Util.setViewerPrefs(this, ""+feedId, AUFRUFART_FEED);
 			reload();
 			// readUrl(); // TODO ???
 			break;
 		}
 
 		case R.id.menu_mobilize: {
+			Util.setViewerPrefs(this, ""+feedId, AUFRUFART_MOBILIZE);
 			loadMoblize();
 			break;
 		}
 
 		case R.id.menu_readability: {
+			Util.setViewerPrefs(this, ""+feedId, AUFRUFART_READABILITY);
 			loadReadability();
 			break;
 		}
 
 		case R.id.menu_amp: {
+			Util.setViewerPrefs(this, ""+feedId, AUFRUFART_AMP);			
 			loadAmp();
 			break;
 		}
@@ -1725,27 +1745,22 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				// webView.getSettings().setUseWideViewPort(true);
 				// webView0.getSettings().setUseWideViewPort(true);
 
-				// // Bilder auf 100% runter sizen
-				// // content is the content of the HTML or XML.
-				// String stringToAdd = "width=\"100%\" height=\"auto\" ";
-				// // Create a StringBuilder to insert string in the middle of
-				// content.
-				// StringBuilder sb = new StringBuilder(bahtml);
-				// int i = 0;
-				// int cont = 0;
-				// // Check for the "src" substring, if it exists, take the
-				// index where
-				// // it appears and insert the stringToAdd there, then
-				// increment a counter
-				// // because the string gets altered and you should sum the
-				// length of the inserted substring
-				// while(i != -1){
-				// i = bahtml.indexOf("src", i + 1);
-				// if(i != -1) sb.insert(i + (cont * stringToAdd.length()),
-				// stringToAdd );
-				// ++cont;
-				// }
-				// bahtml=sb.toString();
+				// Bilder auf 100% runter sizen
+			       // content is the content of the HTML or XML.
+		        String stringToAdd = "width=\"100%\" height=\"auto\" ";
+		        // Create a StringBuilder to insert string in the middle of content.
+		        StringBuilder sb = new StringBuilder(bahtml);
+		        int i = 0;
+		        int cont = 0;
+		        // Check for the "src" substring, if it exists, take the index where 
+		        // it appears and insert the stringToAdd there, then increment a counter
+		        // because the string gets altered and you should sum the length of the inserted substring
+		        while(i != -1){
+		            i = bahtml.indexOf("src", i + 1);
+		            if(i != -1) sb.insert(i + (cont * stringToAdd.length()), stringToAdd );
+		            ++cont;
+		        }
+		        bahtml=sb.toString();
 
 				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
 				// webView.loadDataWithBaseURL(mNewLink, bahtml, "text/html;
@@ -1833,7 +1848,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				webView.loadUrl(mNewLink);
 			} else {
 				Util.toastMessage(EntryActivity.this, "No amphtml");
-				reload();
+				// no reload();
 			}
 		}
 	}

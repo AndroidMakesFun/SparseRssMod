@@ -225,8 +225,8 @@ public class EntriesListActivity extends AppCompatActivity {
 						e.printStackTrace();
 					}
 
-					
-					
+					// aufrufart nur noch aus Prefs... TODO DB Part entfernen 
+					aufrufart=Util.getViewerPrefs(EntriesListActivity.this, ""+feedid);
 					
 					//mark read 2
 					getContentResolver().update(ContentUris.withAppendedId(uri, id), RSSOverview.getReadContentValues(), null, null);
