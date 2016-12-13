@@ -76,7 +76,7 @@
                     android:layout_gravity="fill"
                     android:layout_weight="1"
                     android:paddingTop="2pt"
-                    android:singleLine="true" />
+                    android:singleLine="false" />
                 <!--
                 ImageView
                     android:id="@android:id/icon"
