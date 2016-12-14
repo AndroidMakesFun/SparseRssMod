@@ -770,9 +770,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			button.setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
 					if (successor) {
-						nextEntry(false);
+						nextEntry(true);
 					} else {
-						previousEntry(false);
+						previousEntry(true);
 					}
 				}
 			});
