@@ -267,21 +267,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			setTheme(R.style.Theme_Light);
 		}
 		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
-		if (mAufrufart != AUFRUFART_FEED) {
-			// gegen das flackern der ActionBar Inhalt hinter actionbar
-			// getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-		}
-
 		super.onCreate(savedInstanceState);
-
-		// supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		// setProgressBarIndeterminateVisibility(true);
-		// supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		// setSupportProgressBarIndeterminateVisibility(true);
-
-		// Hide on content scroll requires an overlay action bar, so request one
-		// supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
-		// supportRequestWindowFeature(AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR_OVERLAY);
 
 		setContentView(R.layout.entry);
 
@@ -291,7 +277,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		imageView = (ImageView) findViewById(R.id.backdrop);
 
 		setSupportActionBar(toolbar);
-		// getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		setHomeButtonActive();
 
 		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
@@ -322,8 +307,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
 		showRead = getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
 		iconBytes = getIntent().getByteArrayExtra(FeedData.FeedColumns.ICON);
-		// mAufrufart =
-		// getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
 		feedId = 0;
 
 		Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
@@ -369,10 +352,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		urlButton.setAlpha(BUTTON_ALPHA + 30);
 		previousButton = (ImageButton) findViewById(R.id.prev_button);
 
-		// verbergen
-		// findViewById(R.id.button_layout).setVisibility(View.GONE);
-		// findViewById(R.id.entry_date_layout).setVisibility(View.GONE);
-
 		viewFlipper = (ViewFlipper) findViewById(R.id.content_flipper);
 		nestedScrollView = (View) findViewById(R.id.nested_scroll_view);
 
@@ -407,95 +386,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		final boolean gestures = preferences.getBoolean(Strings.SETTINGS_GESTURESENABLED, true);
 
-		@SuppressWarnings("deprecation")
-		final GestureDetector gestureDetector = new GestureDetector(this,
-				new GestureDetector.SimpleOnGestureListener() {
-
-					public boolean onDown(MotionEvent e) {
-						return false;
-					}
-
-					public boolean onDoubleTap(MotionEvent e) {
-						// setNavVisibility(false);
-						finish();
-						return false;
-					}
-
-					public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-						if (Math.abs(velocityY) < Math.abs(velocityX)) {
-							if (gestures) {
-								if (velocityX > 800) {
-									if (previousButton.isEnabled()) {
-										previousEntry(true);
-									}
-								} else if (velocityX < -800) {
-									if (nextButton.isEnabled()) {
-										nextEntry(true);
-									}
-								}
-							}
-						}
-						return false;
-					}
-
-					public void onLongPress(MotionEvent e) {
-
-					}
-
-					public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-						if (distanceY > 0.0) {
-							if (Math.abs(distanceY) > 30) {
-								// setNavVisibility(false);
-							}
-						} else {
-							if (Math.abs(distanceY) > 30) {
-								// setNavVisibility(true);
-							}
-						}
-						return false;
-					}
-
-					// public boolean onSingleTapUp(MotionEvent e) {
-					// final ActionBar bar = mActivity.getSupportActionBar();
-					// if (bar.isShowing()) {
-					// bar.hide();
-					// findViewById(R.id.button_layout).setVisibility(View.INVISIBLE);
-					// } else {
-					// bar.show();
-					// findViewById(R.id.button_layout).setVisibility(View.VISIBLE);
-					// }
-					//// if (mAufrufart == AUFRUFART_FEED) {
-					//// loadReadability();
-					//// return true;
-					//// }
-					//
-					//// return false;
-					// return true;
-					// }
-
-					public void onShowPress(MotionEvent e) {
-
-					}
-
-				});
-
-		OnTouchListener onTouchListener = new OnTouchListener() {
-			public boolean onTouch(View v, MotionEvent event) {
-				return gestureDetector.onTouchEvent(event);
-			}
-		};
-
-		webView.setOnTouchListener(onTouchListener);
-
-		content.setOnTouchListener(new OnTouchListener() {
-			public boolean onTouch(View v, MotionEvent event) {
-				gestureDetector.onTouchEvent(event);
-				return true; // different to the above one!
-			}
-		});
-
-		webView0.setOnTouchListener(onTouchListener);
-
 		scrollX = 0;
 		scrollY = 0;
 
@@ -503,14 +393,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
 
 		setZoomsScale();
-		MyWebViewClient myWebViewClient = new MyWebViewClient() {
-			public void onPageFinished(WebView view, String url) {
-				if (!isFirstEntry) {
-					nestedScrollView.scrollTo(0, 0);
-				}
-				zeigeProgressBar(false);
-			};
-		};
+		MyWebViewClient myWebViewClient = new MyWebViewClient();
 
 		webView.setWebViewClient(myWebViewClient);
 		webView0.setWebViewClient(myWebViewClient);
@@ -547,9 +430,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		});
 
 		isFirstEntry = true;
-		// setWebViewListener();
 	}// onCreate
 
+	
 	void setZoomsScale() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			webView.getSettings().setTextZoom(mIntScalePercent * 2); // % von
@@ -569,13 +452,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 	}
 
-	// public void clickMarkAsRead(View view) {
-	// + android:onClick="loadWebview"
+	
 	public void loadWebview(View view) {
 		zeigeProgressBar(true);
 		webView.loadUrl(link);
 	}
 
+	
 	public void loadBrowser(View view) {
 		// Browser öffnen
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
@@ -593,9 +476,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void loadInstapaper() {
-		// webView.getSettings().setJavaScriptEnabled(false);
-		// webView.getSettings().setDomStorageEnabled(true);
-		// webView.loadUrl("http://www.instapaper.com/m?u=" + link);
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.instapaper.com/m?u=" + link)));
 	}
 
@@ -673,11 +553,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				if (titleTextView != null) {
 					titleTextView.requestFocus(); // restart ellipsize
 				}
-				// TextView titelTextView=(TextView)
-				// findViewById(R.id.entry_titel);
-				// titelTextView.setSingleLine();
-				// titelTextView.setText(txtTitel);
-
+				
 				int _feedId = entryCursor.getInt(feedIdPosition);
 
 				if (feedId != _feedId) {
@@ -736,8 +612,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					dateStringBuilder.append(BRACKET).append(author).append(')');
 				}
 
-				// ((TextView)
-				// findViewById(R.id.entry_date)).setText(dateStringBuilder);
 				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
 
 				favorite = entryCursor.getInt(favoritePosition) == 1;
@@ -907,61 +781,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			button.setAlpha(60);
 		}
 		cursor.close();
-	}
-
-	private void switchEntry2(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
-		uri = parentUri.buildUpon().appendPath(id).build();
-		getIntent().setData(uri);
-		scrollX = 0;
-		scrollY = 0;
-
-		// ausgeknippst, da viewer sich nicht mit Animation vertragen...
-		// animate = false;
-		if (mAufrufart > 0) {
-			animate = false;
-		}
-
-		if (animate) {
-			WebView dummy = webView; // switch reference
-			webView = webView0;
-			webView0 = dummy;
-		}
-
-		if (mAufrufart > 0) {
-			// link laden
-			Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
-			if (entryCursor.moveToFirst()) {
-				link = entryCursor.getString(linkPosition);
-				link = fixLink(link);
-				timestamp = entryCursor.getLong(datePosition);
-			}
-			entryCursor.close();
-
-			if (mAufrufart == AUFRUFART_MOBILIZE) {
-				loadMoblize();
-			} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
-				loadInstapaper();
-			} else if (mAufrufart == AUFRUFART_READABILITY) {
-				loadReadability();
-			}
-
-			// markRead 2
-			getContentResolver().update(uri, RSSOverview.getReadContentValues(),
-					new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
-
-			setupButton(previousButton, false, timestamp);
-			setupButton(nextButton, true, timestamp);
-		} else {
-			reload();
-		}
-
-		if (animate) {
-			viewFlipper.setInAnimation(inAnimation);
-			viewFlipper.setOutAnimation(outAnimation);
-			viewFlipper.addView(webView, layoutParams);
-			viewFlipper.showNext();
-			viewFlipper.removeViewAt(0);
-		}
 	}
 
 	private void nextEntry(boolean animate) {
@@ -1149,142 +968,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 	}
 
-	private void readUrl_alt() {
-
-		new Thread(new Runnable() {
-			public void run() {
-
-				try {
-					long start = System.currentTimeMillis();// 0
-					URL url = new URL(link);
-					System.out.println("a" + (System.currentTimeMillis() - start));
-					// InputStream is = url.openStream();
-					URLConnection con = url.openConnection();
-					System.out.println("b" + (System.currentTimeMillis() - start));
-					BufferedReader bufferedReader = new BufferedReader(
-							new InputStreamReader(con.getInputStream(), "UTF8")); // 950ms
-					System.out.println("c" + (System.currentTimeMillis() - start));
-					// baseUrl wechselt ab con.getInputStream (open?)
-					String baseUrl = con.getURL().getProtocol() + "://" + con.getURL().getHost();
-					if (con.getURL().getHost().endsWith("golem.de")) {
-						String[] arr = con.getURL().getPath().split("-");
-						String newLink = "http://www.golem.de/pda/pda-" + arr[arr.length - 1];
-						webView.loadUrl(newLink);
-						return;
-					}
-					if (con.getURL().getHost().endsWith("heise.de")) {
-						String newLink = baseUrl + con.getURL().getPath() + "?view=print";
-						webView.loadUrl(newLink);
-						return;
-					}
-					if (con.getURL().getHost().endsWith("wiwo.de")) {
-						String newLink = baseUrl + con.getURL().getPath();
-						int pos = newLink.lastIndexOf('/');
-						if (pos > 0) {
-							newLink = newLink.substring(0, pos) + "/v_detail_tab_print/"
-									+ newLink.substring(pos, newLink.length());
-						}
-						// bufferedReader = new BufferedReader(new
-						// InputStreamReader(con.getInputStream(), "UTF8"));
-						// webView.loadUrl(newLink);
-						// Wiwo print im Browser öffnen
-						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(newLink)));
-						finish();
-						return;
-					}
-
-					// BufferedReader bufferedReader = new BufferedReader(new
-					// InputStreamReader(is));
-					String line = bufferedReader.readLine();
-					while (line != null) {
-						line = bufferedReader.readLine();
-						bahtml += line;
-					}
-					bufferedReader.close();
-					System.out.println("d" + (System.currentTimeMillis() - start));
-
-					// bahtml = Jsoup.clean(bahtml,
-					// Whitelist.basicWithImages());
-					// String baseUrl = con.getURL().getProtocol() + "://" +
-					// con.getURL().getHost();
-					System.out.println("e" + (System.currentTimeMillis() - start));
-
-					// long u=System.currentTimeMillis();
-					// int pBody=bahtml.indexOf("<body");
-					// System.out.println("pBody"+(System.currentTimeMillis() -
-					// u));
-					// int classCon=bahtml.indexOf("class=\"con\"",pBody);
-					// System.out.println("classCon"+(System.currentTimeMillis()
-					// - u));
-					// bahtml=bahtml.substring(classCon);
-					// System.out.println("f0 " + (System.currentTimeMillis() -
-					// start));
-
-					Document dirty = Jsoup.parseBodyFragment(bahtml, baseUrl); // 2300ms
-																				// !!
-					System.out.println("f" + (System.currentTimeMillis() - start));
-					Elements elements = dirty.getElementsByClass("content");
-					System.out.println("g" + (System.currentTimeMillis() - start));
-					if (elements.size() > 0) {
-						// dirty auf content setzen, 2.parse
-						bahtml = elements.first().html();
-						dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
-					} else {
-						elements = dirty.getElementsByClass("con"); // Tagesschau
-						if (elements.size() > 0) {
-							bahtml = elements.first().html();
-							dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
-						} else {
-							elements = dirty.getElementsByAttributeValue("id", "content"); // Heise
-							if (elements.size() > 0) {
-								bahtml = elements.first().html();
-								dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
-								// } else {
-								// elements =
-								// dirty.getElementsByClass("hcf-content"); //
-								// Wiwo - nope, unsused!!
-								// if (elements.size() > 0) {
-								// bahtml = elements.first().html();
-								// dirty = Jsoup.parseBodyFragment(bahtml,
-								// baseUrl);
-								// }
-							}
-						}
-					}
-					Whitelist whitelist = Whitelist.basic(); // 500ms
-					// Whitelist whitelist = Whitelist.basicWithImages(); //
-					// 500ms
-					whitelist.addTags("h1", "h2", "h3");
-					System.out.println("x" + (System.currentTimeMillis() - start));
-					Cleaner cleaner2 = new Cleaner(whitelist);
-					System.out.println("h" + (System.currentTimeMillis() - start));
-					Document clean = cleaner2.clean(dirty);
-					System.out.println("i" + (System.currentTimeMillis() - start));
-					// clean.body().removeAttr(attributeKey)
-					bahtml = clean.body().html();
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					Util.toastMessageLong(EntryActivity.this, "" + e);
-				}
-
-				final TextView view = (TextView) findViewById(R.id.entry_date);
-				view.post(new Runnable() {
-					public void run() {
-						// bahtml="<html><body>You scored <b>192</b>
-						// points.</body></html>";
-						// android.text.Html.fromHtml(instruction).toString()
-						// Spanned spanned = android.text.Html.fromHtml(bahtml);
-						// view.setText(spanned.toString());
-
-						webView.loadData(bahtml, "text/html; charset=UTF-8", null);
-					}
-				});
-
-			}
-		}).start();
-
-	}
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -1327,11 +1010,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	boolean mNavVisible = true;
 
 	private int mIntScalePercent = 50; // 0..100
-	// mSeekBar.setProgress(intLaufzeitPercent);
-	SeekBar mSeekBar;
 
-	// mSeekBar = (SeekBar) findViewById(R.id.seekBar);
-	// mSeekBar.setOnSeekBarChangeListener(this);
+	SeekBar mSeekBar;
 
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -1380,11 +1060,14 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		@Override
 		public void onPageFinished(WebView view, String url) {
-			// animate(view);
+			if (!isFirstEntry) {
+				nestedScrollView.scrollTo(0, 0);
+			}
 			zeigeProgressBar(false);
+			// kopiert
 			view.setVisibility(View.VISIBLE);
 			super.onPageFinished(view, url);
-		}
+		};
 	}
 
 	int mAnimationDirection = android.R.anim.slide_out_right;
@@ -1394,11 +1077,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private AppBarLayout appBarLayout;
 
 	private View nestedScrollView;
-
-	private void animate(final WebView view) {
-		Animation anim = AnimationUtils.loadAnimation(getBaseContext(), mAnimationDirection);
-		view.startAnimation(anim);
-	}
 
 	private void switchEntry(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
 
@@ -1459,20 +1137,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			viewFlipper.showNext();
 			viewFlipper.removeViewAt(0);
 		}
-
-		// new Handler().postDelayed(new Runnable() {
-		//
-		// @Override
-		// public void run() {
-		// webView.scrollTo(0,0);
-		// System.out.println("Scrolled");
-		// }
-		// }, 1000);
 	}
 
 	public void setHomeButtonActive() {
 		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
-		// actionBar7.setHideOnContentScrollEnabled(true); //knallt mit Toolbar
 		actionBar7.setHomeButtonEnabled(true);
 		// durchsichtige Actionbar
 		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
@@ -1503,10 +1171,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 		case R.id.url_button: {
 			if (link != null) {
-				// if (link.endsWith("feed/atom/")) {
-				// link = link.substring(0, link.length() -
-				// "feed/atom/".length());
-				// }
 				// Browser öffnen
 				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
 			}
@@ -1548,34 +1212,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			break;
 		}
 
-		// case R.id.menu_webview: {
-		// loadWebview();
-		// break;
-		// }
-
 		case R.id.menu_copytoclipboard: {
 			if (link != null) {
 				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
 			}
 			break;
 		}
-		// case R.id.menu_delete: {
-		// getContentResolver().delete(uri, null, null);
-		// if (localPictures) {
-		// FeedData.deletePicturesOfEntry(_id);
-		// }
-		//
-		// if (nextButton.isEnabled()) {
-		// nextButton.performClick();
-		// } else {
-		// if (previousButton.isEnabled()) {
-		// previousButton.performClick();
-		// } else {
-		// finish();
-		// }
-		// }
-		// break;
-		// }
+
 		case R.id.menu_share: {
 			if (link != null) {
 				startActivity(Intent.createChooser(
@@ -1624,110 +1267,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 				if (text != null) {
 					bahtml = text + "<br>";
-					return null;
 				}
-
-				HttpURLConnection connection = null;
-				URL url = new URL(link);
-				connection = (HttpURLConnection) url.openConnection();
-				// connection = NetworkUtils.setupConnection(link,cookieName,
-				// cookieValue,httpAuthLoginValue, httpAuthPassValue);
-
-				String contentIndicator = null;
-				if (!TextUtils.isEmpty(abstractText)) {
-					abstractText = Html.fromHtml(abstractText).toString();
-					if (abstractText.length() > 60) {
-						contentIndicator = abstractText.substring(20, 40);
-					}
-				}
-
-				// str für amp
-				BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(connection.getInputStream(), "UTF8"));
-
-				// baseUrl wechselt ab con.getInputStream (open?)
-				String baseUrl = connection.getURL().getProtocol() + "://" + connection.getURL().getHost();
-
-				String line = bufferedReader.readLine();
-				while (line != null) {
-					line = bufferedReader.readLine();
-					bahtml += line;
-				}
-				bufferedReader.close();
-
-				int posAmphtml = bahtml.indexOf("\"amphtml\"");
-				if (posAmphtml >= 0) {
-
-					// AMP
-
-					int posHref = bahtml.indexOf("href=\"", posAmphtml);
-					System.out.println("posAmphtml " + posAmphtml + " " + posHref);
-					posHref = posHref + 6;
-					int posEnd = bahtml.indexOf("\"", posHref);
-					String ampLink = bahtml.substring(posHref, posEnd);
-					if (ampLink.startsWith("/")) {
-						mNewLink = baseUrl + ampLink;
-					} else {
-						mNewLink = ampLink;
-					}
-
-					// HtmlFetcher fetcher = new HtmlFetcher();
-					// JResult res = fetcher.fetchAndExtract(mNewLink, 2000,
-					// true);
-					// String text = res.getText();
-					// String title = res.getTitle();
-					// String imageUrl = res.getImageUrl();
-					//
-					// if(text!=null){
-					// bahtml=text;
-					// return null;
-					// }
-
-					url = new URL(mNewLink);
-					connection = (HttpURLConnection) url.openConnection();
-					bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF8"));
-
-					String ampContent = "";
-					line = bufferedReader.readLine();
-					while (line != null) {
-						line = bufferedReader.readLine();
-						ampContent += line;
-					}
-					bufferedReader.close();
-
-					int posBody = ampContent.indexOf("<body>");
-					if (posBody >= 0) {
-						ampContent = ampContent.substring(posBody + 6);
-					}
-
-					bahtml = ampContent;
-					Util.toastMessage(EntryActivity.this, "amp");
-					return null;
-				}
-
-				// String mobilizedHtml =
-				// ArticleTextExtractor.extractContent(connection.getInputStream(),
-				// contentIndicator);
-				String mobilizedHtml = ArticleTextExtractor.extractContent(bahtml, contentIndicator);
-
-				if (mobilizedHtml != null) {
-					mobilizedHtml = HtmlUtils.improveHtmlContent(mobilizedHtml, getBaseUrl(link));
-					bahtml = mobilizedHtml;
-				} else {
-					bahtml = null;
-				}
-
-				// HtmlFetcher fetcher = new HtmlFetcher();
-				// JResult res = fetcher.fetchAndExtract(link, 5000, true);
-				// String text = res.getText();
-				// String title = res.getTitle();
-				// String imageUrl = res.getImageUrl();
-				//
-				// if(text!=null){
-				// bahtml=text;
-				// }else{
-				// bahtml=null;
-				// }
+				return null;
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -1740,9 +1281,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			if (bahtml != null) {
-				// webView.getSettings().setJavaScriptEnabled(true);
-				// webView.getSettings().setUseWideViewPort(true);
-				// webView0.getSettings().setUseWideViewPort(true);
 
 				// Bilder auf 100% runter sizen
 			       // content is the content of the HTML or XML.
@@ -1767,7 +1305,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 				if (mNewLink != null) {
 
-					// Glide.with(EntryActivity.this).load(Cheeses.getRandomCheeseDrawable()).centerCrop().into(imageView);
 					URL url;
 					try {
 						url = new URL(mNewLink);
@@ -1778,9 +1315,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					}
 				}
 
-			}
+			}  // else bahatml leer - nix machen, ggf. feed (neu) laden ?!
 		}
 	}
+	
 
 	// aus net.etuldan.sparss.utils.NetworkUtils
 	public static String getBaseUrl(String link) {
@@ -1793,6 +1331,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		return baseUrl;
 	}
 
+	
+	
 	class AsyncAmpRead extends AsyncTask<Void, Void, Void> {
 
 		@Override

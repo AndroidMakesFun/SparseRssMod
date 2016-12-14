@@ -293,10 +293,8 @@ public class RSSOverview extends AppCompatActivity  {
 	protected void onResume() {
 		super.onResume();
 		
-//		setProgressBarIndeterminateVisibility(Util.isCurrentlyRefreshing(this));
 		zeigeProgressBar(Util.isCurrentlyRefreshing(this));
 		registerReceiver(refreshReceiver, new IntentFilter("de.bernd.shandschuh.sparserss.REFRESH"));
-
 		
 //		if (RSSOverview.notificationManager != null) {
 //			notificationManager.cancel(0);
@@ -721,22 +719,17 @@ public class RSSOverview extends AppCompatActivity  {
         
 	}
 
-	// Ersatz für setProgressBarIndeterminateVisibility
-	// public für FetcherService
 	public void zeigeProgressBar(boolean zeigen){
 		if(zeigen){
 			progressBar.setVisibility(View.VISIBLE);
-			System.out.println("zeigeProgressBar true");
 		}else{
 			progressBar.setVisibility(View.INVISIBLE);  
-			System.out.println("zeigeProgressBar false");
 		}
 	}
 
 	private BroadcastReceiver refreshReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-//			setProgressBarIndeterminateVisibility(true);
 			zeigeProgressBar(true);
 		}
 	};
