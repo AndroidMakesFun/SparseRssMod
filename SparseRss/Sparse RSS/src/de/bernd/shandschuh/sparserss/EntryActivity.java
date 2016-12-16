@@ -375,7 +375,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		urlButton.setAlpha(BUTTON_ALPHA + 30);
 		previousButton = (ImageButton) findViewById(R.id.prev_button);
 
-		nestedScrollView = (View) findViewById(R.id.nested_scroll_view);
+//		nestedScrollView = (View) findViewById(R.id.nested_scroll_view);
 
 		webView = new WebView(this);
 
