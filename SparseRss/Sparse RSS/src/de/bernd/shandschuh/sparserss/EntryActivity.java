@@ -28,7 +28,6 @@ package de.bernd.shandschuh.sparserss;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -72,11 +71,9 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.TypedValue;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup.LayoutParams;
@@ -88,7 +85,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.ViewFlipper;
 import de.bernd.shandschuh.sparserss.EntryPagerAdapter.DtoEntry;
 import de.bernd.shandschuh.sparserss.handler.PictureFilenameFilter;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
@@ -97,35 +93,60 @@ import de.jetwick.snacktory.JResult;
 
 public class EntryActivity extends AppCompatActivity implements android.widget.SeekBar.OnSeekBarChangeListener {
 
+	public static final int AUFRUFART_FEED = 0;
+	public static final int AUFRUFART_BROWSER = 1;
+	public static final int AUFRUFART_MOBILIZE = 2;
+	public static final int AUFRUFART_INSTAPAPER = 3;
+	public static final int AUFRUFART_READABILITY = 4;
+	public static final int AUFRUFART_AMP = 5;
+	private static final int AUFRUFART_WEBVIEW = 6; // Leiche ?
+
+	private int mAufrufart = 0;
+	private EntryActivity mActivity = null;
+
+	EntryPagerAdapter mEntryPagerAdapter;	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
 			// setTheme(R.style.Theme_Light);
 			setTheme(R.style.MyTheme_Light);
 		}
-		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
-		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.entry);
+		mActivity = this;
+		
+		Uri mUri = mActivity.getIntent().getData();
+		String sFeedId=mUri.getPath();
+		int pos=sFeedId.indexOf("/feeds/");
+		pos+=7;
+		int ende=sFeedId.indexOf("/", pos);
+		sFeedId=sFeedId.substring(pos, ende);
+		feedId = Integer.parseInt(sFeedId);
 
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		if(toolbar==null){
-			System.out.println("toolbar ist null!!");
-		}
-		setSupportActionBar(toolbar);
-		setHomeButtonActive();
+		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
+		mAufrufart = Util.getViewerPrefs(mActivity, sFeedId);
+		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
 
-		ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+
+//		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//		if(toolbar==null){
+//			System.out.println("toolbar ist null!!");
+//		}
+//		setSupportActionBar(toolbar);
+//		setHomeButtonActive();
+		
+		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
+
+
+		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 		mEntryPagerAdapter = new EntryPagerAdapter(this,anzahlFeedeintraege);
 		viewPager.setAdapter(mEntryPagerAdapter);
 
-		mActivity = this;
 
 	}
 
-	EntryPagerAdapter mEntryPagerAdapter;
-	
 	/*
 	 * private static final String NEWLINE = "\n";
 	 * 
@@ -161,7 +182,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
 	private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
 
-	private static final String CSS = "<head><style type='text/css'> " + "body {max-width: 100%; margin: 0.3cm; "
+	public static final String CSS = "<head><style type='text/css'> " + "body {max-width: 100%; margin: 0.3cm; "
 			+ FONT_SANS_SERIF + " color: " + TEXT_COLOR + "; background-color:" + BACKGROUND_COLOR
 			+ "; line-height: 150%} " + "* {max-width: 100%; word-break: break-word}"
 			+ "h1, h2 {font-weight: normal; line-height: 130%} " + "h1 {font-size: 140%; margin-bottom: 0.1em} "
@@ -267,16 +288,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private boolean localPictures;
 
 	private TextView titleTextView;
-	private int mAufrufart = 0;
-	private static final int AUFRUFART_FEED = 0;
-	private static final int AUFRUFART_BROWSER = 1;
-	private static final int AUFRUFART_MOBILIZE = 2;
-	private static final int AUFRUFART_INSTAPAPER = 3;
-	private static final int AUFRUFART_READABILITY = 4;
-	private static final int AUFRUFART_AMP = 5;
-	private static final int AUFRUFART_WEBVIEW = 6; // Leiche ?
-
-	private EntryActivity mActivity = null;
 
 	private long timestamp;
 	private String abstractText;
@@ -359,7 +370,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					.append(DateFormat.getTimeFormat(this).format(date));
 
 			String txtTitel = entryCursor.getString(titlePosition);
-			((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
+//			((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
 		}
 
 		entryCursor.close();
@@ -407,7 +418,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
 
-		setZoomsScale();
+		setZoomsScale(null);
 		MyWebViewClient myWebViewClient = new MyWebViewClient();
 
 		webView.setWebViewClient(myWebViewClient);
@@ -418,13 +429,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		} else if (mAufrufart == AUFRUFART_MOBILIZE) {
 			loadMoblize();
 		} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
-			loadInstapaper();
+			onClickInstapaper(null);
 		} else if (mAufrufart == AUFRUFART_READABILITY) {
 			loadReadability();
 		} else if (mAufrufart == AUFRUFART_WEBVIEW) {
 			loadWebview(null);
 		} else if (mAufrufart == AUFRUFART_AMP) {
-			loadAmp();
+			onClickLoadAmp(null);
 		}
 
 		markAsReadButton.setOnClickListener(new OnClickListener() {
@@ -446,11 +457,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		isFirstEntry = true;
 	}// onCreate
 
-	void setZoomsScale() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			webView.getSettings().setTextZoom(mIntScalePercent * 2);
-		}
-	}
 
 	public void loadWebview(View view) {
 		zeigeProgressBar(true);
@@ -462,15 +468,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		zeigeProgressBar(true);
 		// webView.loadUrl("http://www.readability.com/m?url=" + link);
 		new AsyncNewReadability().execute();
-	}
-
-	private void loadAmp() {
-		zeigeProgressBar(true);
-		new AsyncAmpRead().execute();
-	}
-
-	private void loadInstapaper() {
-		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.instapaper.com/m?u=" + link)));
 	}
 
 	private void loadMoblize() {
@@ -609,7 +606,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					dateStringBuilder.append(BRACKET).append(author).append(')');
 				}
 
-				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
+//				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
 
 				favorite = entryCursor.getInt(favoritePosition) == 1;
 
@@ -1005,6 +1002,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	boolean mNavVisible = true;
 
+	
+	//// Für setZoomsScale und Dlg dafür ////
+	
 	private int mIntScalePercent = 50; // 0..100
 
 	SeekBar mSeekBar;
@@ -1021,7 +1021,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
-		setZoomsScale();
+		setZoomsScale(null);
 	}
 
 	AlertDialog.Builder mAlertDialog = null;
@@ -1029,7 +1029,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public final static String PREFS_NAME = "de.bernd.sparse.rss.preferences";
 
 	// Scale the Text
-	private void showSeekBarDialog() {
+	public void onClickShowSeekBarDialog(View viewD) {
 		View view = getLayoutInflater().inflate(R.layout.entry_seek_bar, null);
 		mSeekBar = (SeekBar) view.findViewById(R.id.seekBar);
 		mSeekBar.setOnSeekBarChangeListener(this);
@@ -1097,7 +1097,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date))
 						.append(' ').append(DateFormat.getTimeFormat(this).format(date));
 				String txtTitel = entryCursor.getString(titlePosition);
-				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
+//				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
 
 			}
 			entryCursor.close();
@@ -1105,7 +1105,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			if (mAufrufart == AUFRUFART_MOBILIZE) {
 				loadMoblize();
 			} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
-				loadInstapaper();
+				onClickInstapaper(null); 
 			} else if (mAufrufart == AUFRUFART_READABILITY) {
 				loadReadability();
 			}
@@ -1153,45 +1153,39 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			break;
 		}
 		case R.id.url_button: {
-			if (link != null) {
-				// Browser öffnen
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
-			}
+			onClickLoadBrowser(null);
 			break;
 		}
 		case R.id.menu_instapaper: {
-			if (link != null) {
-				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
-				Util.setViewerPrefs(this, "" + feedId, AUFRUFART_INSTAPAPER);
-
-				loadInstapaper();
-			}
+			((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
+			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_INSTAPAPER);
+			onClickInstapaper(null);
 			break;
 		}
 
 		case R.id.menu_feed: {
 			_id = null;
 			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_FEED);
-			reload();
+			onClickReload(null);
 			// readUrl(); // TODO ???
 			break;
 		}
 
 		case R.id.menu_mobilize: {
 			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
-			loadMoblize();
+//			loadMoblize();
 			break;
 		}
 
 		case R.id.menu_readability: {
 			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
-			loadReadability();
+			onClickReadability(null);
 			break;
 		}
 
 		case R.id.menu_amp: {
 			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_AMP);
-			loadAmp();
+			onClickLoadAmp(null);
 			break;
 		}
 
@@ -1203,15 +1197,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 
 		case R.id.menu_share: {
-			if (link != null) {
-				startActivity(Intent.createChooser(
-						new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, link).setType(TEXTPLAIN),
-						getString(R.string.menu_share)));
-			}
+			onClickShare(null);
 			break;
 		}
 		case R.id.menu_text_scale: {
-			showSeekBarDialog();
+			onClickShowSeekBarDialog(null);
 		}
 			break;
 		}
@@ -1324,69 +1314,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		return baseUrl;
 	}
 
-	class AsyncAmpRead extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... params) {
-
-			try {
-				bahtml = "";
-				mNewLink = null;
-				HttpURLConnection connection = null;
-				URL url = new URL(link);
-				connection = (HttpURLConnection) url.openConnection();
-
-				BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(connection.getInputStream(), "UTF8"));
-
-				// baseUrl wechselt ab con.getInputStream (open?)
-				String baseUrl = connection.getURL().getProtocol() + "://" + connection.getURL().getHost();
-
-				String line = bufferedReader.readLine();
-				while (line != null) {
-					line = bufferedReader.readLine();
-					bahtml += line;
-				}
-				bufferedReader.close();
-
-				int posAmphtml = bahtml.indexOf("\"amphtml\"");
-				if (posAmphtml < 0) {
-					// kein AMP -> Default == reload/Feed
-					return null;
-				}
-				int posHref = bahtml.indexOf("href=\"", posAmphtml);
-				System.out.println("posAmphtml " + posAmphtml + " " + posHref);
-				posHref = posHref + 6;
-				int posEnd = bahtml.indexOf("\"", posHref);
-				String ampLink = bahtml.substring(posHref, posEnd);
-				if (ampLink.startsWith("/")) {
-					mNewLink = baseUrl + ampLink;
-				} else {
-					mNewLink = ampLink;
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			if (mNewLink != null) {
-				webView.loadUrl(mNewLink);
-			} else {
-				Util.toastMessage(EntryActivity.this, "No amphtml");
-				// no reload();
-			}
-		}
-	}
-
 	public void onClickMarkAsRead(View view) {
-		System.out.println("onClickMarkAsRead");
-		View v = findViewById(R.id.menu_readability);
-		System.out.println("menu_readability " + v);
+		finish();
 	}
 	
 	public void onClickLoadBrowser(View view) {
@@ -1394,5 +1323,76 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(dtoEntry.link)));
 	}
+
+	public void onClickReadability(View view) {
+		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
+		mAufrufart=AUFRUFART_READABILITY;
+		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
+		mEntryPagerAdapter.new AsyncVeryNewReadability().execute(dtoEntry);
+	}
+
+	public void onClickInstapaper(View view) {
+		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.instapaper.com/m?u=" + dtoEntry.link)));
+	}
+
+	public void onClickLoadAmp(View view) {
+		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_AMP);
+		mAufrufart=AUFRUFART_AMP;
+		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
+		mEntryPagerAdapter.new AsyncAmpRead().execute(dtoEntry);
+	}
+
+	public void onClickReload(View view) {
+		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_FEED);
+		mAufrufart=AUFRUFART_FEED;
+		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
+		mEntryPagerAdapter.reload(dtoEntry);
+	}
+
+	public void onClickShare(View view) {
+		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
+		startActivity(Intent.createChooser(
+				new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, dtoEntry.link).setType(TEXTPLAIN),
+				getString(R.string.menu_share)));
+	}
 	
+	
+	public void setZoomsScale(WebView nWebView) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			if(nWebView==null){
+				nWebView=mEntryPagerAdapter.getAktuellenEntry().webview;
+			}
+			nWebView.getSettings().setTextZoom(mIntScalePercent * 2);
+		}
+	}
+
+	public int getmAufrufart() {
+		return mAufrufart;
+	}
+
+	public void onClickNext(View view) {
+		int aktuellePosition = mEntryPagerAdapter.getAktuellePosition();
+		aktuellePosition++;
+		if(aktuellePosition==mEntryPagerAdapter.getCount()){
+			return;
+		}
+		ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
+		viewPager.setCurrentItem(aktuellePosition, true);
+//		Object instantiateCoordinatorLayout = mEntryPagerAdapter.instantiateItem(viewPager, aktuellePosition);
+//		mEntryPagerAdapter.setPrimaryItem(viewPager,aktuellePosition,instantiateCoordinatorLayout);
+	}
+
+	public void onClickPrevious(View view) {
+		int aktuellePosition = mEntryPagerAdapter.getAktuellePosition();
+		aktuellePosition--;
+		if(aktuellePosition<0){
+			return;
+		}
+		ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
+		viewPager.setCurrentItem(aktuellePosition, true);
+//		Object instantiateCoordinatorLayout = mEntryPagerAdapter.instantiateItem(viewPager, aktuellePosition);
+//		mEntryPagerAdapter.setPrimaryItem(viewPager,aktuellePosition,instantiateCoordinatorLayout);
+	}
+
 }

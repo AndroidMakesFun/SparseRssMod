@@ -1,5 +1,9 @@
 package de.bernd.shandschuh.sparserss;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,6 +26,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import de.bernd.shandschuh.sparserss.handler.PictureFilenameFilter;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
@@ -46,6 +51,7 @@ public class EntryPagerAdapter extends PagerAdapter {
     	String id;
     	String link;
     	String linkGrafik;
+    	String linkAmp;
     	String titel;
     	String text;
     	TextView titelView;
@@ -71,9 +77,9 @@ public class EntryPagerAdapter extends PagerAdapter {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.entry_pager, collection, false);
         
-//		Toolbar toolbar = (Toolbar) layout.findViewById(R.id.toolbar);
-//		mContext.setSupportActionBar(toolbar);
-//		setHomeButtonActive();
+		Toolbar toolbar = (Toolbar) layout.findViewById(R.id.toolbar);
+		mContext.setSupportActionBar(toolbar);
+		setHomeButtonActive();
 
 		// Titel, Text und Grafik laden - je Pager
 		DtoId dtoId=ermittleIdZuPosition(position);
@@ -114,7 +120,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			Date date = new Date(timestamp);
 			StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(mContext).format(date))
 					.append(' ').append(DateFormat.getTimeFormat(mContext).format(date));
-			aAsyncDtoEntry.titel=txtTitel + "  " + dateStringBuilder;
+			aAsyncDtoEntry.titel="<b>" + txtTitel + "</b><br>" + dateStringBuilder;
 			return aAsyncDtoEntry;
 		}
 		return null;
@@ -127,26 +133,74 @@ public class EntryPagerAdapter extends PagerAdapter {
 			System.err.println("" + dtoEntry + layout);
 		}
 		
-		ProgressBar progressBar=(ProgressBar) mContext.findViewById(R.id.progress_spinner);
-		progressBar.setVisibility(View.VISIBLE);
-		
+		checkViews(dtoEntry, layout);
 
-	        WebView webView = (WebView) layout.findViewById(R.id.web_view);
-//	        MyWebViewClient myWebViewClient = new MyWebViewClient();
-//	        webView.setWebViewClient(myWebViewClient);
-	        dtoEntry.webview=webView;
 	        
-	        TextView textView =(TextView) layout.findViewById(R.id.entry_date);
-	        textView.setText(dtoEntry.titel);
-	        dtoEntry.titelView=textView;
+//	        TextView textView =(TextView) layout.findViewById(R.id.entry_date);
+//	        textView.setText(dtoEntry.titel);
+//	        dtoEntry.titelView=textView;
 
-	        ImageView imageView = (ImageView) mContext.findViewById(R.id.backdrop);
-	        dtoEntry.imageView=imageView;
 	        
-	        dtoEntry.progressBar=progressBar;
-			
-			new AsyncVeryNewReadability().execute(dtoEntry);			
+//	        if(getAktuellePosition()==0){
+//		        CoordinatorLayout cCoordinatorLayout = (CoordinatorLayout) mContext.findViewById(R.id.coordinatorLayout);
+//		        ViewCompat.requestApplyInsets(cCoordinatorLayout);
+//	        }
+	        
+//			if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_FEED) {
+//			} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_MOBILIZE) {
+//				loadMoblize();
+//			} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_INSTAPAPER) {
+//				onClickInstapaper(null);
+			if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_READABILITY) {
+				new AsyncVeryNewReadability().execute(dtoEntry);			
+			} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_AMP) {
+				new AsyncAmpRead().execute(dtoEntry);			
+			}else{  
+				// Default: AUFRUFART_FEED
+				reload(dtoEntry);
+			}
+
 	}
+
+	/**
+	 * Sucht ggf. nochmal den WebView, etc.
+	 */
+	private void checkViews(DtoEntry dtoEntry, ViewGroup layout) {
+		
+		if(dtoEntry.webview==null){
+			if(layout!=null){
+				dtoEntry.webview = (WebView) layout.findViewById(R.id.web_view);
+			}
+			if(dtoEntry.webview ==null){
+				dtoEntry.webview=(WebView) mContext.findViewById(R.id.web_view);
+			}
+	        mContext.setZoomsScale(dtoEntry.webview);
+		}
+        
+//        MyWebViewClient myWebViewClient = new MyWebViewClient();
+//        webView.setWebViewClient(myWebViewClient);
+		
+		if(dtoEntry.imageView==null){
+			if(layout!=null){
+				dtoEntry.imageView = (ImageView) layout.findViewById(R.id.backdrop);
+			}
+			if(dtoEntry.imageView==null){
+				dtoEntry.imageView = (ImageView) mContext.findViewById(R.id.backdrop);
+			}
+		}
+
+		if(dtoEntry.progressBar==null){
+			if(layout!=null){
+				dtoEntry.progressBar=(ProgressBar) layout.findViewById(R.id.progress_spinner);
+			}
+			if(dtoEntry.progressBar==null){
+				dtoEntry.progressBar=(ProgressBar) mContext.findViewById(R.id.progress_spinner);
+			}
+			dtoEntry.progressBar.setVisibility(View.VISIBLE);
+		}
+		
+	}
+
 
 	private static final String DATE = "(date=";
 	private static final String AND_ID = " and _id";
@@ -240,15 +294,13 @@ public class EntryPagerAdapter extends PagerAdapter {
 	public void setHomeButtonActive() {
 		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
 		actionBar7.setHomeButtonEnabled(true);
-		// durchsichtige Actionbar == default !
-//		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
+		
 		android.app.ActionBar actionBar = mContext.getActionBar();
 		if (actionBar != null) {
 			actionBar.hide(); // immer weil doppelt...
 		}
 
 		// Up Button, kein Titel
-		//{@link android.view.Window#FEATURE_ACTION_BAR FEATURE_SUPPORT_ACTION_BAR}.</p>
 		int flags = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE;
 		int change = actionBar7.getDisplayOptions() ^ flags;
 		actionBar7.setDisplayOptions(change, flags);
@@ -256,7 +308,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 	}
 
 	
-	class AsyncVeryNewReadability extends AsyncTask<DtoEntry, Void, Void> {
+	public class AsyncVeryNewReadability extends AsyncTask<DtoEntry, Void, Void> {
 
 		DtoEntry aAsyncDatensatz;
 		
@@ -265,8 +317,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 			try {
 				aAsyncDatensatz=params[0];
-				
-				
+
+				aAsyncDatensatz.progressBar.setVisibility(View.VISIBLE);
+
 				HtmlFetcher fetcher2 = new HtmlFetcher();
 				fetcher2.setMaxTextLength(50000);
 				JResult res = fetcher2.fetchAndExtract(aAsyncDatensatz.link, 10000, true);
@@ -298,45 +351,29 @@ public class EntryPagerAdapter extends PagerAdapter {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			
-			aAsyncDatensatz.titelView.setText(aAsyncDatensatz.titel);
-
 			if (aAsyncDatensatz.text != null) {
 
 				// Bilder auf 100% runter sizen
-				// content is the content of the HTML or XML.
 				String stringToAdd = "width=\"100%\" height=\"auto\" ";
-				// Create a StringBuilder to insert string in the middle of
-				// content.
 				StringBuilder sb = new StringBuilder(aAsyncDatensatz.text);
 				int i = 0;
 				int cont = 0;
-				// Check for the "src" substring, if it exists, take the index
-				// where
-				// it appears and insert the stringToAdd there, then increment a
-				// counter
-				// because the string gets altered and you should sum the length
-				// of the inserted substring
 				while (i != -1) {
 					i = aAsyncDatensatz.text.indexOf("src", i + 1);
 					if (i != -1)
 						sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
 					++cont;
 				}
-				aAsyncDatensatz.text = sb.toString();
 				
-//				WebView webView = new WebView(mContext);
-//				WebView webView = (WebView) aAsyncDatensatz.layout.findViewById(R.id.web_view);
-
+				aAsyncDatensatz.text = aAsyncDatensatz.titel + "<br>" + sb.toString();
+				
 				aAsyncDatensatz.webview.loadData(aAsyncDatensatz.text, "text/html; charset=UTF-8", null);
-				// webView.loadDataWithBaseURL(mNewLink, bahtml, "text/html;
-				// charset=UTF-8", null, null);
 
 				if (aAsyncDatensatz.linkGrafik != null) {
 
 					URL url;
 					try {
 						url = new URL(aAsyncDatensatz.linkGrafik );
-//						ImageView imageView = (ImageView) aAsyncDatensatz.layout.findViewById(R.id.backdrop);
 						Glide.with(mContext).load(url).centerCrop().into(aAsyncDatensatz.imageView);
 						;
 					} catch (MalformedURLException e) {
@@ -344,6 +381,73 @@ public class EntryPagerAdapter extends PagerAdapter {
 					}
 				}
 
+			} // else text leer - nix machen, ggf. feed (neu) laden ?!
+			aAsyncDatensatz.progressBar.setVisibility(View.INVISIBLE);
+		}
+	}
+
+	public class AsyncAmpRead extends AsyncTask<DtoEntry, Void, Void> {
+
+		DtoEntry aAsyncDatensatz;
+		
+		@Override
+		protected Void doInBackground(DtoEntry... params) {
+
+			try {
+				aAsyncDatensatz=params[0];
+
+				aAsyncDatensatz.progressBar.setVisibility(View.VISIBLE);
+
+				String bahtml = "";
+				HttpURLConnection connection = null;
+				URL url = new URL(aAsyncDatensatz.link);
+				connection = (HttpURLConnection) url.openConnection();
+
+				BufferedReader bufferedReader = new BufferedReader(
+						new InputStreamReader(connection.getInputStream(), "UTF8"));
+
+				// baseUrl wechselt ab con.getInputStream (open?)
+				String baseUrl = connection.getURL().getProtocol() + "://" + connection.getURL().getHost();
+
+				String line = bufferedReader.readLine();
+				while (line != null) {
+					line = bufferedReader.readLine();
+					bahtml += line;
+				}
+				bufferedReader.close();
+
+				int posAmphtml = bahtml.indexOf("\"amphtml\"");
+				if (posAmphtml < 0) {
+					// kein AMP -> Default == reload/Feed
+					return null;
+				}
+				int posHref = bahtml.indexOf("href=\"", posAmphtml);
+				System.out.println("posAmphtml " + posAmphtml + " " + posHref);
+				posHref = posHref + 6;
+				int posEnd = bahtml.indexOf("\"", posHref);
+				String ampLink = bahtml.substring(posHref, posEnd);
+				if (ampLink.startsWith("/")) {
+					aAsyncDatensatz.linkAmp = baseUrl + ampLink;
+				} else {
+					aAsyncDatensatz.linkAmp = ampLink;
+				}
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			
+			if (aAsyncDatensatz.linkAmp != null) {
+				aAsyncDatensatz.webview.loadUrl(aAsyncDatensatz.linkAmp);
+			} else {
+				Util.toastMessage(mContext, "No amphtml");
+				// no reload();
 			} // else text leer - nix machen, ggf. feed (neu) laden ?!
 			aAsyncDatensatz.progressBar.setVisibility(View.INVISIBLE);
 		}
@@ -360,7 +464,12 @@ public class EntryPagerAdapter extends PagerAdapter {
 //			if (!isFirstEntry) {
 //				nestedScrollView.scrollTo(0, 0);
 //			}
-			view.scrollTo(0, 0);
+//			view.scrollTo(0, 0);
+//			NestedScrollView nestedScrollView =(NestedScrollView) mContext.findViewById(R.id.nested_scroll_view);
+//			if(nestedScrollView!=null){
+//				System.out.println("nestedScrollView.scrollTo(0, 300);");
+//				nestedScrollView.scrollTo(0, -300);
+//			}
 //			zeigeProgressBar(false);
 			// kopiert
 			view.setVisibility(View.VISIBLE);
@@ -375,5 +484,74 @@ public class EntryPagerAdapter extends PagerAdapter {
 		System.out.println(" " + akt + " " + dtoEntry.titel);
 		return dtoEntry;
 	}
-	
+
+	public void reload(DtoEntry dtoEntry) {
+		new AsyncReload().execute(dtoEntry);
+	}
+
+	public class AsyncReload extends AsyncTask<DtoEntry, Void, Void> {
+
+		DtoEntry dtoEntry;
+		
+		@Override
+		protected Void doInBackground(DtoEntry... params) {
+			dtoEntry=params[0];
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			
+			int posImg = dtoEntry.text.indexOf("src=\"");
+			if (posImg > 0) {
+				posImg += 5;
+				int posImgEnde = dtoEntry.text.indexOf('"', posImg);
+				if (posImgEnde > 0) {
+					dtoEntry.linkGrafik = dtoEntry.text.substring(posImg, posImgEnde);
+					System.out.println("gliedeHeader:" + dtoEntry.linkGrafik);
+					URL url;
+					try {
+						url = new URL(dtoEntry.linkGrafik);
+						Glide.with(mContext).load(url).centerCrop().into(dtoEntry.imageView);
+						;
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					}
+				}
+
+				// sonst ein anderes aus dem Artikel, wenn Bilder geladen
+				// wurden...
+			} else if (Util.getImageFolderFile(mContext) != null && Util.getImageFolderFile(mContext).exists()) {
+				PictureFilenameFilter filenameFilter = new PictureFilenameFilter(dtoEntry.id);
+
+				File[] files = Util.getImageFolderFile(mContext).listFiles(filenameFilter);
+				if (files != null && files.length > 0) {
+					Glide.with(mContext).load(files[0]).centerCrop().into(dtoEntry.imageView);
+				}
+			}
+			
+			// Bilder auf 100% runter sizen
+			String stringToAdd = "width=\"100%\" height=\"auto\" ";
+			StringBuilder sb = new StringBuilder(dtoEntry.text);
+			int i = 0;
+			int cont = 0;
+			while (i != -1) {
+				i = dtoEntry.text.indexOf("src", i + 1);
+				if (i != -1)
+					sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
+				++cont;
+			}
+			
+			dtoEntry.text = dtoEntry.titel + "<br>" + sb.toString();
+			
+			checkViews(dtoEntry, null);
+			dtoEntry.webview.loadData(dtoEntry.text, "text/html; charset=UTF-8", "utf-8");
+//			dtoEntry.webview.loadDataWithBaseURL(dtoEntry.link, dtoEntry.text, "text/html", "utf-8", null);
+
+			
+			dtoEntry.progressBar.setVisibility(View.INVISIBLE);
+		}
+	}
+
 }
