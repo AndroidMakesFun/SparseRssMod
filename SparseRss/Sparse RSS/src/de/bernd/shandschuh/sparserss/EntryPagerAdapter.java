@@ -57,7 +57,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 	public EntryPagerAdapter(EntryActivity context, int anzahlFeedeintraege) {
         mContext = context;
-        mAktuellePosition=-1;
+        setAktuellePosition(-1);
         mAnzahlFeedeintraege=anzahlFeedeintraege;
         mListeIDS.clear();
 		mUri = mContext.getIntent().getData();
@@ -225,12 +225,16 @@ public class EntryPagerAdapter extends PagerAdapter {
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
     	super.setPrimaryItem(container, position, object);
     	System.out.println("setPrimaryItem " + position);
-    	mAktuellePosition=position;
+    	setAktuellePosition(position);
     }
 
-    public int getAktuellePosition() {
+    synchronized public int getAktuellePosition() {
 		return mAktuellePosition;
 	}
+    
+    synchronized public void setAktuellePosition(int pos){
+    	mAktuellePosition=pos;
+    }
 
     
 	public void setHomeButtonActive() {
@@ -365,8 +369,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 	}
 
 	public DtoEntry getAktuellenEntry() {
-		DtoId dtoId = this.ermittleIdZuPosition(mAktuellePosition);
-		return this.ladeDtoEntry(dtoId);
+		int akt=getAktuellePosition();
+		DtoId dtoId = this.ermittleIdZuPosition(akt);
+		DtoEntry dtoEntry = this.ladeDtoEntry(dtoId);
+		System.out.println(" " + akt + " " + dtoEntry.titel);
+		return dtoEntry;
 	}
 	
 }
