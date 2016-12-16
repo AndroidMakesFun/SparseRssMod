@@ -63,26 +63,24 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
-import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.TypedValue;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
@@ -91,15 +89,43 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
+import de.bernd.shandschuh.sparserss.EntryPagerAdapter.DtoEntry;
 import de.bernd.shandschuh.sparserss.handler.PictureFilenameFilter;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
-import net.etuldan.sparss.utils.ArticleTextExtractor;
-import net.etuldan.sparss.utils.HtmlUtils;
 
 public class EntryActivity extends AppCompatActivity implements android.widget.SeekBar.OnSeekBarChangeListener {
 
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		if (Util.isLightTheme(this)) {
+			// setTheme(R.style.Theme_Light);
+			setTheme(R.style.MyTheme_Light);
+		}
+		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
+		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
+		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.entry);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		if(toolbar==null){
+			System.out.println("toolbar ist null!!");
+		}
+		setSupportActionBar(toolbar);
+		setHomeButtonActive();
+
+		ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+		mEntryPagerAdapter = new EntryPagerAdapter(this,anzahlFeedeintraege);
+		viewPager.setAdapter(mEntryPagerAdapter);
+
+		mActivity = this;
+
+	}
+
+	EntryPagerAdapter mEntryPagerAdapter;
+	
 	/*
 	 * private static final String NEWLINE = "\n";
 	 * 
@@ -218,10 +244,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private WebView webView;
 	private ImageView imageView;
 
-	private WebView webView0; // only needed for the animation
-
-	private ViewFlipper viewFlipper;
-
 	private ImageButton nextButton;
 	private ImageButton markAsReadButton;
 	private ImageButton readabilityButton;
@@ -261,8 +283,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	private boolean isFirstEntry = true;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+
+	// @Override
+	protected void onCreate_2(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
 			setTheme(R.style.Theme_Light);
 		}
@@ -352,14 +375,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		urlButton.setAlpha(BUTTON_ALPHA + 30);
 		previousButton = (ImageButton) findViewById(R.id.prev_button);
 
-		viewFlipper = (ViewFlipper) findViewById(R.id.content_flipper);
 		nestedScrollView = (View) findViewById(R.id.nested_scroll_view);
 
-		layoutParams = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-
 		webView = new WebView(this);
-
-		viewFlipper.addView(webView, layoutParams);
 
 		OnKeyListener onKeyEventListener = new OnKeyListener() {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -379,9 +397,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		content = findViewById(R.id.entry_content);
 
-		webView0 = new WebView(this);
-		webView0.setOnKeyListener(onKeyEventListener);
-
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		final boolean gestures = preferences.getBoolean(Strings.SETTINGS_GESTURESENABLED, true);
@@ -396,7 +411,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		MyWebViewClient myWebViewClient = new MyWebViewClient();
 
 		webView.setWebViewClient(myWebViewClient);
-		webView0.setWebViewClient(myWebViewClient);
 
 		// 1 Browser schon aus Liste herraus
 		if (mAufrufart == AUFRUFART_FEED) {
@@ -432,37 +446,17 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		isFirstEntry = true;
 	}// onCreate
 
-	
 	void setZoomsScale() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			webView.getSettings().setTextZoom(mIntScalePercent * 2); // % von
-																		// 100
-																		// //
-																		// API
-																		// 14 !!
-			if (webView0 != null) {
-				webView0.getSettings().setTextZoom(mIntScalePercent * 2); // %
-																			// von
-																			// 100
-																			// //
-																			// API
-																			// 14
-																			// !!
-			}
+			webView.getSettings().setTextZoom(mIntScalePercent * 2);
 		}
 	}
 
-	
 	public void loadWebview(View view) {
 		zeigeProgressBar(true);
 		webView.loadUrl(link);
 	}
 
-	
-	public void loadBrowser(View view) {
-		// Browser öffnen
-		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
-	}
 
 	private void loadReadability() {
 		zeigeProgressBar(true);
@@ -500,8 +494,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
 
 		// wegen Absturz durch leere _nextId
-		setupButton(previousButton, false, timestamp);
-		setupButton(nextButton, true, timestamp);
+		// setupButton(previousButton, false, timestamp);
+		// setupButton(nextButton, true, timestamp);
+
+		View v = findViewById(R.id.menu_readability);
+		System.out.println("menu_readability " + v);
 
 	}
 
@@ -553,7 +550,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				if (titleTextView != null) {
 					titleTextView.requestFocus(); // restart ellipsize
 				}
-				
+
 				int _feedId = entryCursor.getInt(feedIdPosition);
 
 				if (feedId != _feedId) {
@@ -640,7 +637,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					}
 				}
 
-				boolean keineBilder=true;
+				boolean keineBilder = true;
 				// alt erstmal online _erstes_ Bild
 				int posImg = abstractText.indexOf("src=\"");
 				if (posImg > 0) {
@@ -653,7 +650,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 						try {
 							url = new URL(mNewLink);
 							Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);
-							keineBilder=false;
+							keineBilder = false;
 							;
 						} catch (MalformedURLException e) {
 							e.printStackTrace();
@@ -668,17 +665,16 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					File[] files = Util.getImageFolderFile(this).listFiles(filenameFilter);
 					if (files != null && files.length > 0) {
 						Glide.with(EntryActivity.this).load(files[0]).centerCrop().into(imageView);
-						keineBilder=false;
+						keineBilder = false;
 					}
 				}
 
-				if(keineBilder){
-//					System.out.println(appBarLayout.getMinimumHeight());
-//					appBarLayout.setMinimumHeight(100);
-//					System.out.println(imageView.getMinimumHeight());
-//					imageView.setMinimumHeight(2);
+				if (keineBilder) {
+					// System.out.println(appBarLayout.getMinimumHeight());
+					// appBarLayout.setMinimumHeight(100);
+					// System.out.println(imageView.getMinimumHeight());
+					// imageView.setMinimumHeight(2);
 				}
-
 
 				int fontsize = Integer.parseInt(preferences.getString(Strings.SETTINGS_FONTSIZE, Strings.ONE));
 
@@ -733,7 +729,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 				setupButton(previousButton, false, timestamp);
 				setupButton(nextButton, true, timestamp);
-//				webView.scrollTo(scrollX, scrollY); // resets the scrolling
+				// webView.scrollTo(scrollX, scrollY); // resets the scrolling
 			}
 		} else {
 			entryCursor.close();
@@ -798,18 +794,19 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	@Override
 	protected void onPause() {
 		super.onPause();
-		scrollX = webView.getScrollX();
-		scrollY = webView.getScrollY();
+		// scrollX = webView.getScrollX();
+		// scrollY = webView.getScrollY();
 	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		webView.saveState(outState);
+//		webView.saveState(outState);
 		super.onSaveInstanceState(outState);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		System.out.println("onCreateOptionsMenu");
 		getMenuInflater().inflate(R.menu.entry, menu);
 		// MenuItem markasreadItem = menu.add(R.string.contextmenu_markasread);
 		// //@string/contextmenu_markasread
@@ -968,7 +965,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 	}
 
-
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (event.getAction() == KeyEvent.ACTION_DOWN) {
@@ -1088,12 +1084,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		scrollX = 0;
 		scrollY = 0;
 
-		if (animate && mAufrufart == 0) {
-			WebView dummy = webView; // switch reference
-			webView = webView0;
-			webView0 = dummy;
-		}
-
 		if (mAufrufart > 0) {
 			// link laden
 			Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
@@ -1130,13 +1120,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			reload();
 		}
 
-		if (animate && mAufrufart == 0) {
-			viewFlipper.setInAnimation(inAnimation);
-			viewFlipper.setOutAnimation(outAnimation);
-			viewFlipper.addView(webView, layoutParams);
-			viewFlipper.showNext();
-			viewFlipper.removeViewAt(0);
-		}
 	}
 
 	public void setHomeButtonActive() {
@@ -1179,7 +1162,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		case R.id.menu_instapaper: {
 			if (link != null) {
 				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
-				Util.setViewerPrefs(this, ""+feedId, AUFRUFART_INSTAPAPER);
+				Util.setViewerPrefs(this, "" + feedId, AUFRUFART_INSTAPAPER);
 
 				loadInstapaper();
 			}
@@ -1188,26 +1171,26 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		case R.id.menu_feed: {
 			_id = null;
-			Util.setViewerPrefs(this, ""+feedId, AUFRUFART_FEED);
+			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_FEED);
 			reload();
 			// readUrl(); // TODO ???
 			break;
 		}
 
 		case R.id.menu_mobilize: {
-			Util.setViewerPrefs(this, ""+feedId, AUFRUFART_MOBILIZE);
+			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
 			loadMoblize();
 			break;
 		}
 
 		case R.id.menu_readability: {
-			Util.setViewerPrefs(this, ""+feedId, AUFRUFART_READABILITY);
+			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
 			loadReadability();
 			break;
 		}
 
 		case R.id.menu_amp: {
-			Util.setViewerPrefs(this, ""+feedId, AUFRUFART_AMP);			
+			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_AMP);
 			loadAmp();
 			break;
 		}
@@ -1236,6 +1219,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	}
 
 	private void zeigeProgressBar(boolean zeigen) {
+		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
+		if (progressBar == null) {
+			System.out.println("progressBar NULL");
+			return;
+		}
+
 		if (zeigen) {
 			progressBar.setVisibility(View.VISIBLE);
 		} else {
@@ -1259,7 +1248,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				// System.out.println("image " + imageUrl);
 
 				// collapsingToolbar.setTitle(title);
-				collapsingToolbar.setTitle("");
+				// collapsingToolbar.setTitle("");
 
 				if (imageUrl != null && !"".equals(imageUrl)) {
 					mNewLink = imageUrl;
@@ -1283,21 +1272,26 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			if (bahtml != null) {
 
 				// Bilder auf 100% runter sizen
-			       // content is the content of the HTML or XML.
-		        String stringToAdd = "width=\"100%\" height=\"auto\" ";
-		        // Create a StringBuilder to insert string in the middle of content.
-		        StringBuilder sb = new StringBuilder(bahtml);
-		        int i = 0;
-		        int cont = 0;
-		        // Check for the "src" substring, if it exists, take the index where 
-		        // it appears and insert the stringToAdd there, then increment a counter
-		        // because the string gets altered and you should sum the length of the inserted substring
-		        while(i != -1){
-		            i = bahtml.indexOf("src", i + 1);
-		            if(i != -1) sb.insert(i + (cont * stringToAdd.length()), stringToAdd );
-		            ++cont;
-		        }
-		        bahtml=sb.toString();
+				// content is the content of the HTML or XML.
+				String stringToAdd = "width=\"100%\" height=\"auto\" ";
+				// Create a StringBuilder to insert string in the middle of
+				// content.
+				StringBuilder sb = new StringBuilder(bahtml);
+				int i = 0;
+				int cont = 0;
+				// Check for the "src" substring, if it exists, take the index
+				// where
+				// it appears and insert the stringToAdd there, then increment a
+				// counter
+				// because the string gets altered and you should sum the length
+				// of the inserted substring
+				while (i != -1) {
+					i = bahtml.indexOf("src", i + 1);
+					if (i != -1)
+						sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
+					++cont;
+				}
+				bahtml = sb.toString();
 
 				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
 				// webView.loadDataWithBaseURL(mNewLink, bahtml, "text/html;
@@ -1315,10 +1309,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					}
 				}
 
-			}  // else bahatml leer - nix machen, ggf. feed (neu) laden ?!
+			} // else bahatml leer - nix machen, ggf. feed (neu) laden ?!
 		}
 	}
-	
 
 	// aus net.etuldan.sparss.utils.NetworkUtils
 	public static String getBaseUrl(String link) {
@@ -1331,8 +1324,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		return baseUrl;
 	}
 
-	
-	
 	class AsyncAmpRead extends AsyncTask<Void, Void, Void> {
 
 		@Override
@@ -1392,4 +1383,16 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 	}
 
+	public void onClickMarkAsRead(View view) {
+		System.out.println("onClickMarkAsRead");
+		View v = findViewById(R.id.menu_readability);
+		System.out.println("menu_readability " + v);
+	}
+	
+	public void onClickLoadBrowser(View view) {
+		// Browser öffnen
+		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(dtoEntry.link)));
+	}
+	
 }

@@ -77,6 +77,7 @@ public class EntriesListActivity extends AppCompatActivity {
 	public static final String EXTRA_AUTORELOAD = "autoreload";
 
 	public static final String EXTRA_AUFRUFART = "aufrufart";
+	public static final String EXTRA_ANZAHL = "anzahl";
 
 	private static final String[] FEED_PROJECTION = { FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL, FeedData.FeedColumns.ICON };
 
@@ -248,8 +249,12 @@ public class EntriesListActivity extends AppCompatActivity {
 
 				}
 
-				startActivity(new Intent(Intent.ACTION_VIEW, contenUri).putExtra(EXTRA_SHOWREAD, entriesListAdapter.isShowRead()).putExtra(FeedData.FeedColumns.ICON, iconBytes)
+				startActivity(new Intent(Intent.ACTION_VIEW, contenUri)
+						.putExtra(EXTRA_SHOWREAD, entriesListAdapter.isShowRead())
+						.putExtra(FeedData.FeedColumns.ICON, iconBytes)
+						.putExtra(EXTRA_ANZAHL, entriesListAdapter.getCount())
 						.putExtra(EXTRA_AUFRUFART, aufrufart));
+				
 			}
 		});
 

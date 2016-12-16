@@ -1,0 +1,55 @@
+<android.support.v4.widget.NestedScrollView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+        	xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/nested_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+              android:fillViewport="true"
+            android:scrollbars="vertical" >
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:id="@+id/entry_date_layout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="4pt" >
+
+                    <TextView
+                        android:id="@+id/entry_date"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="fill"
+                        android:layout_weight="1"
+                        android:paddingTop="2pt"
+                        android:singleLine="false" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:drawable/title_bar" />
+
+                <RelativeLayout
+                    android:id="@+id/entry_content"
+                    android:layout_width="fill_parent"
+                    android:layout_height="0dip"
+                    android:layout_gravity="fill"
+                    android:layout_weight="1"
+                    tools:ignore="NewApi" >
+
+                    <WebView
+                        android:id="@+id/web_view"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:textIsSelectable="true" />
+                    
+                </RelativeLayout>
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
+
