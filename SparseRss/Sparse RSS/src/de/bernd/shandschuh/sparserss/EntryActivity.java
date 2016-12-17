@@ -117,6 +117,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		mActivity = this;
 		
 		Uri mUri = mActivity.getIntent().getData();
+		
 		String sFeedId=mUri.getPath();
 		int pos=sFeedId.indexOf("/feeds/");
 		pos+=7;
@@ -127,6 +128,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
 		mAufrufart = Util.getViewerPrefs(mActivity, sFeedId);
 		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
+		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, 0);
 
 
 //		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -141,9 +143,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-		mEntryPagerAdapter = new EntryPagerAdapter(this,anzahlFeedeintraege);
+		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege);
 		viewPager.setAdapter(mEntryPagerAdapter);
-
+		
+//		viewPager.setCurrentItem(positionInListe, true);
 
 	}
 
@@ -1361,7 +1364,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public void setZoomsScale(WebView nWebView) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			if(nWebView==null){
-				nWebView=mEntryPagerAdapter.getAktuellenEntry().webview;
+				nWebView=mEntryPagerAdapter.getAktuellenEntry().viewWeb;
 			}
 			nWebView.getSettings().setTextZoom(mIntScalePercent * 2);
 		}

@@ -11,6 +11,7 @@ import java.util.Date;
 
 import com.bumptech.glide.Glide;
 
+import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -37,7 +38,14 @@ public class EntryPagerAdapter extends PagerAdapter {
     private int mAktuellePosition;
     private int mAnzahlFeedeintraege;
     
+    /**
+     * content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/2/entries/8242
+     */
     Uri mUri;
+    
+    /**
+     * content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/2/entries
+     */
     Uri mParentUri;
     
     private ArrayList<DtoId> mListeIDS = new ArrayList<DtoId>();
@@ -45,6 +53,7 @@ public class EntryPagerAdapter extends PagerAdapter {
     class DtoId{
     	String id;
     	long date;
+    	boolean isRead;
     }
 
     class DtoEntry{
@@ -54,20 +63,22 @@ public class EntryPagerAdapter extends PagerAdapter {
     	String linkAmp;
     	String titel;
     	String text;
-    	TextView titelView;
-    	WebView webview;
-    	ImageView imageView;
+    	boolean isRead;
+    	TextView viewTitel;
+    	WebView viewWeb;
+    	ImageView viewImage;
     	ProgressBar progressBar;
     }
 
 
-	public EntryPagerAdapter(EntryActivity context, int anzahlFeedeintraege) {
+	public EntryPagerAdapter(EntryActivity context, int position, int anzahlFeedeintraege) {
         mContext = context;
-        setAktuellePosition(-1);
         mAnzahlFeedeintraege=anzahlFeedeintraege;
         mListeIDS.clear();
 		mUri = mContext.getIntent().getData();
 		mParentUri = FeedData.EntryColumns.PARENT_URI(mUri.getPath());
+//        setAktuellePosition(position);
+        setAktuellePosition(-1);
     }
 
     @Override
@@ -91,7 +102,7 @@ public class EntryPagerAdapter extends PagerAdapter {
     }
 
 	public DtoEntry ladeDtoEntry(DtoId idEntry) {
-		// TODO welche Aufrufart?
+
 		if(idEntry==null){
 			System.err.println("" + idEntry);
 			// knallt sowieso
@@ -105,22 +116,44 @@ public class EntryPagerAdapter extends PagerAdapter {
 		final int abstractPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.ABSTRACT);
 		final int datePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.DATE);
 		final int titlePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.TITLE);
+		final int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
 
 		if (entryCursor.moveToFirst()) {
-			String link = entryCursor.getString(linkPosition);
-			link = mContext.fixLink(link);
-			long timestamp = entryCursor.getLong(datePosition);
-			String txtTitel = entryCursor.getString(titlePosition);
-			String abstractText = entryCursor.getString(abstractPosition);
 			DtoEntry aAsyncDtoEntry=new DtoEntry();
 			aAsyncDtoEntry.id=id;
+			String link = entryCursor.getString(linkPosition);
+			link = EntryActivity.fixLink(link);
 			aAsyncDtoEntry.link=link;
+
+			String abstractText = entryCursor.getString(abstractPosition);
 			aAsyncDtoEntry.text=abstractText;
-			
+
+			if (entryCursor.isNull(readDatePosition)){
+				aAsyncDtoEntry.isRead=false;
+			}else{
+				aAsyncDtoEntry.isRead=true;
+			}
+
+			long timestamp = entryCursor.getLong(datePosition);
+			String txtTitel = entryCursor.getString(titlePosition);					
 			Date date = new Date(timestamp);
-			StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(mContext).format(date))
-					.append(' ').append(DateFormat.getTimeFormat(mContext).format(date));
-			aAsyncDtoEntry.titel="<b>" + txtTitel + "</b><br>" + dateStringBuilder;
+			StringBuilder dateStringBuilder = new StringBuilder("");
+			if(aAsyncDtoEntry.isRead){
+//				dateStringBuilder.append(txtTitel + "<br>");
+				dateStringBuilder.append(txtTitel );
+			}else{
+//				dateStringBuilder.append("<b>" + txtTitel + "</b><br>");
+				dateStringBuilder.append("<b>" + txtTitel + "</b>");
+			}			
+			// + date align right
+//			dateStringBuilder.append("<p align=\"right\">");
+			dateStringBuilder.append("<div style=\"text-align:right;\">");
+			dateStringBuilder.append(DateFormat.getDateFormat(mContext).format(date))
+				.append(' ').append(DateFormat.getTimeFormat(mContext).format(date));
+//			dateStringBuilder.append("</p>");			
+			dateStringBuilder.append("</div>");			
+			aAsyncDtoEntry.titel=dateStringBuilder.toString();
+			
 			return aAsyncDtoEntry;
 		}
 		return null;
@@ -167,25 +200,25 @@ public class EntryPagerAdapter extends PagerAdapter {
 	 */
 	private void checkViews(DtoEntry dtoEntry, ViewGroup layout) {
 		
-		if(dtoEntry.webview==null){
+		if(dtoEntry.viewWeb==null){
 			if(layout!=null){
-				dtoEntry.webview = (WebView) layout.findViewById(R.id.web_view);
+				dtoEntry.viewWeb = (WebView) layout.findViewById(R.id.web_view);
 			}
-			if(dtoEntry.webview ==null){
-				dtoEntry.webview=(WebView) mContext.findViewById(R.id.web_view);
+			if(dtoEntry.viewWeb ==null){
+				dtoEntry.viewWeb=(WebView) mContext.findViewById(R.id.web_view);
 			}
-	        mContext.setZoomsScale(dtoEntry.webview);
+	        mContext.setZoomsScale(dtoEntry.viewWeb);
 		}
         
 //        MyWebViewClient myWebViewClient = new MyWebViewClient();
 //        webView.setWebViewClient(myWebViewClient);
 		
-		if(dtoEntry.imageView==null){
+		if(dtoEntry.viewImage==null){
 			if(layout!=null){
-				dtoEntry.imageView = (ImageView) layout.findViewById(R.id.backdrop);
+				dtoEntry.viewImage = (ImageView) layout.findViewById(R.id.backdrop);
 			}
-			if(dtoEntry.imageView==null){
-				dtoEntry.imageView = (ImageView) mContext.findViewById(R.id.backdrop);
+			if(dtoEntry.viewImage==null){
+				dtoEntry.viewImage = (ImageView) mContext.findViewById(R.id.backdrop);
 			}
 		}
 
@@ -238,15 +271,21 @@ public class EntryPagerAdapter extends PagerAdapter {
     				.append(id).append(')').append(OR_DATE).append(successor ? '<' : '>').append(date);
     		
     		Cursor cursor = mContext.getContentResolver()
-    				.query(mParentUri, new String[] { FeedData.EntryColumns._ID,FeedData.EntryColumns.DATE }, queryString.toString(), null, successor ? DESC : ASC);
+    				.query(mParentUri, new String[] { FeedData.EntryColumns._ID,FeedData.EntryColumns.DATE,FeedData.EntryColumns.READDATE }, queryString.toString(), null, successor ? DESC : ASC);
 
     		if (cursor.moveToFirst()) {
     			final String nextId = cursor.getString(0);
     			final String strDate = cursor.getString(1);
-        		DtoId adapterDatensatz = new DtoId();
-        		adapterDatensatz.id = nextId;
-        		adapterDatensatz.date = Long.parseLong(strDate);
-    			mListeIDS.add(adapterDatensatz);
+    			final String strReadDate = cursor.getString(2);
+        		DtoId dto = new DtoId();
+        		dto.id = nextId;
+        		dto.date = Long.parseLong(strDate);
+        		if(strReadDate==null){
+        			dto.isRead=false;
+        		}else{
+        			dto.isRead=true;
+        		}
+    			mListeIDS.add(dto);
     		}
     		cursor.close();
     	}
@@ -280,6 +319,11 @@ public class EntryPagerAdapter extends PagerAdapter {
     	super.setPrimaryItem(container, position, object);
     	System.out.println("setPrimaryItem " + position);
     	setAktuellePosition(position);
+    	DtoId dto = ermittleIdZuPosition(position);
+    	if(!dto.isRead){
+    		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(dto.id)), RSSOverview.getReadContentValues(), null, null);
+    	}
+    	
     }
 
     synchronized public int getAktuellePosition() {
@@ -310,33 +354,29 @@ public class EntryPagerAdapter extends PagerAdapter {
 	
 	public class AsyncVeryNewReadability extends AsyncTask<DtoEntry, Void, Void> {
 
-		DtoEntry aAsyncDatensatz;
+		DtoEntry dto;
 		
 		@Override
 		protected Void doInBackground(DtoEntry... params) {
 
 			try {
-				aAsyncDatensatz=params[0];
+				dto=params[0];
 
-				aAsyncDatensatz.progressBar.setVisibility(View.VISIBLE);
+				dto.progressBar.setVisibility(View.VISIBLE);
 
 				HtmlFetcher fetcher2 = new HtmlFetcher();
 				fetcher2.setMaxTextLength(50000);
-				JResult res = fetcher2.fetchAndExtract(aAsyncDatensatz.link, 10000, true);
+				JResult res = fetcher2.fetchAndExtract(dto.link, 10000, true);
 				String text = res.getText();
 				String title = res.getTitle();
 				String imageUrl = res.getImageUrl();
-				// System.out.println("image " + imageUrl);
-
-				// collapsingToolbar.setTitle(title);
-				// collapsingToolbar.setTitle("");
 
 				if (imageUrl != null && !"".equals(imageUrl)) {
-					aAsyncDatensatz.linkGrafik = imageUrl;
+					dto.linkGrafik = imageUrl;
 				}
 
 				if (text != null) {
-					aAsyncDatensatz.text = text + "<br>";
+					dto.text = text + "<br>";
 				}
 				return null;
 
@@ -351,30 +391,30 @@ public class EntryPagerAdapter extends PagerAdapter {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			
-			if (aAsyncDatensatz.text != null) {
+			if (dto.text != null) {
 
 				// Bilder auf 100% runter sizen
 				String stringToAdd = "width=\"100%\" height=\"auto\" ";
-				StringBuilder sb = new StringBuilder(aAsyncDatensatz.text);
+				StringBuilder sb = new StringBuilder(dto.text);
 				int i = 0;
 				int cont = 0;
 				while (i != -1) {
-					i = aAsyncDatensatz.text.indexOf("src", i + 1);
+					i = dto.text.indexOf("src", i + 1);
 					if (i != -1)
 						sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
 					++cont;
 				}
 				
-				aAsyncDatensatz.text = aAsyncDatensatz.titel + "<br>" + sb.toString();
+				dto.text = dto.titel + sb.toString();
 				
-				aAsyncDatensatz.webview.loadData(aAsyncDatensatz.text, "text/html; charset=UTF-8", null);
+				dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", null);
 
-				if (aAsyncDatensatz.linkGrafik != null) {
+				if (dto.linkGrafik != null) {
 
 					URL url;
 					try {
-						url = new URL(aAsyncDatensatz.linkGrafik );
-						Glide.with(mContext).load(url).centerCrop().into(aAsyncDatensatz.imageView);
+						url = new URL(dto.linkGrafik );
+						Glide.with(mContext).load(url).centerCrop().into(dto.viewImage);
 						;
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
@@ -382,7 +422,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 				}
 
 			} // else text leer - nix machen, ggf. feed (neu) laden ?!
-			aAsyncDatensatz.progressBar.setVisibility(View.INVISIBLE);
+			dto.progressBar.setVisibility(View.INVISIBLE);
 		}
 	}
 
@@ -444,7 +484,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			super.onPostExecute(result);
 			
 			if (aAsyncDatensatz.linkAmp != null) {
-				aAsyncDatensatz.webview.loadUrl(aAsyncDatensatz.linkAmp);
+				aAsyncDatensatz.viewWeb.loadUrl(aAsyncDatensatz.linkAmp);
 			} else {
 				Util.toastMessage(mContext, "No amphtml");
 				// no reload();
@@ -513,7 +553,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 					URL url;
 					try {
 						url = new URL(dtoEntry.linkGrafik);
-						Glide.with(mContext).load(url).centerCrop().into(dtoEntry.imageView);
+						Glide.with(mContext).load(url).centerCrop().into(dtoEntry.viewImage);
 						;
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
@@ -527,7 +567,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 				File[] files = Util.getImageFolderFile(mContext).listFiles(filenameFilter);
 				if (files != null && files.length > 0) {
-					Glide.with(mContext).load(files[0]).centerCrop().into(dtoEntry.imageView);
+					Glide.with(mContext).load(files[0]).centerCrop().into(dtoEntry.viewImage);
 				}
 			}
 			
@@ -546,7 +586,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dtoEntry.text = dtoEntry.titel + "<br>" + sb.toString();
 			
 			checkViews(dtoEntry, null);
-			dtoEntry.webview.loadData(dtoEntry.text, "text/html; charset=UTF-8", "utf-8");
+			dtoEntry.viewWeb.loadData(dtoEntry.text, "text/html; charset=UTF-8", "utf-8");
 //			dtoEntry.webview.loadDataWithBaseURL(dtoEntry.link, dtoEntry.text, "text/html", "utf-8", null);
 
 			

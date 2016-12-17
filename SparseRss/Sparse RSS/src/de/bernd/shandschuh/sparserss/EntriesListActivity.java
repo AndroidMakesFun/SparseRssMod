@@ -78,6 +78,7 @@ public class EntriesListActivity extends AppCompatActivity {
 
 	public static final String EXTRA_AUFRUFART = "aufrufart";
 	public static final String EXTRA_ANZAHL = "anzahl";
+	public static final String EXTRA_POSITION = "position";
 
 	private static final String[] FEED_PROJECTION = { FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL, FeedData.FeedColumns.ICON };
 
@@ -252,6 +253,7 @@ public class EntriesListActivity extends AppCompatActivity {
 				startActivity(new Intent(Intent.ACTION_VIEW, contenUri)
 						.putExtra(EXTRA_SHOWREAD, entriesListAdapter.isShowRead())
 						.putExtra(FeedData.FeedColumns.ICON, iconBytes)
+						.putExtra(EXTRA_POSITION, position)
 						.putExtra(EXTRA_ANZAHL, entriesListAdapter.getCount())
 						.putExtra(EXTRA_AUFRUFART, aufrufart));
 				
