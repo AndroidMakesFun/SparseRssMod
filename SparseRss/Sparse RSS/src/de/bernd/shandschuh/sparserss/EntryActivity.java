@@ -1349,8 +1349,17 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public void onClickReload(View view) {
 		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_FEED);
 		mAufrufart=AUFRUFART_FEED;
+		
+		int aktuellePosition = mEntryPagerAdapter.getAktuellePosition();
+		System.out.println("Reload " + aktuellePosition);
+		
 		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
 		mEntryPagerAdapter.reload(dtoEntry);
+
+//		ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
+//		viewPager.setCurrentItem(aktuellePosition, true);
+//		viewPager.refreshDrawableState();
+
 	}
 
 	public void onClickShare(View view) {
@@ -1382,8 +1391,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 		ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
 		viewPager.setCurrentItem(aktuellePosition, true);
-//		Object instantiateCoordinatorLayout = mEntryPagerAdapter.instantiateItem(viewPager, aktuellePosition);
-//		mEntryPagerAdapter.setPrimaryItem(viewPager,aktuellePosition,instantiateCoordinatorLayout);
 	}
 
 	public void onClickPrevious(View view) {
@@ -1394,8 +1401,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 		ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
 		viewPager.setCurrentItem(aktuellePosition, true);
-//		Object instantiateCoordinatorLayout = mEntryPagerAdapter.instantiateItem(viewPager, aktuellePosition);
-//		mEntryPagerAdapter.setPrimaryItem(viewPager,aktuellePosition,instantiateCoordinatorLayout);
 	}
 
 }

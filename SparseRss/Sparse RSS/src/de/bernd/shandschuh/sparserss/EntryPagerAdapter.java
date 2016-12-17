@@ -362,8 +362,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 			try {
 				dto=params[0];
 
-				dto.progressBar.setVisibility(View.VISIBLE);
-
 				HtmlFetcher fetcher2 = new HtmlFetcher();
 				fetcher2.setMaxTextLength(50000);
 				JResult res = fetcher2.fetchAndExtract(dto.link, 10000, true);
@@ -391,6 +389,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			
+			checkViews(dto, null);
+		
 			if (dto.text != null) {
 
 				// Bilder auf 100% runter sizen
@@ -428,19 +428,17 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 	public class AsyncAmpRead extends AsyncTask<DtoEntry, Void, Void> {
 
-		DtoEntry aAsyncDatensatz;
+		DtoEntry dto;
 		
 		@Override
 		protected Void doInBackground(DtoEntry... params) {
 
 			try {
-				aAsyncDatensatz=params[0];
-
-				aAsyncDatensatz.progressBar.setVisibility(View.VISIBLE);
+				dto=params[0];
 
 				String bahtml = "";
 				HttpURLConnection connection = null;
-				URL url = new URL(aAsyncDatensatz.link);
+				URL url = new URL(dto.link);
 				connection = (HttpURLConnection) url.openConnection();
 
 				BufferedReader bufferedReader = new BufferedReader(
@@ -467,9 +465,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 				int posEnd = bahtml.indexOf("\"", posHref);
 				String ampLink = bahtml.substring(posHref, posEnd);
 				if (ampLink.startsWith("/")) {
-					aAsyncDatensatz.linkAmp = baseUrl + ampLink;
+					dto.linkAmp = baseUrl + ampLink;
 				} else {
-					aAsyncDatensatz.linkAmp = ampLink;
+					dto.linkAmp = ampLink;
 				}
 
 			} catch (Exception e) {
@@ -482,14 +480,17 @@ public class EntryPagerAdapter extends PagerAdapter {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			
-			if (aAsyncDatensatz.linkAmp != null) {
-				aAsyncDatensatz.viewWeb.loadUrl(aAsyncDatensatz.linkAmp);
+
+			checkViews(dto, null);
+
+			if (dto.linkAmp != null) {
+				dto.viewWeb.loadUrl(dto.linkAmp);
 			} else {
 				Util.toastMessage(mContext, "No amphtml");
+				reload(dto);
 				// no reload();
 			} // else text leer - nix machen, ggf. feed (neu) laden ?!
-			aAsyncDatensatz.progressBar.setVisibility(View.INVISIBLE);
+			dto.progressBar.setVisibility(View.INVISIBLE);
 		}
 	}
 
@@ -525,17 +526,19 @@ public class EntryPagerAdapter extends PagerAdapter {
 		return dtoEntry;
 	}
 
-	public void reload(DtoEntry dtoEntry) {
-		new AsyncReload().execute(dtoEntry);
+	public void reload(DtoEntry dto) {
+
+		new AsyncReload().execute(dto);
+		
 	}
 
 	public class AsyncReload extends AsyncTask<DtoEntry, Void, Void> {
 
-		DtoEntry dtoEntry;
+		DtoEntry dto;
 		
 		@Override
 		protected Void doInBackground(DtoEntry... params) {
-			dtoEntry=params[0];
+			dto=params[0];
 			return null;
 		}
 
@@ -543,17 +546,19 @@ public class EntryPagerAdapter extends PagerAdapter {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			
-			int posImg = dtoEntry.text.indexOf("src=\"");
+			checkViews(dto, null);
+			
+			int posImg = dto.text.indexOf("src=\"");
 			if (posImg > 0) {
 				posImg += 5;
-				int posImgEnde = dtoEntry.text.indexOf('"', posImg);
+				int posImgEnde = dto.text.indexOf('"', posImg);
 				if (posImgEnde > 0) {
-					dtoEntry.linkGrafik = dtoEntry.text.substring(posImg, posImgEnde);
-					System.out.println("gliedeHeader:" + dtoEntry.linkGrafik);
+					dto.linkGrafik = dto.text.substring(posImg, posImgEnde);
+					System.out.println("gliedeHeader:" + dto.linkGrafik);
 					URL url;
 					try {
-						url = new URL(dtoEntry.linkGrafik);
-						Glide.with(mContext).load(url).centerCrop().into(dtoEntry.viewImage);
+						url = new URL(dto.linkGrafik);
+						Glide.with(mContext).load(url).centerCrop().into(dto.viewImage);
 						;
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
@@ -563,34 +568,35 @@ public class EntryPagerAdapter extends PagerAdapter {
 				// sonst ein anderes aus dem Artikel, wenn Bilder geladen
 				// wurden...
 			} else if (Util.getImageFolderFile(mContext) != null && Util.getImageFolderFile(mContext).exists()) {
-				PictureFilenameFilter filenameFilter = new PictureFilenameFilter(dtoEntry.id);
+				PictureFilenameFilter filenameFilter = new PictureFilenameFilter(dto.id);
 
 				File[] files = Util.getImageFolderFile(mContext).listFiles(filenameFilter);
 				if (files != null && files.length > 0) {
-					Glide.with(mContext).load(files[0]).centerCrop().into(dtoEntry.viewImage);
+					Glide.with(mContext).load(files[0]).centerCrop().into(dto.viewImage);
 				}
 			}
 			
 			// Bilder auf 100% runter sizen
 			String stringToAdd = "width=\"100%\" height=\"auto\" ";
-			StringBuilder sb = new StringBuilder(dtoEntry.text);
+			StringBuilder sb = new StringBuilder(dto.text);
 			int i = 0;
 			int cont = 0;
 			while (i != -1) {
-				i = dtoEntry.text.indexOf("src", i + 1);
+				i = dto.text.indexOf("src", i + 1);
 				if (i != -1)
 					sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
 				++cont;
 			}
 			
-			dtoEntry.text = dtoEntry.titel + "<br>" + sb.toString();
+			dto.text = dto.titel + sb.toString();
 			
-			checkViews(dtoEntry, null);
-			dtoEntry.viewWeb.loadData(dtoEntry.text, "text/html; charset=UTF-8", "utf-8");
+			checkViews(dto, null);
+			dto.viewWeb.clearView();
+			dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", "utf-8");
 //			dtoEntry.webview.loadDataWithBaseURL(dtoEntry.link, dtoEntry.text, "text/html", "utf-8", null);
 
 			
-			dtoEntry.progressBar.setVisibility(View.INVISIBLE);
+			dto.progressBar.setVisibility(View.INVISIBLE);
 		}
 	}
 
