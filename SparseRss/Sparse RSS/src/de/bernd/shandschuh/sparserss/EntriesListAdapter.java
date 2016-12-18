@@ -228,7 +228,10 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	}
 	
 	private static Cursor createManagedCursor(Activity context, Uri uri, boolean showRead) {
-		return context.managedQuery(uri, null, showRead ? null : READDATEISNULL, null, new StringBuilder(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_PRIORITIZE, false) ? SQLREAD : Strings.EMPTY).append(FeedData.EntryColumns.DATE).append(Strings.DB_DESC).toString());
+		String str=new StringBuilder(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_PRIORITIZE, false) ? SQLREAD : Strings.EMPTY).append(FeedData.EntryColumns.DATE).append(Strings.DB_DESC).toString();
+		return context.managedQuery(uri, null, 
+				showRead ? null : READDATEISNULL, 
+				null,str);
 	}
 	
 	public void markAsRead() {

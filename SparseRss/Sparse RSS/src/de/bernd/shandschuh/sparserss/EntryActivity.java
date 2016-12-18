@@ -145,8 +145,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege);
 		viewPager.setAdapter(mEntryPagerAdapter);
-		
-//		viewPager.setCurrentItem(positionInListe, true);
+		viewPager.setCurrentItem(positionInListe, true);
 
 	}
 
@@ -1329,9 +1328,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	public void onClickReadability(View view) {
 		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
-		mAufrufart=AUFRUFART_READABILITY;
-		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
-		mEntryPagerAdapter.new AsyncVeryNewReadability().execute(dtoEntry);
+		mAufrufart=AUFRUFART_READABILITY;		
+		mEntryPagerAdapter.notifyDataSetChanged();
 	}
 
 	public void onClickInstapaper(View view) {
@@ -1342,24 +1340,14 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public void onClickLoadAmp(View view) {
 		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_AMP);
 		mAufrufart=AUFRUFART_AMP;
-		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
-		mEntryPagerAdapter.new AsyncAmpRead().execute(dtoEntry);
+		mEntryPagerAdapter.notifyDataSetChanged();
 	}
 
 	public void onClickReload(View view) {
 		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_FEED);
 		mAufrufart=AUFRUFART_FEED;
+		mEntryPagerAdapter.notifyDataSetChanged();
 		
-		int aktuellePosition = mEntryPagerAdapter.getAktuellePosition();
-		System.out.println("Reload " + aktuellePosition);
-		
-		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
-		mEntryPagerAdapter.reload(dtoEntry);
-
-//		ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
-//		viewPager.setCurrentItem(aktuellePosition, true);
-//		viewPager.refreshDrawableState();
-
 	}
 
 	public void onClickShare(View view) {
@@ -1373,7 +1361,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public void setZoomsScale(WebView nWebView) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			if(nWebView==null){
-				nWebView=mEntryPagerAdapter.getAktuellenEntry().viewWeb;
+				nWebView=(WebView) this.getCurrentFocus();
 			}
 			nWebView.getSettings().setTextZoom(mIntScalePercent * 2);
 		}

@@ -132,6 +132,8 @@ public class EntriesListActivity extends AppCompatActivity {
 		entriesListAdapter = new EntriesListAdapter(this, uri, intent.getBooleanExtra(EXTRA_SHOWFEEDINFO, false), intent.getBooleanExtra(EXTRA_AUTORELOAD, false));
 		listview.setAdapter(entriesListAdapter);
 		
+
+		
 		emptyview = (TextView) findViewById(android.R.id.empty);
 		if(entriesListAdapter.getCount()>0){
 			emptyview.setVisibility(View.INVISIBLE);
@@ -391,4 +393,10 @@ public class EntriesListActivity extends AppCompatActivity {
 		}
 		return true;
 	}
+	
+	public EntriesListAdapter getEntriesListAdapter() {
+		return entriesListAdapter;
+	}
+
+
 }
