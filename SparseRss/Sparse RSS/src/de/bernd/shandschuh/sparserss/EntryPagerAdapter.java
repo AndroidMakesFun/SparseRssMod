@@ -12,7 +12,10 @@ import java.util.Date;
 import com.bumptech.glide.Glide;
 
 import android.content.ContentUris;
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.view.PagerAdapter;
@@ -208,6 +211,7 @@ public class EntryPagerAdapter extends PagerAdapter {
         
 //        MyWebViewClient myWebViewClient = new MyWebViewClient();
 //        webView.setWebViewClient(myWebViewClient);
+		dtoEntry.viewWeb.setBackgroundColor(getBackgroundColor(mContext));
 		
 		if(dtoEntry.viewImage==null){
 			if(layout!=null){
@@ -564,4 +568,36 @@ public class EntryPagerAdapter extends PagerAdapter {
 	public int getItemPosition(Object object) {
 	    return POSITION_NONE;
 	}
+	
+	static private int backgroundColor=-1;
+	static private int textForgroundColor=-1;
+	
+	int getBackgroundColor(Context context){
+		if(backgroundColor < 0 ){
+			TypedArray array = context.getTheme().obtainStyledAttributes(new int[] {  
+			    android.R.attr.colorBackground, 
+			    android.R.attr.textColorPrimary, 
+			}); 
+			backgroundColor = array.getColor(0, 0xFF00FF); 
+			textForgroundColor = array.getColor(1, 0xFF00FF); 
+			array.recycle();
+		}
+		return backgroundColor;
+	}
+
+	int getTextForgroundColor(Context context){
+		if(backgroundColor < 0 ){
+			TypedArray array = context.getTheme().obtainStyledAttributes(new int[] {  
+			    android.R.attr.colorBackground, 
+			    android.R.attr.textColorPrimary, 
+			}); 
+			backgroundColor = array.getColor(0, 0xFF00FF); 
+			textForgroundColor = array.getColor(1, 0xFF00FF); 
+			array.recycle();
+		}
+		return backgroundColor;
+	}
+
+
+
 }
