@@ -651,7 +651,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 							Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);
 							keineBilder = false;
 							;
-						} catch (MalformedURLException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
@@ -807,23 +807,21 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public boolean onCreateOptionsMenu(Menu menu) {
 		System.out.println("onCreateOptionsMenu");
 		getMenuInflater().inflate(R.menu.entry, menu);
-		// MenuItem markasreadItem = menu.add(R.string.contextmenu_markasread);
-		// //@string/contextmenu_markasread
-		MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread); // @string/contextmenu_markasread
-		MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-		markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
-
-		MenuItem browserItem = menu.add(0, R.id.url_button, 0, R.string.contextmenu_browser);
-		MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-		browserItem.setIcon(android.R.drawable.ic_menu_view);
-
-		MenuItem readabilityItem = menu.add(0, R.id.menu_readability, 0, "Readability");
-		MenuItemCompat.setShowAsAction(readabilityItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-		readabilityItem.setIcon(R.drawable.readability_400);
-
-		MenuItem feedItem = menu.add(0, R.id.menu_feed, 0, "Feed");
-		MenuItemCompat.setShowAsAction(feedItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-		feedItem.setIcon(R.drawable.ic_action_crop);
+//		MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
+//		MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+//		markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
+//
+//		MenuItem browserItem = menu.add(0, R.id.url_button, 0, R.string.contextmenu_browser);
+//		MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+//		browserItem.setIcon(android.R.drawable.ic_menu_view);
+//
+//		MenuItem readabilityItem = menu.add(0, R.id.menu_readability, 0, "Readability");
+//		MenuItemCompat.setShowAsAction(readabilityItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+//		readabilityItem.setIcon(R.drawable.readability_400);
+//
+//		MenuItem feedItem = menu.add(0, R.id.menu_feed, 0, "Feed");
+//		MenuItemCompat.setShowAsAction(feedItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+//		feedItem.setIcon(R.drawable.ic_action_crop);
 
 		return true;
 	}
@@ -1173,11 +1171,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			break;
 		}
 
-		case R.id.menu_mobilize: {
-			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
-//			loadMoblize();
-			break;
-		}
+//		case R.id.menu_mobilize: {
+//			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
+////			loadMoblize();
+//			break;
+//		}
 
 		case R.id.menu_readability: {
 			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
@@ -1296,7 +1294,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 						url = new URL(mNewLink);
 						Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);
 						;
-					} catch (MalformedURLException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}

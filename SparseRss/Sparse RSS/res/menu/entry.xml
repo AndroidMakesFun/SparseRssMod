@@ -12,35 +12,31 @@
         android:title="@string/contextmenu_browser"
 		android:showAsAction="always"/>
 -->		
+
+    <item android:id="@+id/menu_feed"
+        android:icon="@drawable/ic_action_crop"
+        android:title="Feed" 
+        android:showAsAction="ifRoom"/>
     
+	<item android:id="@+id/menu_amp"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:title="AMP" 
+        android:showAsAction="ifRoom"/>
+	
   	<item android:id="@+id/menu_readability"
         android:icon="@drawable/readability_400"
         android:title="Readability"
-        android:visible="false" 
-        android:showAsAction="always"/>
+        android:showAsAction="ifRoom"
+        />
         
-    <item android:id="@+id/menu_mobilize"
-        android:icon="@android:drawable/ic_menu_zoom"
-        android:title="Mobilize" 
-        android:showAsAction="ifRoom"/>
-    
     
 	<item android:id="@+id/menu_instapaper"
         android:icon="@android:drawable/ic_menu_compass"
         android:title="@string/contextmenu_instapaper" 
         android:showAsAction="ifRoom"/>
 
-	<item android:id="@+id/menu_amp"
-        android:icon="@android:drawable/ic_menu_gallery"
-        android:title="AMP" 
-        android:showAsAction="ifRoom"/>
 	
 
-    <item android:id="@+id/menu_feed"
-        android:icon="@drawable/ic_action_crop"
-        android:title="Feed" 
-        android:visible="false" 
-        android:showAsAction="ifRoom"/>
 
 <!--     
     <item android:id="@+id/menu_webview"
@@ -62,7 +58,15 @@
     <item android:id="@+id/menu_delete"
         android:icon="@android:drawable/ic_menu_delete"
         android:title="@string/contextmenu_delete"/>
+        
+    <item android:id="@+id/menu_mobilize"
+        android:icon="@android:drawable/ic_menu_zoom"
+        android:visible="false" 
+        android:title="Mobilize" 
+        android:showAsAction="ifRoom"
+        />        
  -->    
+ 
     <item android:id="@+id/menu_text_scale"
         android:icon="@android:drawable/ic_menu_sort_alphabetically"
         android:title="Text Scale" 

@@ -374,7 +374,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 						url = new URL(dto.linkGrafik );
 						Glide.with(mContext).load(url).centerCrop().into(dto.viewImage);
 						;
-					} catch (MalformedURLException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -487,7 +487,57 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 	public void reload(DtoEntry dto) {
 
-		new AsyncReload().execute(dto);
+//		new AsyncReload().execute(dto);
+		
+		
+		checkViews(dto, null);
+		
+		int posImg = dto.text.indexOf("src=\"");
+		if (posImg > 0) {
+			posImg += 5;
+			int posImgEnde = dto.text.indexOf('"', posImg);
+			if (posImgEnde > 0) {
+				dto.linkGrafik = dto.text.substring(posImg, posImgEnde);
+				System.out.println("gliedeHeader:" + dto.linkGrafik);
+				URL url;
+				try {
+					url = new URL(dto.linkGrafik);
+					Glide.with(mContext).load(url).centerCrop().into(dto.viewImage);
+					;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			// sonst ein anderes aus dem Artikel, wenn Bilder geladen
+			// wurden...
+		} else if (Util.getImageFolderFile(mContext) != null && Util.getImageFolderFile(mContext).exists()) {
+			PictureFilenameFilter filenameFilter = new PictureFilenameFilter(dto.id);
+
+			File[] files = Util.getImageFolderFile(mContext).listFiles(filenameFilter);
+			if (files != null && files.length > 0) {
+				Glide.with(mContext).load(files[0]).centerCrop().into(dto.viewImage);
+			}
+		}
+		
+		// Bilder auf 100% runter sizen
+		String stringToAdd = "width=\"100%\" height=\"auto\" ";
+		StringBuilder sb = new StringBuilder(dto.text);
+		int i = 0;
+		int cont = 0;
+		while (i != -1) {
+			i = dto.text.indexOf("src", i + 1);
+			if (i != -1)
+				sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
+			++cont;
+		}
+		
+		dto.text = dto.titel + sb.toString();
+		
+		checkViews(dto, null);
+		dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", "utf-8");
+		
+		dto.progressBar.setVisibility(View.INVISIBLE);
 		
 	}
 
@@ -505,61 +555,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			
-			checkViews(dto, null);
-			
-			int posImg = dto.text.indexOf("src=\"");
-			if (posImg > 0) {
-				posImg += 5;
-				int posImgEnde = dto.text.indexOf('"', posImg);
-				if (posImgEnde > 0) {
-					dto.linkGrafik = dto.text.substring(posImg, posImgEnde);
-					System.out.println("gliedeHeader:" + dto.linkGrafik);
-					URL url;
-					try {
-						url = new URL(dto.linkGrafik);
-						Glide.with(mContext).load(url).centerCrop().into(dto.viewImage);
-						;
-					} catch (MalformedURLException e) {
-						e.printStackTrace();
-					}
-				}
 
-				// sonst ein anderes aus dem Artikel, wenn Bilder geladen
-				// wurden...
-			} else if (Util.getImageFolderFile(mContext) != null && Util.getImageFolderFile(mContext).exists()) {
-				PictureFilenameFilter filenameFilter = new PictureFilenameFilter(dto.id);
-
-				File[] files = Util.getImageFolderFile(mContext).listFiles(filenameFilter);
-				if (files != null && files.length > 0) {
-					Glide.with(mContext).load(files[0]).centerCrop().into(dto.viewImage);
-				}
-			}
-			
-			// Bilder auf 100% runter sizen
-			String stringToAdd = "width=\"100%\" height=\"auto\" ";
-			StringBuilder sb = new StringBuilder(dto.text);
-			int i = 0;
-			int cont = 0;
-			while (i != -1) {
-				i = dto.text.indexOf("src", i + 1);
-				if (i != -1)
-					sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
-				++cont;
-			}
-			
-			dto.text = dto.titel + sb.toString();
-			
-			checkViews(dto, null);
-			dto.viewWeb.clearView();
-			dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", "utf-8");
-//			dtoEntry.webview.loadDataWithBaseURL(dtoEntry.link, dtoEntry.text, "text/html", "utf-8", null);
-
-			
-			dto.progressBar.setVisibility(View.INVISIBLE);
 		}
 	}
 
-	// Rigeroses "immer" neu laden - um viewer wechsel zu ermöglichen
+	// Rigeroses neu laden nach notifyDataSetChanged() - um ggf. sofortigen viewer wechsel zu erzwingen
 	@Override
 	public int getItemPosition(Object object) {
 	    return POSITION_NONE;
