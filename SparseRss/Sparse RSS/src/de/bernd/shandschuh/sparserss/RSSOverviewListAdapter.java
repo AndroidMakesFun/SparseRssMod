@@ -113,7 +113,10 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 
 		textView.setSingleLine();
 		
-		Cursor countCursor = context.getContentResolver().query(FeedData.EntryColumns.CONTENT_URI(cursor.getString(idPosition)), new String[] {COUNT_UNREAD, COUNT}, null, null, null);
+		Cursor countCursor = context.getContentResolver().query(
+				FeedData.EntryColumns.CONTENT_URI(cursor.getString(idPosition)), 
+				new String[] {COUNT_UNREAD, COUNT}, 
+				null, null, null);
 		
 		countCursor.moveToFirst();
 		
@@ -153,6 +156,7 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 			
 			if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
 				int bitmapSizeInDip = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f, context.getResources().getDisplayMetrics());
+				bitmapSizeInDip*=2;
 				
 				if (bitmap.getHeight() != bitmapSizeInDip) {
 					bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
