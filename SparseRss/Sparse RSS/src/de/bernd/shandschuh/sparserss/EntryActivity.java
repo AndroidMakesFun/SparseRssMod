@@ -28,7 +28,6 @@ package de.bernd.shandschuh.sparserss;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
@@ -61,10 +60,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.view.MenuItemCompat;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
@@ -140,7 +140,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
-
 
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege);
@@ -269,7 +268,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	private ImageButton nextButton;
 	private ImageButton markAsReadButton;
-	private ImageButton readabilityButton;
 
 	private ImageButton urlButton;
 
@@ -383,7 +381,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		nextButton = (ImageButton) findViewById(R.id.next_button);
 		markAsReadButton = (ImageButton) findViewById(R.id.menu_markasread2);
 		markAsReadButton.setAlpha(BUTTON_ALPHA);
-		readabilityButton = (ImageButton) findViewById(R.id.menu_readability2);
 		urlButton = (ImageButton) findViewById(R.id.url_button);
 		urlButton.setAlpha(BUTTON_ALPHA + 30);
 		previousButton = (ImageButton) findViewById(R.id.prev_button);
@@ -445,14 +442,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			@Override
 			public void onClick(View v) {
 				finish();
-			}
-		});
-
-		readabilityButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				loadReadability();
 			}
 		});
 
@@ -1156,12 +1145,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			onClickLoadBrowser(null);
 			break;
 		}
-		case R.id.menu_instapaper: {
-			((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
-			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_INSTAPAPER);
-			onClickInstapaper(null);
-			break;
-		}
 
 		case R.id.menu_feed: {
 			_id = null;
@@ -1328,6 +1311,25 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
 		mAufrufart=AUFRUFART_READABILITY;		
 		mEntryPagerAdapter.notifyDataSetChanged();
+	}
+	
+	public void onClickMenu2(View view) {
+
+		if(view==null){
+			view=this.getCurrentFocus();
+		}
+		
+		PopupMenu popup = new PopupMenu(EntryActivity.this, view);
+		popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+            	EntryActivity.this.onOptionsItemSelected( item);
+                return true;
+            }
+        });
+		popup.show();
+		
 	}
 
 	public void onClickInstapaper(View view) {

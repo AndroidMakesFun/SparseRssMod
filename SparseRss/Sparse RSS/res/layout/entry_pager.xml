@@ -131,14 +131,14 @@
                 android:src="@android:drawable/ic_menu_revert" />
 
             <ImageButton
-                android:id="@+id/menu_readability2"
-                android:onClick="onClickReadability"
+                android:id="@+id/menu_menu2"
+                android:onClick="onClickMenu2"
                 android:layout_width="70dp"
                 android:layout_height="50dp"
                 android:background="#00000000"
                 android:padding="12dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/readability_400" />
+                android:src="@drawable/ic_menu_moreoverflow_normal_holo_light" />
 
             <ImageButton
                 android:id="@+id/next_button"

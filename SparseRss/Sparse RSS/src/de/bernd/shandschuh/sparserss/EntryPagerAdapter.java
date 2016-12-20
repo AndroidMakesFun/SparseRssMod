@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,9 +14,9 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -286,6 +285,7 @@ public class EntryPagerAdapter extends PagerAdapter {
     		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
 //    	}
     	
+    		
     }
 
     synchronized public int getAktuellePosition() {
@@ -449,7 +449,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			if (dto.linkAmp != null) {
 				dto.viewWeb.loadUrl(dto.linkAmp);
 			} else {
-				Util.toastMessage(mContext, "No amphtml");
+//				Util.toastMessage(mContext, "No amphtml");
 				reload(dto);
 				// no reload();
 			} // else text leer - nix machen, ggf. feed (neu) laden ?!
