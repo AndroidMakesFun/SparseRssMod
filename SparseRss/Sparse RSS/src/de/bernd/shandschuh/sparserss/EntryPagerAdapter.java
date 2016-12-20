@@ -16,7 +16,6 @@ import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -144,7 +143,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 //			dateStringBuilder.append("<p align=\"right\">");
 			dateStringBuilder.append("<div style=\"text-align:right;\">");
 			
-			dateStringBuilder.append(mContext.getmAufrufart() + " "); //DEBUG
+//			dateStringBuilder.append(mContext.getmAufrufart() + " "); //DEBUG
 			
 			dateStringBuilder.append(DateFormat.getDateFormat(mContext).format(date))
 				.append(' ').append(DateFormat.getTimeFormat(mContext).format(date));
@@ -159,37 +158,20 @@ public class EntryPagerAdapter extends PagerAdapter {
 
     
 	private void refreshLayout(DtoEntry dtoEntry, ViewGroup layout) {
-		// TODO welche Aufrufart?
 		if(dtoEntry==null || dtoEntry==null){
 			System.err.println("" + dtoEntry + layout);
 		}
 		
 		checkViews(dtoEntry, layout);
 
-	        
-//	        TextView textView =(TextView) layout.findViewById(R.id.entry_date);
-//	        textView.setText(dtoEntry.titel);
-//	        dtoEntry.titelView=textView;
-
-	        
-//	        if(getAktuellePosition()==0){
-//		        CoordinatorLayout cCoordinatorLayout = (CoordinatorLayout) mContext.findViewById(R.id.coordinatorLayout);
-//		        ViewCompat.requestApplyInsets(cCoordinatorLayout);
-//	        }
-	        
-//			if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_FEED) {
-//			} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_MOBILIZE) {
-//				loadMoblize();
-//			} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_INSTAPAPER) {
-//				onClickInstapaper(null);
-			if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_READABILITY) {
-				new AsyncVeryNewReadability().execute(dtoEntry);			
-			} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_AMP) {
-				new AsyncAmpRead().execute(dtoEntry);			
-			}else{  
-				// Default: AUFRUFART_FEED
-				reload(dtoEntry);
-			}
+		if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_READABILITY) {
+			new AsyncVeryNewReadability().execute(dtoEntry);			
+		} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_AMP) {
+			new AsyncAmpRead().execute(dtoEntry);			
+		}else{  
+			// Default: AUFRUFART_FEED
+			reload(dtoEntry);
+		}
 
 	}
 
