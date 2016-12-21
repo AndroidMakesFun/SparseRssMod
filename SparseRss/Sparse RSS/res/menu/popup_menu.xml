@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_feed"
+        android:icon="@drawable/ic_action_crop"
+        android:showAsAction="ifRoom"
+        android:title="Feed"
+        />
+    <item
+        android:id="@+id/menu_amp"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:showAsAction="ifRoom"
+        android:title="AMP"/>
+    <item
+        android:id="@+id/menu_readability"
+        android:icon="@drawable/readability_400"
+        android:showAsAction="ifRoom"
+        android:title="Readability"/>
+    
+    <item
+        android:id="@+id/menu_copytoclipboard"
+        android:icon="@android:drawable/ic_menu_upload"
+        android:title="@string/contextmenu_copyurl"
+        android:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/menu_share"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="@string/menu_share"
+        android:showAsAction="ifRoom"
+        />
+
+    <item android:id="@+id/menu_text_scale"
+        android:icon="@android:drawable/ic_menu_sort_alphabetically"
+        android:title="Text Scale" 
+        android:showAsAction="ifRoom"/>
+    
+</menu>
