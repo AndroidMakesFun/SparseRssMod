@@ -146,6 +146,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege);
 		viewPager.setAdapter(mEntryPagerAdapter);
 		viewPager.setCurrentItem(positionInListe, true);
+		
+		if(Util.isLightTheme(mActivity)){
+			viewPager.setBackgroundColor( Color.parseColor("#f6f6f6"));  // Grau Weiss des CSS
+		}else{
+			viewPager.setBackgroundColor(Color.BLACK);
+		}
 
 	}
 

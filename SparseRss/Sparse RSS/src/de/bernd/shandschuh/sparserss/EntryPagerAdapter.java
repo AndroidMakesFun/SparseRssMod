@@ -195,11 +195,11 @@ public class EntryPagerAdapter extends PagerAdapter {
         
 //        MyWebViewClient myWebViewClient = new MyWebViewClient();
 //        webView.setWebViewClient(myWebViewClient);
-		if (Util.isLightTheme(mContext)) {
-			dtoEntry.viewWeb.setBackgroundColor(getBackgroundColor(mContext));
-		}else{
-			dtoEntry.viewWeb.setBackgroundColor(Color.BLACK);
-		}
+//		if (Util.isLightTheme(mContext)) {
+//			dtoEntry.viewWeb.setBackgroundColor(getBackgroundColor(mContext));
+//		}else{
+//			dtoEntry.viewWeb.setBackgroundColor(Color.BLACK);
+//		}
 		
 		if(dtoEntry.viewImage==null){
 			if(layout!=null){
