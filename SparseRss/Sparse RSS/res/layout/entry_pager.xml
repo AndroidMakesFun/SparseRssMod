@@ -26,6 +26,7 @@
 
                 <ImageView
                     android:id="@+id/backdrop"
+				    android:background="@android:color/black"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:layout_collapseMode="parallax"
@@ -70,10 +71,6 @@
                 android:layout_height="fill_parent"
                 android:orientation="vertical" >
 
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:background="@android:drawable/title_bar" />
 
                 <RelativeLayout
                     android:id="@+id/entry_content"

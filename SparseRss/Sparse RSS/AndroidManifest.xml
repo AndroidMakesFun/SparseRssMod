@@ -49,6 +49,7 @@
         <activity
             android:name=".RSSOverview"
             android:launchMode="singleTask" >
+            android:theme="@style/Theme.AppCompat.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -56,9 +57,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".EmptyActivity" />
+        
         <activity
             android:name=".EntriesListActivity"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask" 
+            android:theme="@style/Theme.AppCompat.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -67,10 +70,11 @@
                 <data android:mimeType="vnd.android.cursor.dir/vnd.feeddata.entry" />
             </intent-filter>
         </activity>
+        
         <activity
             android:name=".EntryActivity"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
+            android:theme="@style/Theme.AppCompat.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

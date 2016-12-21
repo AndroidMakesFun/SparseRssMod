@@ -1,6 +1,7 @@
 <resources>
 
-    <style name="MyTheme.Light" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="MyTheme.Light" parent="Theme.AppCompat.Light.NoActionBar" >
+    </style>
 
 <!--     
     <style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />

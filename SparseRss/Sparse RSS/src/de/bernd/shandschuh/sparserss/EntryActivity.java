@@ -60,7 +60,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -77,6 +76,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -200,6 +201,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			+ ".button-section input, .button-section a {font-family: sans-serif-light; font-size: 100%; color: #FFFFFF; background-color: "
 			+ BUTTON_COLOR + "; text-decoration: none; border: none; border-radius:0.2cm; padding: 0.3cm} "
 			+ "</style><meta name='viewport' content='width=device-width, initial-scale=1'/></head>";
+	
+	public static String getCSS(){
+		return CSS;
+	}
 
 	private static final String FONT_START = CSS + "<body link=\"#97ACE5\" text=\"#C0C0C0\">";
 
@@ -478,16 +483,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		if (RSSOverview.notificationManager != null) {
 			RSSOverview.notificationManager.cancel(0);
 		}
-		uri = getIntent().getData();
-		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
-
-		// wegen Absturz durch leere _nextId
-		// setupButton(previousButton, false, timestamp);
-		// setupButton(nextButton, true, timestamp);
-
-		View v = findViewById(R.id.menu_readability);
-		System.out.println("menu_readability " + v);
-
+//		uri = getIntent().getData();
+//		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
 	}
 
 	public static String fixLink(String strLink) {

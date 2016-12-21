@@ -14,6 +14,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.view.PagerAdapter;
@@ -23,11 +24,14 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import de.bernd.shandschuh.sparserss.EntryPagerAdapter.DtoEntry;
 import de.bernd.shandschuh.sparserss.handler.PictureFilenameFilter;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.jetwick.snacktory.HtmlFetcher;
@@ -132,22 +136,21 @@ public class EntryPagerAdapter extends PagerAdapter {
 			String txtTitel = entryCursor.getString(titlePosition);					
 			Date date = new Date(timestamp);
 			StringBuilder dateStringBuilder = new StringBuilder("");
+			
+			dateStringBuilder.append(mContext.getCSS());  // immer
+			
 			if(aAsyncDtoEntry.isRead){
-//				dateStringBuilder.append(txtTitel + "<br>");
 				dateStringBuilder.append(txtTitel );
 			}else{
-//				dateStringBuilder.append("<b>" + txtTitel + "</b><br>");
 				dateStringBuilder.append("<b>" + txtTitel + "</b>");
 			}			
 			// + date align right
-//			dateStringBuilder.append("<p align=\"right\">");
 			dateStringBuilder.append("<div style=\"text-align:right;\">");
 			
 //			dateStringBuilder.append(mContext.getmAufrufart() + " "); //DEBUG
 			
 			dateStringBuilder.append(DateFormat.getDateFormat(mContext).format(date))
 				.append(' ').append(DateFormat.getTimeFormat(mContext).format(date));
-//			dateStringBuilder.append("</p>");			
 			dateStringBuilder.append("</div>");			
 			aAsyncDtoEntry.titel=dateStringBuilder.toString();
 			
@@ -192,7 +195,11 @@ public class EntryPagerAdapter extends PagerAdapter {
         
 //        MyWebViewClient myWebViewClient = new MyWebViewClient();
 //        webView.setWebViewClient(myWebViewClient);
-		dtoEntry.viewWeb.setBackgroundColor(getBackgroundColor(mContext));
+		if (Util.isLightTheme(mContext)) {
+			dtoEntry.viewWeb.setBackgroundColor(getBackgroundColor(mContext));
+		}else{
+			dtoEntry.viewWeb.setBackgroundColor(Color.BLACK);
+		}
 		
 		if(dtoEntry.viewImage==null){
 			if(layout!=null){
@@ -266,7 +273,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 //    	if(!dto.isRead){
     		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
 //    	}
-    	
     		
     }
 
@@ -283,16 +289,22 @@ public class EntryPagerAdapter extends PagerAdapter {
 		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
 		actionBar7.setHomeButtonEnabled(true);
 		
-		android.app.ActionBar actionBar = mContext.getActionBar();
-		if (actionBar != null) {
-			actionBar.hide(); // immer weil doppelt...
-		}
+//		android.app.ActionBar actionBar = mContext.getActionBar();
+//		if (actionBar != null) {
+//			actionBar.hide(); // immer weil doppelt...
+//		}
 
 		// Up Button, kein Titel
 		int flags = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE;
 		int change = actionBar7.getDisplayOptions() ^ flags;
 		actionBar7.setDisplayOptions(change, flags);
-
+		
+		
+//        Window win = mContext.getWindow();
+//        WindowManager.LayoutParams winParams = win.getAttributes();
+//        winParams.flags |=  WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+////        winParams.flags |=  WindowManager.LayoutParams.FLAG_FULLSCREEN;  // funkt
+//        win.setAttributes(winParams);
 	}
 
 	
@@ -443,7 +455,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 	 * Für onPageFinished um ProzessBar an/aus zu knipsen da webview aSyncron
 	 * die animation trasht
 	 */
-	private class MyWebViewClient extends WebViewClient {
+	class MyWebViewClient extends WebViewClient {
 
 		@Override
 		public void onPageFinished(WebView view, String url) {

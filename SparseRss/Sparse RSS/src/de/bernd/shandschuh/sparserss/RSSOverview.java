@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -122,6 +123,8 @@ public class RSSOverview extends AppCompatActivity  {
 	public void onCreate(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
 			setTheme(R.style.MyTheme_Light);
+		}else{
+			setTheme(R.style.Theme_AppCompat_NoActionBar); //@style/Theme.AppCompat.NoActionBar
 		}
 		super.onCreate(savedInstanceState);
 		
@@ -140,6 +143,9 @@ public class RSSOverview extends AppCompatActivity  {
 		listview = (ListView) findViewById(android.R.id.list);
 		listAdapter = new RSSOverviewListAdapter(this);
 		listview.setAdapter(listAdapter);
+		if (!Util.isLightTheme(this)) {
+			listview.setBackgroundColor(Color.BLACK);
+		}
 		
 		emptyview = (TextView) findViewById(android.R.id.empty);
 		if(listAdapter.getCount()>0){

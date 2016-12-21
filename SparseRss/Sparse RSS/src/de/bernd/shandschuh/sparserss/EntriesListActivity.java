@@ -128,7 +128,9 @@ public class EntriesListActivity extends AppCompatActivity {
 		uri = intent.getData();
 
 		listview = (ListView) findViewById(android.R.id.list);
-
+		if (!Util.isLightTheme(this)) {
+			listview.setBackgroundColor(Color.BLACK);
+		}
 		entriesListAdapter = new EntriesListAdapter(this, uri, intent.getBooleanExtra(EXTRA_SHOWFEEDINFO, false), intent.getBooleanExtra(EXTRA_AUTORELOAD, false));
 		listview.setAdapter(entriesListAdapter);
 		
