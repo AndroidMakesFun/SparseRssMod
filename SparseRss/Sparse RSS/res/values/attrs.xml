@@ -1,0 +1,8 @@
+<resources>
+	
+    <declare-styleable name="mein_menu">
+        <attr name="ic_menu_moreoverflow_normal_holo" format="reference"/>
+    </declare-styleable>
+
+    		
+</resources>

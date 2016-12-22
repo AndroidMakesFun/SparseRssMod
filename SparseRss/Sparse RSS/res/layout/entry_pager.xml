@@ -135,7 +135,7 @@
                 android:background="#00000000"
                 android:padding="12dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/ic_menu_moreoverflow_normal_holo_light" />
+                android:src="?attr/ic_menu_moreoverflow_normal_holo" />
 
             <ImageButton
                 android:id="@+id/next_button"

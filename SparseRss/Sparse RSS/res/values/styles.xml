@@ -1,8 +1,13 @@
 <resources>
 
     <style name="MyTheme.Light" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="ic_menu_moreoverflow_normal_holo" >@drawable/ic_menu_moreoverflow_normal_holo_light</item>
     </style>
 
+    <style name="MyTheme" parent="Theme.AppCompat.NoActionBar" >
+        <item name="ic_menu_moreoverflow_normal_holo" >@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
+    </style>			
+    
 <!--     
     <style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
 
