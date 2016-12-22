@@ -117,26 +117,38 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		setContentView(R.layout.entry);
 		mActivity = this;
 		
-		Uri mUri = mActivity.getIntent().getData();
+		Uri mUri = mActivity.getIntent().getData(); // aus EntriesListActivity
 		
 		String sFeedId=mUri.getPath();
 		int pos=sFeedId.indexOf("/feeds/");
-		pos+=7;
-		int ende=sFeedId.indexOf("/", pos);
-		sFeedId=sFeedId.substring(pos, ende);
-		feedId = Integer.parseInt(sFeedId);
+		if (pos>0){
+			pos+=7;
+			int ende=sFeedId.indexOf("/", pos);
+			sFeedId=sFeedId.substring(pos, ende);
+			feedId = Integer.parseInt(sFeedId);
+		}else{
+			// Aufruf vom Widget
+			_id = mUri.getLastPathSegment();
+			feedId = getFeedIdZuEntryId(_id);
+			sFeedId=""+feedId;
+			mUri = FeedData.EntryColumns.FULL_CONTENT_URI(sFeedId, _id);
+		}
 
 		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
 		mAufrufart = Util.getViewerPrefs(mActivity, sFeedId);
 		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
-		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, 0);
+		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, -1);  // !!
 
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
 
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+		
 		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege);
 		viewPager.setAdapter(mEntryPagerAdapter);
+		if(positionInListe<0){
+			positionInListe=mEntryPagerAdapter.getAktuellePosition();  // dort neu ermittelt
+		}
 		viewPager.setCurrentItem(positionInListe, true);
 		
 		if(Util.isLightTheme(mActivity)){
@@ -144,6 +156,50 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}else{
 			viewPager.setBackgroundColor(Color.BLACK);
 		}
+		
+		
+		
+//		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
+//		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, 0);
+//		
+//		feedId = 0;
+//		boolean bDirektSprungVomWidget=false;
+//		String sFeedId=mUri.getPath();
+//		int pos=sFeedId.indexOf("/feeds/");
+//		if (pos>0){
+//			pos+=7;
+//			int ende=sFeedId.indexOf("/", pos);
+//			sFeedId=sFeedId.substring(pos, ende);
+//			feedId = Integer.parseInt(sFeedId);
+//		}else{
+//			bDirektSprungVomWidget=true;
+//			_id = mUri.getLastPathSegment();
+//			feedId = getFeedIdZuEntryId(_id);
+//		}
+//
+//		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
+//		mAufrufart = Util.getViewerPrefs(mActivity, sFeedId);
+//
+//		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+//		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
+//		
+//		Uri parentUri=FeedData.EntryColumns.PARENT_URI(mUri.getPath());
+//
+//		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+//		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege, parentUri);
+//		viewPager.setAdapter(mEntryPagerAdapter);
+//		if(!bDirektSprungVomWidget){
+//			viewPager.setCurrentItem(positionInListe, true);
+//		}else{
+//			int posID=mEntryPagerAdapter.ermittlePositionZuId(_id);
+//			viewPager.setCurrentItem(posID, true);
+//		}
+//		
+//		if(Util.isLightTheme(mActivity)){
+//			viewPager.setBackgroundColor( Color.parseColor("#f6f6f6"));  // Grau Weiss des CSS
+//		}else{
+//			viewPager.setBackgroundColor(Color.BLACK);
+//		}
 
 	}
 
@@ -1373,4 +1429,18 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		viewPager.setCurrentItem(aktuellePosition, true);
 	}
 
+	public int getFeedIdZuEntryId(String id){
+	
+		Uri selectUri= FeedData.EntryColumns.ENTRY_CONTENT_URI(id);
+		Cursor entryCursor = getContentResolver().query(selectUri, null, null, null, null);
+
+		int feedIdPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.FEED_ID);
+
+		int feedId = -1;
+		if (entryCursor.moveToFirst()) {
+			feedId = entryCursor.getInt(feedIdPosition); // bah			
+		}	
+		entryCursor.close();
+		return feedId;
+	}
 }

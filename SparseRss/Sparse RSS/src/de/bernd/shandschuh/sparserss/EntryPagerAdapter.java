@@ -77,6 +77,12 @@ public class EntryPagerAdapter extends PagerAdapter {
 		mParentUri = FeedData.EntryColumns.PARENT_URI(mUri.getPath());
 		
         ermittleAlleIds();
+        
+        if(position<0){
+            mAnzahlFeedeintraege=mListeIdsAsString.size(); // statt anzahlFeedeintraege
+        	String id = mUri.getLastPathSegment();
+        	position=ermittlePositionZuId(id);
+        }
         setAktuellePosition(position);
     }
 
@@ -148,6 +154,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 				.append(' ').append(DateFormat.getTimeFormat(mContext).format(date));
 			dateStringBuilder.append("</div>");			
 			aAsyncDtoEntry.titel=dateStringBuilder.toString();
+			
+			entryCursor.close();
 			
 			return aAsyncDtoEntry;
 		}
@@ -228,15 +236,27 @@ public class EntryPagerAdapter extends PagerAdapter {
 			mListeIdsAsString.add(id);
 			cursor.moveToNext();
 		}
-		if(!(mListeIdsAsString.size() == mAnzahlFeedeintraege)){
-			Util.toastMessageLong(mContext, "Wrong mListeIdsAsString " + mListeIdsAsString.size() + " " + mAnzahlFeedeintraege);
-		}
+//		if(!(mListeIdsAsString.size() == mAnzahlFeedeintraege)){
+//			Util.toastMessageLong(mContext, "Wrong mListeIdsAsString " + mListeIdsAsString.size() + " " + mAnzahlFeedeintraege);
+//		}
     }
     
     
     public String ermittleIdZuPosition(int position) {
     		return mListeIdsAsString.get(position);
 	}
+
+    /**
+     * Durchsucht mListeIdsAsString nach primaryKey ID und gibt seine Postiion in der Liste bzw. DB zurück
+     */
+    public int ermittlePositionZuId(String id) {
+    	for (int i = 0; i < mListeIdsAsString.size(); i++) {
+			if(id.equals(mListeIdsAsString.get(i))){
+				return i;
+			}
+		}
+    	return -1;
+}
 
 	@Override
     public void destroyItem(ViewGroup collection, int position, Object view) {

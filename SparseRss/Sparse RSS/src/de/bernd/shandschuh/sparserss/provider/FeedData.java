@@ -121,6 +121,14 @@ public class FeedData {
 			return Uri.parse(new StringBuilder(CONTENT).append(AUTHORITY).append("/feeds/").append(feedId).append("/entries").toString());
 		}
 
+		/**
+		 * baut 
+		 * content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/2/entries/8242
+		 */
+		public static Uri FULL_CONTENT_URI(String feedId, String entryId) {
+			return Uri.parse(new StringBuilder(CONTENT).append(AUTHORITY).append("/feeds/").append(feedId).append("/entries/").append(entryId).toString());
+		}
+
 		public static Uri ENTRY_CONTENT_URI(String entryId) {
 			return Uri.parse(new StringBuilder(CONTENT).append(AUTHORITY).append("/entries/").append(entryId).toString());
 		}
