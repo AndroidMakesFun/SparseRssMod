@@ -26,7 +26,9 @@
 package de.bernd.shandschuh.sparserss;
 
 import android.app.Activity;
+import android.content.ClipboardManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -80,6 +82,15 @@ public class FeedConfigActivity extends Activity {
         spinner.setAdapter(adapter);
 			
 		if (intent.getAction().equals(Intent.ACTION_INSERT)) {
+			
+			ClipboardManager cm = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
+			if (cm.getPrimaryClip().getItemCount() > 0) {
+				String clip = "" + cm.getPrimaryClip().getItemAt(0).getText();
+				if (!"".equals(clip)) {
+					urlEditText.setText(clip);
+				}
+			}
+			
 			setTitle(R.string.newfeed_title);
 			restoreInstanceState(savedInstanceState);
 			((Button) findViewById(R.id.button_ok)).setOnClickListener(new OnClickListener() {
