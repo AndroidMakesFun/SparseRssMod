@@ -71,22 +71,12 @@
                 android:layout_height="fill_parent"
                 android:orientation="vertical" >
 
-
-                <RelativeLayout
-                    android:id="@+id/entry_content"
-                    android:layout_width="fill_parent"
-                    android:layout_height="0dip"
-                    android:layout_gravity="fill"
-                    android:layout_weight="1"
-                    tools:ignore="NewApi" >
-
                     <WebView
                         android:id="@+id/web_view"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
                         android:textIsSelectable="true" />
                     
-                </RelativeLayout>
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
 

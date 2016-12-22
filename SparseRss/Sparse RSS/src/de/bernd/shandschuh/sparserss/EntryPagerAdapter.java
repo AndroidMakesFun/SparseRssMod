@@ -82,8 +82,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup collection, int position) {
-    	System.out.println("instantiateItem " + position);
-//        CustomPagerEnum customPagerEnum = CustomPagerEnum.values()[position];
+    	
         LayoutInflater inflater = LayoutInflater.from(mContext);
         ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.entry_pager, collection, false);
         
@@ -91,7 +90,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 		mContext.setSupportActionBar(toolbar);
 		setHomeButtonActive();
 
-		// Titel, Text und Grafik laden - je Pager
 		String id=ermittleIdZuPosition(position);
 		DtoEntry dtoEntry =ladeDtoEntry(id);
 		refreshLayout(dtoEntry, layout);
@@ -104,7 +102,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 		if(id==null){
 			System.err.println("ladeDtoEntry id is null");
-			// knallt sowieso
 		}
 		
 		Uri selectUri= FeedData.EntryColumns.ENTRY_CONTENT_URI(id);
@@ -146,8 +143,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 			}			
 			// + date align right
 			dateStringBuilder.append("<div style=\"text-align:right;\">");
-			
-//			dateStringBuilder.append(mContext.getmAufrufart() + " "); //DEBUG
 			
 			dateStringBuilder.append(DateFormat.getDateFormat(mContext).format(date))
 				.append(' ').append(DateFormat.getTimeFormat(mContext).format(date));
@@ -226,8 +221,6 @@ public class EntryPagerAdapter extends PagerAdapter {
     public void ermittleAlleIds() {
     	mListeIdsAsString.clear();
     	
-    	// entriesListAdapter = new EntriesListAdapter(this, uri, intent.getBooleanExtra(EXTRA_SHOWFEEDINFO, false), intent.getBooleanExtra(EXTRA_AUTORELOAD, false));
-    	
 		Cursor cursor = mContext.getContentResolver().query(mParentUri, null, null, null, "date DESC");
 		cursor.moveToFirst();
 		while (cursor.isAfterLast() == false) {
@@ -235,7 +228,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 			mListeIdsAsString.add(id);
 			cursor.moveToNext();
 		}
-		System.out.println("mListeIdsAsString " + mListeIdsAsString.size() + " " + (mListeIdsAsString.size() == mAnzahlFeedeintraege));
 		if(!(mListeIdsAsString.size() == mAnzahlFeedeintraege)){
 			Util.toastMessageLong(mContext, "Wrong mListeIdsAsString " + mListeIdsAsString.size() + " " + mAnzahlFeedeintraege);
 		}
@@ -248,7 +240,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 	@Override
     public void destroyItem(ViewGroup collection, int position, Object view) {
-    	System.out.println("destroyItem " + position);
         collection.removeView((View) view);
     }
 
@@ -267,13 +258,10 @@ public class EntryPagerAdapter extends PagerAdapter {
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
     	super.setPrimaryItem(container, position, object);
-    	System.out.println("setPrimaryItem " + position);
     	setAktuellePosition(position);
     	String id = ermittleIdZuPosition(position);
 //    	if(!dto.isRead){
-    		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
-//    	}
-    		
+   		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
     }
 
     synchronized public int getAktuellePosition() {
@@ -289,22 +277,10 @@ public class EntryPagerAdapter extends PagerAdapter {
 		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
 		actionBar7.setHomeButtonEnabled(true);
 		
-//		android.app.ActionBar actionBar = mContext.getActionBar();
-//		if (actionBar != null) {
-//			actionBar.hide(); // immer weil doppelt...
-//		}
-
 		// Up Button, kein Titel
 		int flags = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE;
 		int change = actionBar7.getDisplayOptions() ^ flags;
 		actionBar7.setDisplayOptions(change, flags);
-		
-		
-//        Window win = mContext.getWindow();
-//        WindowManager.LayoutParams winParams = win.getAttributes();
-//        winParams.flags |=  WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
-////        winParams.flags |=  WindowManager.LayoutParams.FLAG_FULLSCREEN;  // funkt
-//        win.setAttributes(winParams);
 	}
 
 	
@@ -333,19 +309,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 			checkViews(dto, null);
 		
 			if (dto.text != null) {
-
-//				// Bilder auf 100% runter sizen
-//				String stringToAdd = "width=\"100%\" height=\"auto\" ";
-//				StringBuilder sb = new StringBuilder(dto.text);
-//				int i = 0;
-//				int cont = 0;
-//				while (i != -1) {
-//					i = dto.text.indexOf("src", i + 1);
-//					if (i != -1)
-//						sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
-//					++cont;
-//				}				
-//				dto.text = dto.titel + sb.toString();
 
 				dto.text = dto.titel + dto.text;
 
@@ -403,7 +366,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 					return null;
 				}
 				int posHref = bahtml.indexOf("href=\"", posAmphtml);
-				System.out.println("posAmphtml " + posAmphtml + " " + posHref);
 				posHref = posHref + 6;
 				int posEnd = bahtml.indexOf("\"", posHref);
 				String ampLink = bahtml.substring(posHref, posEnd);
@@ -474,15 +436,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 		int akt=getAktuellePosition();
 		String id = this.ermittleIdZuPosition(akt);
 		DtoEntry dtoEntry = this.ladeDtoEntry(id);
-		System.out.println(" " + akt + " " + dtoEntry.titel);
 		return dtoEntry;
 	}
 
 	public void reload(DtoEntry dto) {
 
-//		new AsyncReload().execute(dto);
-		
-		
 		checkViews(dto, null);
 		
 		int posImg = dto.text.indexOf("src=\"");
@@ -491,7 +449,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 			int posImgEnde = dto.text.indexOf('"', posImg);
 			if (posImgEnde > 0) {
 				dto.linkGrafik = dto.text.substring(posImg, posImgEnde);
-				System.out.println("glide Header:" + dto.linkGrafik);
 				URL url;
 				try {
 					url = new URL(dto.linkGrafik);
@@ -513,19 +470,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 			}
 		}
 		
-//		// Bilder auf 100% runter sizen
-//		String stringToAdd = "width=\"100%\" height=\"auto\" ";
-//		StringBuilder sb = new StringBuilder(dto.text);
-//		int i = 0;
-//		int cont = 0;
-//		while (i != -1) {
-//			i = dto.text.indexOf("src", i + 1);
-//			if (i != -1)
-//				sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
-//			++cont;
-//		}	
-//		dto.text = dto.titel + sb.toString();
-		
 		dto.text = dto.titel + dto.text;
 		
 		checkViews(dto, null);
@@ -535,25 +479,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 		
 	}
 
-//	public class AsyncReload extends AsyncTask<DtoEntry, Void, Void> {
-//
-//		DtoEntry dto;
-//		
-//		@Override
-//		protected Void doInBackground(DtoEntry... params) {
-//			dto=params[0];
-//			return null;
-//		}
-//
-//		@Override
-//		protected void onPostExecute(Void result) {
-//			super.onPostExecute(result);
-//			
-//
-//		}
-//	}
 
-	// Rigeroses neu laden nach notifyDataSetChanged() - um ggf. sofortigen viewer wechsel zu erzwingen
 	@Override
 	public int getItemPosition(Object object) {
 	    return POSITION_NONE;

@@ -371,7 +371,6 @@ public class RSSHandler extends DefaultHandler {
 		} else if (TAG_NAME.equals(localName)) {
 			nameTagEntered = true;
 		} else if (TAG_IMAGE.equals(localName)) {
-			System.out.println("TAG_IMAGE ");
 			imageTagEntered=true;
 
 		}
@@ -585,7 +584,6 @@ public class RSSHandler extends DefaultHandler {
 		} else if (TAG_AUTHOR.equals(localName)) {
 			authorTagEntered = false;
 		} else if (TAG_IMAGE.equals(localName)) {
-			System.out.println("TAG_IMAGE END");
 			imageTagEntered=false;
 		}
 	}

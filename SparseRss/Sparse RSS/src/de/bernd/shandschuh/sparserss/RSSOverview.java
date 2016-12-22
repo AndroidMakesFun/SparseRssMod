@@ -117,8 +117,6 @@ public class RSSOverview extends AppCompatActivity  {
 
 	public static RSSOverview INSTANCE;
 
-	/** Called when the activity is first created. */
-	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
@@ -697,32 +695,17 @@ public class RSSOverview extends AppCompatActivity  {
 		return getSupportActionBar();
 	}
 
-//	@SuppressLint("NewApi")
-//	public void setHomeButtonActive() {
-//		myActionBar().setDisplayHomeAsUpEnabled(true);
-//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-//			myActionBar().setHomeButtonEnabled(true);
-//		}
-//	}
-
 	public void setHomeButtonActive() {
 		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
-//		actionBar7.setHideOnContentScrollEnabled(true); //knallt mit Toolbar
 		actionBar7.setHomeButtonEnabled(true);
 		// durchsichtige Actionbar
 //		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
-		android.app.ActionBar actionBar = getActionBar();
-		if (actionBar != null) {
-			actionBar.hide(); //immer weil doppelt...
-		}
 
 		//Up Button, funkt per Default automatisch
         int flags = 0;
         flags = ActionBar.DISPLAY_HOME_AS_UP|ActionBar.DISPLAY_SHOW_TITLE;
         int change = actionBar7.getDisplayOptions() ^ flags;
         actionBar7.setDisplayOptions(change, flags);
-
-        
 	}
 
 	public void zeigeProgressBar(boolean zeigen){

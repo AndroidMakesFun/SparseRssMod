@@ -131,14 +131,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
 		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, 0);
 
-
-//		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//		if(toolbar==null){
-//			System.out.println("toolbar ist null!!");
-//		}
-//		setSupportActionBar(toolbar);
-//		setHomeButtonActive();
-		
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
 
@@ -154,12 +146,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}
 
 	}
-
-	/*
-	 * private static final String NEWLINE = "\n";
-	 * 
-	 * private static final String BR = "<br/>";
-	 */
 
 	private static final String TEXT_HTML = "text/html";
 
@@ -292,7 +278,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	private LayoutParams layoutParams;
 
-	private View content;
+//	private View content;
 
 	private SharedPreferences preferences;
 
@@ -416,7 +402,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		};
 		webView.setOnKeyListener(onKeyEventListener);
 
-		content = findViewById(R.id.entry_content);
+//		content = findViewById(R.id.entry_content);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -636,7 +622,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 					int posImgEnde = abstractText.indexOf('"', posImg);
 					if (posImgEnde > 0) {
 						mNewLink = abstractText.substring(posImg, posImgEnde);
-						System.out.println("gliedeHeader:" + mNewLink);
 						URL url;
 						try {
 							url = new URL(mNewLink);
@@ -686,7 +671,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 								.append(BODY_END).toString(), TEXT_HTML, UTF8, null);
 					}
 					webView.setBackgroundColor(Color.WHITE);
-					content.setBackgroundColor(Color.WHITE);
+//					content.setBackgroundColor(Color.WHITE);
 				} else {
 					if (fontsize > 0) {
 						webView.loadDataWithBaseURL(null, new StringBuilder(FONT_FONTSIZE_START).append(fontsize)
@@ -698,7 +683,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 								TEXT_HTML, UTF8, null);
 					}
 					webView.setBackgroundColor(Color.BLACK);
-					content.setBackgroundColor(Color.BLACK);
+//					content.setBackgroundColor(Color.BLACK);
 				}
 
 				link = entryCursor.getString(linkPosition);
@@ -797,7 +782,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		System.out.println("onCreateOptionsMenu");
 		getMenuInflater().inflate(R.menu.entry, menu);
 //		MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
 //		MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
@@ -1197,7 +1181,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private void zeigeProgressBar(boolean zeigen) {
 		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
 		if (progressBar == null) {
-			System.out.println("progressBar NULL");
 			return;
 		}
 
@@ -1221,10 +1204,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				String text = res.getText();
 				String title = res.getTitle();
 				String imageUrl = res.getImageUrl();
-				// System.out.println("image " + imageUrl);
-
-				// collapsingToolbar.setTitle(title);
-				// collapsingToolbar.setTitle("");
 
 				if (imageUrl != null && !"".equals(imageUrl)) {
 					mNewLink = imageUrl;
