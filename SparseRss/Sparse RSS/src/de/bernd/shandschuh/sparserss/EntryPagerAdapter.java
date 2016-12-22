@@ -317,25 +317,10 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 			try {
 				dto=params[0];
-
-				HtmlFetcher fetcher2 = new HtmlFetcher();
-				fetcher2.setMaxTextLength(50000);
-				JResult res = fetcher2.fetchAndExtract(dto.link, 10000, true);
-				String text = res.getText();
-				String title = res.getTitle();
-				String imageUrl = res.getImageUrl();
-
-				if (imageUrl != null && !"".equals(imageUrl)) {
-					dto.linkGrafik = imageUrl;
-				}
-
-				if (text != null) {
-					dto.text = text + "<br>";
-				}
-				return null;
+				fetchHtmlSeite(dto);
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				Util.toastMessage(mContext, "" + e);
 				e.printStackTrace();
 			}
 			return null;
@@ -349,20 +334,21 @@ public class EntryPagerAdapter extends PagerAdapter {
 		
 			if (dto.text != null) {
 
-				// Bilder auf 100% runter sizen
-				String stringToAdd = "width=\"100%\" height=\"auto\" ";
-				StringBuilder sb = new StringBuilder(dto.text);
-				int i = 0;
-				int cont = 0;
-				while (i != -1) {
-					i = dto.text.indexOf("src", i + 1);
-					if (i != -1)
-						sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
-					++cont;
-				}
-				
-				dto.text = dto.titel + sb.toString();
-				
+//				// Bilder auf 100% runter sizen
+//				String stringToAdd = "width=\"100%\" height=\"auto\" ";
+//				StringBuilder sb = new StringBuilder(dto.text);
+//				int i = 0;
+//				int cont = 0;
+//				while (i != -1) {
+//					i = dto.text.indexOf("src", i + 1);
+//					if (i != -1)
+//						sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
+//					++cont;
+//				}				
+//				dto.text = dto.titel + sb.toString();
+
+				dto.text = dto.titel + dto.text;
+
 				dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", null);
 
 				if (dto.linkGrafik != null) {
@@ -426,6 +412,17 @@ public class EntryPagerAdapter extends PagerAdapter {
 				} else {
 					dto.linkAmp = ampLink;
 				}
+				
+				
+				if (dto.linkAmp != null) {
+					
+					dto.link=dto.linkAmp;
+					
+					fetchHtmlSeite(dto);
+					
+					dto.linkAmp=null; // reload() erzwingen
+				}
+
 
 			} catch (Exception e) {
 
@@ -443,10 +440,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 			if (dto.linkAmp != null) {
 				dto.viewWeb.loadUrl(dto.linkAmp);
 			} else {
-//				Util.toastMessage(mContext, "No amphtml");
 				reload(dto);
-				// no reload();
-			} // else text leer - nix machen, ggf. feed (neu) laden ?!
+			} 
 			dto.progressBar.setVisibility(View.INVISIBLE);
 		}
 	}
@@ -496,7 +491,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			int posImgEnde = dto.text.indexOf('"', posImg);
 			if (posImgEnde > 0) {
 				dto.linkGrafik = dto.text.substring(posImg, posImgEnde);
-				System.out.println("gliedeHeader:" + dto.linkGrafik);
+				System.out.println("glide Header:" + dto.linkGrafik);
 				URL url;
 				try {
 					url = new URL(dto.linkGrafik);
@@ -518,19 +513,20 @@ public class EntryPagerAdapter extends PagerAdapter {
 			}
 		}
 		
-		// Bilder auf 100% runter sizen
-		String stringToAdd = "width=\"100%\" height=\"auto\" ";
-		StringBuilder sb = new StringBuilder(dto.text);
-		int i = 0;
-		int cont = 0;
-		while (i != -1) {
-			i = dto.text.indexOf("src", i + 1);
-			if (i != -1)
-				sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
-			++cont;
-		}
+//		// Bilder auf 100% runter sizen
+//		String stringToAdd = "width=\"100%\" height=\"auto\" ";
+//		StringBuilder sb = new StringBuilder(dto.text);
+//		int i = 0;
+//		int cont = 0;
+//		while (i != -1) {
+//			i = dto.text.indexOf("src", i + 1);
+//			if (i != -1)
+//				sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
+//			++cont;
+//		}	
+//		dto.text = dto.titel + sb.toString();
 		
-		dto.text = dto.titel + sb.toString();
+		dto.text = dto.titel + dto.text;
 		
 		checkViews(dto, null);
 		dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", "utf-8");
@@ -539,23 +535,23 @@ public class EntryPagerAdapter extends PagerAdapter {
 		
 	}
 
-	public class AsyncReload extends AsyncTask<DtoEntry, Void, Void> {
-
-		DtoEntry dto;
-		
-		@Override
-		protected Void doInBackground(DtoEntry... params) {
-			dto=params[0];
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			
-
-		}
-	}
+//	public class AsyncReload extends AsyncTask<DtoEntry, Void, Void> {
+//
+//		DtoEntry dto;
+//		
+//		@Override
+//		protected Void doInBackground(DtoEntry... params) {
+//			dto=params[0];
+//			return null;
+//		}
+//
+//		@Override
+//		protected void onPostExecute(Void result) {
+//			super.onPostExecute(result);
+//			
+//
+//		}
+//	}
 
 	// Rigeroses neu laden nach notifyDataSetChanged() - um ggf. sofortigen viewer wechsel zu erzwingen
 	@Override
@@ -593,5 +589,26 @@ public class EntryPagerAdapter extends PagerAdapter {
 	}
 
 
+	/**
+	 * Liest dto.link aus.
+	 * Überschreibt dto.text und dto.linkGrafik 
+	 */
+	public void fetchHtmlSeite(DtoEntry dto) throws Exception {
+
+		HtmlFetcher fetcher2 = new HtmlFetcher();
+		fetcher2.setMaxTextLength(50000);
+		JResult res = fetcher2.fetchAndExtract(dto.link, 10000, true);
+		String text = res.getText();
+//		String title = res.getTitle();
+		String imageUrl = res.getImageUrl();
+
+		if (imageUrl != null && !"".equals(imageUrl)) {
+			dto.linkGrafik = imageUrl;
+		}
+
+		if (text != null) {
+			dto.text = text + "<br>";
+		}
+	}
 
 }
