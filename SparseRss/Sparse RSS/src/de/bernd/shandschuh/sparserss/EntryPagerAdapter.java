@@ -37,7 +37,7 @@ import de.jetwick.snacktory.JResult;
 public class EntryPagerAdapter extends PagerAdapter {
 
     final private EntryActivity mContext;
-    private int mAktuellePosition;
+    private int mAktuellePosition=-1;
     private int mAnzahlFeedeintraege;
     
     /**
@@ -51,7 +51,8 @@ public class EntryPagerAdapter extends PagerAdapter {
     Uri mParentUri;
     
     private ArrayList<String> mListeIdsAsString = new ArrayList<String>();
-	private boolean showPics;
+	private boolean showPics; // Prefs Bilder laden und anzeigen
+	private boolean showRead; // EntriesListActivity gelesene anzeigen
     
     class DtoEntry{
     	String id;
@@ -72,6 +73,7 @@ public class EntryPagerAdapter extends PagerAdapter {
         mContext = context;
         mAnzahlFeedeintraege=anzahlFeedeintraege;
 		mUri = mContext.getIntent().getData();
+		showRead = mContext.getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
 		mParentUri = FeedData.EntryColumns.PARENT_URI(mUri.getPath());
 		showPics = Util.showPics(context);
 		
@@ -108,6 +110,21 @@ public class EntryPagerAdapter extends PagerAdapter {
         collection.addView(layout);
         return layout;
     }
+
+    // Ermittlung der aktuell angezeigten Position
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+//    	super.setPrimaryItem(container, position, object);
+//    	if (getAktuellePosition()!=position){
+    		// never, da schon im Contructor - Wer setzt gelesen ?
+        	System.out.println("setPrimaryItem " + position + " " + object);
+        	setAktuellePosition(position);
+        	String id = ermittleIdZuPosition(position);
+//        	if(!dto.isRead){
+       		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
+//    	}
+    }
+
 
 	public DtoEntry ladeDtoEntry(String id) {
 
@@ -250,17 +267,24 @@ public class EntryPagerAdapter extends PagerAdapter {
 
     public void ermittleAlleIds() {
     	mListeIdsAsString.clear();
-    	
-		Cursor cursor = mContext.getContentResolver().query(mParentUri, null, null, null, "date DESC");
+    	Cursor cursor;
+    	if(showRead){
+    		cursor = mContext.getContentResolver().query(mParentUri, null, null, null, "date DESC");    		
+    	}else{
+    		String READDATEISNULL = "readdate is null";
+    		cursor = mContext.getContentResolver().query(mParentUri, null, READDATEISNULL, null, "date DESC");
+    	}
 		cursor.moveToFirst();
 		while (cursor.isAfterLast() == false) {
 			final String id = cursor.getString(0);
 			mListeIdsAsString.add(id);
 			cursor.moveToNext();
 		}
-//		if(!(mListeIdsAsString.size() == mAnzahlFeedeintraege)){
+		cursor.close();
+		if(!(mListeIdsAsString.size() == mAnzahlFeedeintraege)){
+			System.out.println("Wrong mListeIdsAsString " + mListeIdsAsString.size() + " " + mAnzahlFeedeintraege);
 //			Util.toastMessageLong(mContext, "Wrong mListeIdsAsString " + mListeIdsAsString.size() + " " + mAnzahlFeedeintraege);
-//		}
+		}
     }
     
     
@@ -296,21 +320,11 @@ public class EntryPagerAdapter extends PagerAdapter {
         return view == object;
     }
 
-    // Ermittlung der aktuell angezeigten Position
-    @Override
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
-    	super.setPrimaryItem(container, position, object);
-    	setAktuellePosition(position);
-    	String id = ermittleIdZuPosition(position);
-//    	if(!dto.isRead){
-   		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
-    }
-
-    synchronized public int getAktuellePosition() {
+    public int getAktuellePosition() {
 		return mAktuellePosition;
 	}
     
-    synchronized public void setAktuellePosition(int pos){
+    public void setAktuellePosition(int pos){
     	mAktuellePosition=pos;
     }
 

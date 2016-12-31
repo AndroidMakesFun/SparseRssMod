@@ -423,9 +423,9 @@ public class RSSHandler extends DefaultHandler {
 			author.append(ch, start, length);
 			
 		} else if (imageTagEntered) {
-			StringBuilder test=new StringBuilder();
-			test.append(ch, start, length);
-			System.out.println("TAG_IMAGE Content " + test);
+//			StringBuilder test=new StringBuilder();
+//			test.append(ch, start, length);
+//			System.out.println("TAG_IMAGE Content " + test);
 		}
 	}
 	

@@ -235,22 +235,22 @@ public class EntriesListActivity extends AppCompatActivity {
 					aufrufart=Util.getViewerPrefs(EntriesListActivity.this, ""+feedid);
 					
 					//mark read 2
-					getContentResolver().update(ContentUris.withAppendedId(uri, id), RSSOverview.getReadContentValues(), null, null);
 					entriesListAdapter.markAsRead(id);
 
 					link=EntryActivity.fixLink(link);
 					if (aufrufart == 1) {
 						// // Browser öffnen
+						getContentResolver().update(ContentUris.withAppendedId(uri, id), RSSOverview.getReadContentValues(), null, null);
 						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
 						return;
 					}
-					if (aufrufart == 3) {
-						//Problem Lesestatus !!
-						// // Browser öffnen
-						link = "http://www.instapaper.com/m?u=" + link;
-						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
-						return;
-					}
+//					if (aufrufart == 3) {
+//						//Problem Lesestatus !!
+//						// // Browser öffnen
+//						link = "http://www.instapaper.com/m?u=" + link;
+//						startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
+//						return;
+//					}
 
 				}
 

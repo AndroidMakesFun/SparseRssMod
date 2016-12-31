@@ -326,7 +326,7 @@ public class HtmlFetcher {
 
         String enc = Converter.extractEncoding(hConn.getContentType());
         String res = createConverter(urlAsString).streamToString(is, enc);
-            System.out.println(res.length() + " FetchAsString:" + urlAsString);
+//            System.out.println(res.length() + " FetchAsString:" + urlAsString);
         return res;
     }
 
@@ -377,7 +377,7 @@ public class HtmlFetcher {
         	System.err.println("getResolvedUrl:" + urlAsString + " Error:" + ex.getMessage());
             return "";
         } finally {
-                System.out.println(responseCode + " url:" + urlAsString + " resolved:" + newUrl);
+//                System.out.println("getResolvedUrl: " + responseCode + " url:" + urlAsString + " resolved:" + newUrl);
         }
     }
 
