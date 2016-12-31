@@ -99,7 +99,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 		
 		if(!showPics){
 			AppBarLayout aAppBarLayout =(AppBarLayout) layout.findViewById(R.id.appBarLayout);
-			aAppBarLayout.setExpanded(false,false);
+			if(aAppBarLayout!=null){
+				aAppBarLayout.setExpanded(false,false);
+			}
 		}
 
 
@@ -212,7 +214,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			new AsyncAmpRead().execute(dtoEntry);			
 		}else{  
 			// Default: AUFRUFART_FEED
-			reload(dtoEntry);
+			reload(dtoEntry, layout);
 		}
 
 	}
@@ -380,6 +382,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+				}else{
+					AppBarLayout aAppBarLayout =(AppBarLayout) mContext.findViewById(R.id.appBarLayout);
+					if(aAppBarLayout!=null){
+						aAppBarLayout.setExpanded(false,false);
+					}
 				}
 
 			} // else text leer - nix machen, ggf. feed (neu) laden ?!
@@ -458,7 +465,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			if (dto.linkAmp != null) {
 				dto.viewWeb.loadUrl(dto.linkAmp);
 			} else {
-				reload(dto);
+				reload(dto, null);
 			} 
 			dto.progressBar.setVisibility(View.INVISIBLE);
 		}
@@ -495,37 +502,52 @@ public class EntryPagerAdapter extends PagerAdapter {
 		return dtoEntry;
 	}
 
-	public void reload(DtoEntry dto) {
+	public void reload(DtoEntry dto, ViewGroup layout) {
 
 		checkViews(dto, null);
+
+		if(layout!=null){  // nur Feed - kein Cover !
+			AppBarLayout aAppBarLayout =(AppBarLayout) layout.findViewById(R.id.appBarLayout);
+			if(aAppBarLayout!=null){
+				aAppBarLayout.setExpanded(false,false);
+			}
+		}else{
+			if(showPics){
+				boolean noPic=true;
+				int posImg = dto.text.indexOf("src=\"");
+				if (posImg > 0) {
+					posImg += 5;
+					int posImgEnde = dto.text.indexOf('"', posImg);
+					if (posImgEnde > 0) {
+						dto.linkGrafik = dto.text.substring(posImg, posImgEnde);
+						URL url;
+						try {
+							url = new URL(dto.linkGrafik);
+							Glide.with(mContext).load(url).centerCrop().into(dto.viewImage);
+							noPic=false;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 		
-		if(showPics){
-			int posImg = dto.text.indexOf("src=\"");
-			if (posImg > 0) {
-				posImg += 5;
-				int posImgEnde = dto.text.indexOf('"', posImg);
-				if (posImgEnde > 0) {
-					dto.linkGrafik = dto.text.substring(posImg, posImgEnde);
-					URL url;
-					try {
-						url = new URL(dto.linkGrafik);
-						Glide.with(mContext).load(url).centerCrop().into(dto.viewImage);
-						;
-					} catch (Exception e) {
-						e.printStackTrace();
+					// sonst ein anderes aus dem Artikel, wenn Bilder geladen
+					// wurden...
+				} else if (Util.getImageFolderFile(mContext) != null && Util.getImageFolderFile(mContext).exists()) {
+					PictureFilenameFilter filenameFilter = new PictureFilenameFilter(dto.id);
+		
+					File[] files = Util.getImageFolderFile(mContext).listFiles(filenameFilter);
+					if (files != null && files.length > 0) {
+						Glide.with(mContext).load(files[0]).centerCrop().into(dto.viewImage);
+						noPic=false;
 					}
 				}
-	
-				// sonst ein anderes aus dem Artikel, wenn Bilder geladen
-				// wurden...
-			} else if (Util.getImageFolderFile(mContext) != null && Util.getImageFolderFile(mContext).exists()) {
-				PictureFilenameFilter filenameFilter = new PictureFilenameFilter(dto.id);
-	
-				File[] files = Util.getImageFolderFile(mContext).listFiles(filenameFilter);
-				if (files != null && files.length > 0) {
-					Glide.with(mContext).load(files[0]).centerCrop().into(dto.viewImage);
+				if(noPic){
+					AppBarLayout aAppBarLayout =(AppBarLayout) mContext.findViewById(R.id.appBarLayout);
+					if(aAppBarLayout!=null){
+						aAppBarLayout.setExpanded(false,false);
+					}
 				}
-			}
+			} // showPics	
 		}	
 		
 		dto.text = dto.titel + dto.text;
