@@ -240,7 +240,8 @@ public class FetcherService extends IntentService {
 		RSSHandler handler = new RSSHandler(context);
 		
 		handler.setEfficientFeedParsing(preferences.getBoolean(Strings.SETTINGS_EFFICIENTFEEDPARSING, true));
-		handler.setFetchImages(preferences.getBoolean(Strings.SETTINGS_FETCHPICTURES, false));
+//		handler.setFetchImages(preferences.getBoolean(Strings.SETTINGS_FETCHPICTURES, false));
+		handler.setFetchImages(false);  // bah, immer ohne Bilder
 		
 		while(cursor.moveToNext()) {
 			String id = cursor.getString(idPosition);

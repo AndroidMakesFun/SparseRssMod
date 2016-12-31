@@ -116,4 +116,10 @@ public class Util {
 		return prefs.getInt(PREFERENCE_VIEWER_PREFS + FeedId, 0);  // 0 Feed
 	}
 
+	public static boolean showPics(Context context) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean ret=prefs.getBoolean(Strings.SETTINGS_DISABLEPICTURES, false);
+		return !ret; // disable != showPics
+	}
+
 }

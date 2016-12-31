@@ -31,18 +31,21 @@
             android:defaultValue="7"
             android:entries="@array/settings_keeptimes"
             android:entryValues="@array/settings_keeptimevalues" />
+        
         <CheckBoxPreference
             android:title="@string/settings_disablepictures"
             android:defaultValue="false"
             android:summary="@string/settings_disablepictures_description"
             android:key="pictures.disable"
             android:disableDependentsState="true"/>
+<!--         
         <CheckBoxPreference
             android:title="@string/settings_fetchpictures"
             android:defaultValue="false"
             android:summary="@string/settings_fetchpictures_description"
             android:key="pictures.fetch"
             android:dependency="pictures.disable"/>
+ -->            
 <!--         
         <CheckBoxPreference
             android:title="@string/settings_blacktextwhite"
