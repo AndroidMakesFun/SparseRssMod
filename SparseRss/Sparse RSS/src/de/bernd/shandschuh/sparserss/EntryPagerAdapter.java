@@ -144,11 +144,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 		final int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
 
 		if (entryCursor.moveToFirst()) {
-			DtoEntry aAsyncDtoEntry=new DtoEntry();
-			aAsyncDtoEntry.id=id;
+			DtoEntry dto=new DtoEntry();
+			dto.id=id;
 			String link = entryCursor.getString(linkPosition);
 			link = EntryActivity.fixLink(link);
-			aAsyncDtoEntry.link=link;
+			dto.link=link;
 
 			String abstractText = entryCursor.getString(abstractPosition);
 			
@@ -157,12 +157,12 @@ public class EntryPagerAdapter extends PagerAdapter {
 				abstractText = abstractText.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
 			}
 			
-			aAsyncDtoEntry.text=abstractText + "<br><br>";
+			dto.text=abstractText + "<br><br>";
 
 			if (entryCursor.isNull(readDatePosition)){
-				aAsyncDtoEntry.isRead=false;
+				dto.isRead=false;
 			}else{
-				aAsyncDtoEntry.isRead=true;
+				dto.isRead=true;
 			}
 
 			long timestamp = entryCursor.getLong(datePosition);
@@ -180,7 +180,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 //			}
 				
 			// + date align right
-			if(!aAsyncDtoEntry.isRead){
+			if(!dto.isRead){
 				dateStringBuilder.append("<b>");
 			}
 			dateStringBuilder.append("<div style=\"text-align:right;\">");
@@ -188,14 +188,14 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dateStringBuilder.append(DateFormat.getDateFormat(mContext).format(date))
 				.append(' ').append(DateFormat.getTimeFormat(mContext).format(date));
 			dateStringBuilder.append("</div>");			
-			if(!aAsyncDtoEntry.isRead){
+			if(!dto.isRead){
 				dateStringBuilder.append("</b>");
 			}
-			aAsyncDtoEntry.titel=dateStringBuilder.toString();
+			dto.titel=dateStringBuilder.toString();
 			
 			entryCursor.close();
 			
-			return aAsyncDtoEntry;
+			return dto;
 		}
 		return null;
 	}
@@ -212,6 +212,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 			new AsyncVeryNewReadability().execute(dtoEntry);			
 		} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_AMP) {
 			new AsyncAmpRead().execute(dtoEntry);			
+		} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_MOBILIZE) {
+			new AsyncMobilizeBody().execute(dtoEntry);			
 		}else{  
 			// Default: AUFRUFART_FEED
 			reload(dtoEntry, layout);
@@ -617,4 +619,69 @@ public class EntryPagerAdapter extends PagerAdapter {
 		}
 	}
 
+	
+	public class AsyncMobilizeBody extends AsyncTask<DtoEntry, Void, Void> {
+
+		DtoEntry dto;
+		
+		@Override
+		protected Void doInBackground(DtoEntry... params) {
+
+			try {
+				dto=params[0];
+
+				String bahtml = "";
+				HttpURLConnection connection = null;
+				URL url = new URL(dto.link);
+				connection = (HttpURLConnection) url.openConnection();
+
+				BufferedReader bufferedReader = new BufferedReader(
+						new InputStreamReader(connection.getInputStream(), "UTF8"));
+
+				// baseUrl wechselt ab con.getInputStream (open?)
+				String baseUrl = connection.getURL().getProtocol() + "://" + connection.getURL().getHost();
+
+				String line = bufferedReader.readLine();
+				while (line != null) {
+					line = bufferedReader.readLine();
+					bahtml += line;
+				}
+				bufferedReader.close();
+
+				int posBody = bahtml.indexOf("<body>");
+				if (posBody < 0) {
+					// -> Default == reload/Feed
+					return null;
+				}
+				bahtml=bahtml.substring(posBody+6);
+
+				// todo strip body: images, youtube,...?!
+
+				StringBuilder stringBuilder = new StringBuilder("");				
+				stringBuilder.append(EntryActivity.getCSS());  // immer				
+				stringBuilder.append(dto.titel);
+				stringBuilder.append(bahtml);
+				
+				dto.text=stringBuilder.toString();
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+
+			checkViews(dto, null);
+			
+			reload(dto, null);
+			
+			dto.progressBar.setVisibility(View.INVISIBLE);
+		}
+	}
+	
+	
 }

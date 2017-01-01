@@ -1196,11 +1196,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			break;
 		}
 
-//		case R.id.menu_mobilize: {
-//			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
-////			loadMoblize();
-//			break;
-//		}
+		case R.id.menu_mobilize: {
+			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
+			onClickLoadMobilize(null);
+			break;
+		}
 
 		case R.id.menu_readability: {
 			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
@@ -1452,4 +1452,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		entryCursor.close();
 		return feedId;
 	}
+	
+	private void onClickLoadMobilize(View view) {
+		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
+		mAufrufart=AUFRUFART_MOBILIZE;		
+		mEntryPagerAdapter.notifyDataSetChanged();
+	}
+
+
 }
