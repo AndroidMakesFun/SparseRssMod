@@ -157,7 +157,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 				abstractText = abstractText.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
 			}
 			
-			aAsyncDtoEntry.text=abstractText;
+			aAsyncDtoEntry.text=abstractText + "<br><br>";
 
 			if (entryCursor.isNull(readDatePosition)){
 				aAsyncDtoEntry.isRead=false;
