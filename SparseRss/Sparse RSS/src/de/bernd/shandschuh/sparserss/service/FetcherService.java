@@ -163,6 +163,7 @@ public class FetcherService extends IntentService {
 					builder.setContentTitle(getString(R.string.rss_feeds));
 			         builder.setContentText(text);
 			         builder.setContentIntent(contentIntent);
+			         builder.setSmallIcon(R.drawable.icon);
 
 //					if (preferences.getBoolean(Strings.SETTINGS_NOTIFICATIONSVIBRATE, false)) {
 //						notification.defaults = Notification.DEFAULT_VIBRATE;
