@@ -522,7 +522,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		webView.restoreState(savedInstanceState);
 	}
 
 	@Override
