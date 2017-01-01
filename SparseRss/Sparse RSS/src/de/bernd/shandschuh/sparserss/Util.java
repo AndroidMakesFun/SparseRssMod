@@ -7,6 +7,8 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
@@ -120,6 +122,18 @@ public class Util {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		boolean ret=prefs.getBoolean(Strings.SETTINGS_DISABLEPICTURES, false);
 		return !ret; // disable != showPics
+	}
+
+	public static String getVersionNumber(Context context) {
+		String version = "?";
+		try {
+			PackageInfo packagInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+			version = packagInfo.versionName;
+		} catch (PackageManager.NameNotFoundException e) {
+		}
+		;
+
+		return version;
 	}
 
 }

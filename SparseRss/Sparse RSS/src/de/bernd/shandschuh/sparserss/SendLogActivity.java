@@ -135,7 +135,7 @@ public class SendLogActivity extends Activity {
 		// mAdditonalInfo = getString(R.string.device_info_fmt, getVersionNumber(this), Build.MODEL, Build.VERSION.RELEASE, getFormattedKernelVersion(), Build.DISPLAY);
 		log.append("Log:");
 		log.append(LINE_SEPARATOR);
-		log.append("Version: "+ getVersionNumber(this));
+		log.append("Version: "+ Util.getVersionNumber(this));
 		log.append(LINE_SEPARATOR);
 		log.append("Model: "+ Build.MODEL);
 		log.append(LINE_SEPARATOR);
@@ -186,7 +186,7 @@ public class SendLogActivity extends Activity {
         or defaults to "brief"*/
 
 		ArrayList<String> list = new ArrayList<String>();
-
+		
 		if (mFormat != null) {
 			list.add("-v");
 			list.add(mFormat);
@@ -240,7 +240,7 @@ public class SendLogActivity extends Activity {
 		}
 
 		@Override
-		protected void onPostExecute(StringBuilder log) {
+		protected void onPostExecute(StringBuilder loge) {
 			if (null != log) {
 				// truncate if necessary
 				int keepOffset = Math.max(log.length() - MAX_LOG_MESSAGE_LENGTH, 0);
@@ -318,17 +318,6 @@ public class SendLogActivity extends Activity {
 		super.onPause();
 	}
 
-	private static String getVersionNumber(Context context) {
-		String version = "?";
-		try {
-			PackageInfo packagInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-			version = packagInfo.versionName;
-		} catch (PackageManager.NameNotFoundException e) {
-		}
-		;
-
-		return version;
-	}
 
 	private String getFormattedKernelVersion() {
 		String procVersionStr;

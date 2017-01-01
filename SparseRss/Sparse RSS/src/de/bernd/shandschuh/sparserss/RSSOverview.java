@@ -729,7 +729,11 @@ public class RSSOverview extends AppCompatActivity  {
 		final TextView textView = (TextView) view.findViewById(R.id.license_text);
 		
 		textView.setTextColor(textView.getTextColors().getDefaultColor()); // disables color change on selection
-		textView.setText(new StringBuilder(getString(R.string.license_intro)).append(Strings.THREENEWLINES).append(getString(R.string.license)));
+		StringBuilder sb = new StringBuilder();
+		sb.append("Version: "+ Util.getVersionNumber(this) + "\n");
+		sb.append("Playstore:\nhttps://play.google.com/store/apps/details?id=de.bernd.shandschuh.sparserss\n\n");
+		sb.append(getString(R.string.license_intro)).append(Strings.THREENEWLINES).append(getString(R.string.license));
+		textView.setText(sb);
 		
 		final TextView contributorsTextView = (TextView) view.findViewById(R.id.contributors_togglebutton);
 		
