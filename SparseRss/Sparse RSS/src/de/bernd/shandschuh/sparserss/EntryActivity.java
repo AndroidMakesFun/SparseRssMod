@@ -1398,10 +1398,20 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	
 	public void setZoomsScale(WebView nWebView) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			if(nWebView==null){
-				nWebView=(WebView) this.getCurrentFocus();
+			
+			try {
+				if (nWebView == null) {
+					View view = this.getCurrentFocus();
+					if (view == null || !(view instanceof WebView)) {
+						nWebView = (WebView) view;
+					} else {
+						nWebView = (WebView) this.findViewById(R.id.web_view);
+					}
+				}
+				nWebView.getSettings().setTextZoom(mIntScalePercent * 2);
+			} catch (Exception e) {
+				Util.toastMessage(this, "Select WebView");
 			}
-			nWebView.getSettings().setTextZoom(mIntScalePercent * 2);
 		}
 	}
 
