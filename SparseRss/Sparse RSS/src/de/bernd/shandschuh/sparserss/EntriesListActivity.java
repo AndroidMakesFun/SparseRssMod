@@ -94,14 +94,9 @@ public class EntriesListActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
-//			setTheme(R.style.Theme_Light);
 			setTheme(R.style.MyTheme_Light);
 		}
-
 		super.onCreate(savedInstanceState);
-		if (Util.isLightTheme(this)) {
-//			getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
-		}
 
 		String title = null;
 

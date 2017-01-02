@@ -1334,7 +1334,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		return baseUrl;
 	}
 
-	public void onClickMarkAsRead(View view) {
+	public void clickMarkAsRead(View view) {
 		finish();
 	}
 	

@@ -28,7 +28,6 @@ package de.bernd.shandschuh.sparserss;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -45,6 +44,9 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.TabLayout;
+import android.support.design.widget.TabLayout.OnTabSelectedListener;
+import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -136,7 +138,6 @@ public class RSSOverview extends AppCompatActivity  {
 		setSupportActionBar(toolbar);
 //		setHomeButtonActive();
 		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
-
 
 		listview = (ListView) findViewById(android.R.id.list);
 		listAdapter = new RSSOverviewListAdapter(this);
@@ -577,6 +578,10 @@ public class RSSOverview extends AppCompatActivity  {
 				startActivity(intent);
 				break;
 			}
+			case R.id.menu_alle: {
+				clickShowAll(null);
+				break;
+			}
 		}
 		return true;
 	}
@@ -754,6 +759,18 @@ public class RSSOverview extends AppCompatActivity  {
 			
 		});
 		builder.setView(view);
+	}
+
+	public void clickShowAll(View view) {
+		Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI);
+		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDINFO, true); // ?
+		startActivity(intent);
+	}
+
+	public void clickShowFav(View view) {
+		Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.FAVORITES_CONTENT_URI);
+		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDINFO, true); // ?
+		startActivity(intent);
 	}
 
 }

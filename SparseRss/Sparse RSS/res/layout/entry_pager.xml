@@ -111,7 +111,7 @@
 
             <ImageButton
                 android:id="@+id/menu_markasread2"
-                android:onClick="onClickMarkAsRead"
+                android:onClick="clickMarkAsRead"
                 android:layout_width="80dp"
                 android:layout_height="50dp"
                 android:background="#00000000"
