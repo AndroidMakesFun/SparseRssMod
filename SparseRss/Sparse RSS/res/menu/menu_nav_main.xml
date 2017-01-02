@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <group android:id="@+id/menu_group_0" >
+
+        <item
+            android:id="@+id/menu_overview"
+            android:icon="@drawable/ic_statusbar_rss"
+            android:title="@string/overview"/>
+        <item
+            android:id="@+id/menu_alle"
+            android:icon="@drawable/ic_statusbar_rss"
+            android:title="@string/all"/>
+        <item
+            android:id="@+id/menu_favorites"
+            android:icon="@android:drawable/star_big_off"
+            android:title="@string/favorites"
+            />
+        
+    </group>
+    <group android:id="@+id/menu_group_1" >
+        
+    </group>
+
+<!--     
+    <group android:id="@+id/menu_group_2" >
+        
+        <item
+            android:id="@+id/menu_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="@string/menu_settings"/>
+        <item
+            android:id="@+id/menu_about"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="@string/menu_about"/>
+        <item
+            android:id="@+id/menu_import"
+            android:title="@string/menu_import"/>
+        <item
+            android:id="@+id/menu_export"
+            android:title="@string/menu_export"/>
+        
+    </group>
+    <group android:id="@+id/menu_group_3" >
+    </group>
+    
+ -->    
+</menu>
