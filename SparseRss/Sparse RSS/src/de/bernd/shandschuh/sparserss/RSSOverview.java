@@ -28,6 +28,7 @@ package de.bernd.shandschuh.sparserss;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -38,19 +39,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
 import android.support.v7.app.AppCompatActivity;
@@ -58,6 +58,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -78,6 +79,8 @@ import de.bernd.shandschuh.sparserss.endlessscroll.RecycleListActivity;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.OPML;
 import de.bernd.shandschuh.sparserss.service.RefreshService;
+import de.bernd.shandschuh.sparserss.util.NavigationDrawerAdapter;
+import de.bernd.shandschuh.sparserss.util.NavigationDrawerAdapter.NavDrawerLineEntry;
 
 public class RSSOverview extends AppCompatActivity {
 	private static final int DIALOG_ERROR_FEEDIMPORT = 3;
@@ -119,8 +122,6 @@ public class RSSOverview extends AppCompatActivity {
 	private TextView emptyview;
 	private ProgressBar progressBar;
 
-	private DrawerLayout mDrawerLayout;
-
 	public static RSSOverview INSTANCE;
 
 	@Override
@@ -138,13 +139,12 @@ public class RSSOverview extends AppCompatActivity {
 		setContentView(R.layout.main);
 		INSTANCE = this;
 
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		setupDrawerContent();
-
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_36dp);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		setupDrawerContent();
 
 		// setHomeButtonActive();
 		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
@@ -271,8 +271,7 @@ public class RSSOverview extends AppCompatActivity {
 				setFeedSortEnabled(false);
 
 				if (Util.getTestListPrefs(getApplicationContext())) {
-					Intent intent = new Intent(Intent.ACTION_VIEW,
-							FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
+					Intent intent = new Intent(Intent.ACTION_VIEW,FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
 					intent.putExtra(FeedData.FeedColumns._ID, id);
 					startActivity(intent);
 				} else {
@@ -771,10 +770,6 @@ public class RSSOverview extends AppCompatActivity {
 		}
 	}
 
-	public android.support.v7.app.ActionBar myActionBar() {
-		return getSupportActionBar();
-	}
-
 	public void setHomeButtonActive() {
 		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
 		actionBar7.setHomeButtonEnabled(true);
@@ -854,47 +849,81 @@ public class RSSOverview extends AppCompatActivity {
 		startActivity(intent);
 	}
 
-	private void setupDrawerContent() {
-		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-		
-		MenuItem menuItem = navigationView.getMenu().add(R.id.menu_group_1, 42, Menu.NONE, R.string.overview);
-		menuItem.setIcon(R.drawable.icon);
-		
-		Cursor cursor;
-		cursor = this.getContentResolver().query(FeedData.FeedColumns.CONTENT_URI, null, null, null, null);
-		
-		int nameColumnPosition = cursor.getColumnIndex(FeedData.FeedColumns.NAME);
-		int idPosition = cursor.getColumnIndex(FeedData.FeedColumns._ID);
-		int iconPosition = cursor.getColumnIndex(FeedData.FeedColumns.ICON);
-		
-		cursor.moveToFirst();
-		while (cursor.isAfterLast() == false) {
-			String name = cursor.getString(nameColumnPosition);
-			int id=Integer.parseInt(cursor.getString(idPosition));
-			byte[] iconBytes = cursor.getBlob(iconPosition);
-			
-			MenuItem item = navigationView.getMenu().add(R.id.menu_group_1, id, Menu.NONE, name);
-			if (iconBytes != null && iconBytes.length > 0) {
-				Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-				item.setIcon(new BitmapDrawable(bitmap));
-			}
-			
-			cursor.moveToNext();
+	
+	public void selectItem(int position) {
+		mDrawerList.setItemChecked(position, true);
+		mDrawerLayout.closeDrawer(mDrawerList);
+		NavDrawerLineEntry navDrawerLineEntry = (NavDrawerLineEntry) mDrawerList.getAdapter().getItem(position);
+		if (navDrawerLineEntry == null) {
+			Util.toastMessageLong(this, "navDrawerLineEntry is Empty for position " + position);
+			return;
 		}
-		cursor.close();
-
-		
-		
-		navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+		switch (navDrawerLineEntry.ID) {
+		case R.id.cancel_action:
+			// do nothing
+			break;
 			
+		case R.id.menu_overview:{
+			// do nothing
+			break;
+		}
+		case R.id.menu_alle:{
+			clickShowAll(null);
+			break;
+		}
+		case R.id.menu_favorites:{
+			clickShowFav(null);
+			break;
+		}
+
+		default:
+			Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI(Integer.toString(navDrawerLineEntry.ID)));
+			long longID=navDrawerLineEntry.ID;
+			intent.putExtra(FeedData.FeedColumns._ID, longID);
+			startActivity(intent);
+			break;
+		}
+	}
+
+	private DrawerLayout mDrawerLayout;
+	protected ListView mDrawerList;
+	private ActionBarDrawerToggle mDrawerToggle;
+
+
+	private void setupDrawerContent() {
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_main);
+		mDrawerList = (ListView) findViewById(R.id.navigation_drawer_left_main);
+
+		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+		mDrawerList.setAdapter(new NavigationDrawerAdapter(this));
+		
+		mDrawerList.setOnItemClickListener(new OnItemClickListener() {
+
 			@Override
-			public boolean onNavigationItemSelected(MenuItem menuItem) {
-//				menuItem.setChecked(true);
-				mDrawerLayout.closeDrawers();
-				onOptionsItemSelected(menuItem);
-				return true;
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				 selectItem(position);				
 			}
 		});
+	}
+
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+		case KeyEvent.KEYCODE_BACK:
+			mDrawerLayout.closeDrawers();
+			return true;
+		}
+		return super.onKeyUp(keyCode, event);
+	}
+
+	
+	// für Hamburger Home Icon
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	protected Context getActionBarThemedContextCompat() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			return getSupportActionBar().getThemedContext();
+		} else {
+			return this;
+		}
 	}
 
 }

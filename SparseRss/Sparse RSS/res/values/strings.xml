@@ -238,4 +238,8 @@ The collected log will be sent using an application of your choice.
 You also will have an opportunity to see and modify the data being sent."</string>
     <string name="title_activity_recycle_list">RecycleListActivity</string>
 
+    <!-- Navigation Drawer -->
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    
 </resources>

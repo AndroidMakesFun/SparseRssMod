@@ -29,6 +29,8 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Vector;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -75,6 +77,8 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 	
 	private DateFormat timeFormat;
 	
+	private int buttonSize;
+	
 	public RSSOverviewListAdapter(Activity activity) {
 		super(activity, R.layout.feedlistitem, activity.managedQuery(FeedData.FeedColumns.CONTENT_URI, null, null, null, null));
 		nameColumnPosition = getCursor().getColumnIndex(FeedData.FeedColumns.NAME);
@@ -102,6 +106,9 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 		sortViews = new Vector<View>();
 		dateFormat = android.text.format.DateFormat.getDateFormat(activity);
 		timeFormat = android.text.format.DateFormat.getTimeFormat(activity);
+		
+		buttonSize=Util.getButtonSizeInPixel(activity);
+
 	}
 
 	@Override
@@ -148,29 +155,31 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 			textView.setEnabled(false);
 			updateTextView.setEnabled(false);
 		}
-		
-		byte[] iconBytes = cursor.getBlob(iconPosition);
-		
-		if (iconBytes != null && iconBytes.length > 0) {
-			Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-			
-			if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
-				int bitmapSizeInDip = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f, context.getResources().getDisplayMetrics());
-				bitmapSizeInDip*=2;
+
+		String link = cursor.getString(linkPosition);
+		String titel=(cursor.isNull(nameColumnPosition) ? cursor.getString(linkPosition) : cursor.getString(nameColumnPosition));
+		textView.setText(" " + titel);
+		boolean hatBild=false;
+
+		//http://feeds2.feedburner.com/aktuell/feeds/rss/     http://feeds.feedburner.com"
+		if(!link.contains(".feedburner.com")){
+			byte[] iconBytes = cursor.getBlob(iconPosition);
+			if (iconBytes != null && iconBytes.length > 0) {
+				Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
 				
-				if (bitmap.getHeight() != bitmapSizeInDip) {
-					bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
+				if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
+					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+					textView.setCompoundDrawablesWithIntrinsicBounds(new BitmapDrawable(bitmap), null, null, null);
+					hatBild=true;
 				}
-				textView.setCompoundDrawablesWithIntrinsicBounds(new BitmapDrawable(bitmap), null, null, null);
-				textView.setText(" " + (cursor.isNull(nameColumnPosition) ? cursor.getString(linkPosition) : cursor.getString(nameColumnPosition)));
-			} else {
-				textView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-				textView.setText(cursor.isNull(nameColumnPosition) ? cursor.getString(linkPosition) : cursor.getString(nameColumnPosition));
-			}
-		} else {
-			view.setTag(null);
-			textView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-			textView.setText(cursor.isNull(nameColumnPosition) ? cursor.getString(linkPosition) : cursor.getString(nameColumnPosition));
+			} 
+		}
+		if(!hatBild){
+			
+			view.setTag(null);			
+			Object feedId=Long.parseLong(cursor.getString(idPosition));
+			TextDrawable textDrawable = Util.getRoundButtonImage(context, feedId, titel);
+			textView.setCompoundDrawablesWithIntrinsicBounds(textDrawable, null, null, null);
 		}
 		
 		View sortView = view.findViewById(R.id.sortitem);

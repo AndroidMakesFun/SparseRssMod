@@ -25,11 +25,11 @@
 
 package de.bernd.shandschuh.sparserss;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.ListActivity;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -38,7 +38,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -52,12 +51,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
-import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedData.FeedColumns;
 
@@ -104,21 +101,35 @@ public class EntriesListActivity extends AppCompatActivity {
 
 		Intent intent = getIntent();
 
+
+		setContentView(R.layout.entries);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
+//		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		long feedId = intent.getLongExtra(FeedData.FeedColumns._ID, 0);
 
 		if (feedId > 0) {
 			Cursor cursor = getContentResolver().query(FeedData.FeedColumns.CONTENT_URI(feedId), FEED_PROJECTION, null, null, null);
 
+	        int buttonSize=Util.getButtonSizeInPixel(this);
+			
 			if (cursor.moveToFirst()) {
 				title = cursor.isNull(0) ? cursor.getString(1) : cursor.getString(0);
 				iconBytes = cursor.getBlob(2);
+				if(iconBytes!=null  && iconBytes.length>0){
+					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
+					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+					getSupportActionBar().setIcon(new BitmapDrawable(bitmap));
+				}else{
+					if (title != null) {
+						TextDrawable textDrawable = Util.getRoundButtonImage(this, Long.valueOf(feedId), title);
+						getSupportActionBar().setIcon(textDrawable);
+					}
+				}
 			}
 			cursor.close();
 		}
-
-		setContentView(R.layout.entries);
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
 
 		uri = intent.getData();
 
@@ -139,7 +150,7 @@ public class EntriesListActivity extends AppCompatActivity {
 
 
 		if (title != null) {
-			setTitle(title);
+			setTitle(" " +title);
 		}
 		if (iconBytes != null && iconBytes.length > 0) {
 			int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
@@ -291,6 +302,14 @@ public class EntriesListActivity extends AppCompatActivity {
 	}
 	
 	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			break;
+
+		default:
+			break;
+		}
 		return onMenuItemSelected(item);
 	}
 
