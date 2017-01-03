@@ -141,7 +141,7 @@ public class RSSOverview extends AppCompatActivity {
 
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
-		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_black_36dp);
+		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_grey600_36dp);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		setupDrawerContent();
@@ -916,14 +916,14 @@ public class RSSOverview extends AppCompatActivity {
 	}
 
 	
-	// für Hamburger Home Icon
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-	protected Context getActionBarThemedContextCompat() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			return getSupportActionBar().getThemedContext();
-		} else {
-			return this;
-		}
-	}
+//	// für Hamburger Home Icon
+//	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+//	protected Context getActionBarThemedContextCompat() {
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+//			return getSupportActionBar().getThemedContext();
+//		} else {
+//			return this;
+//		}
+//	}
 
 }

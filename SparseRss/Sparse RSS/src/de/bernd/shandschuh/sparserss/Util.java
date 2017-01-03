@@ -152,7 +152,7 @@ public class Util {
 		
 		int buttonSize=getButtonSizeInPixel(context);
         ColorGenerator generator = ColorGenerator.DEFAULT;
-        int color = generator.getColor(colorObject); // The color is specific to the feedId (which shouldn't change)
+        int color = generator.getColor(title); // The color is specific to the feedId (which shouldn't change)
         
         TextDrawable textDrawable = TextDrawable.builder()
                 .beginConfig()

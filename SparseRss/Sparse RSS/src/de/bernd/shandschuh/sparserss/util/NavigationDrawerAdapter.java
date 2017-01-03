@@ -43,6 +43,8 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 		mInflater = LayoutInflater.from(context);
 		mListeNavDrawerEntries = new ArrayList<NavDrawerLineEntry>();
 		
+		int buttonSize = Util.getButtonSizeInPixel(context);
+		
 		Drawable drawable;
 		String titel;
 		drawable = context.getResources().getDrawable( R.drawable.ic_arrow_back_grey600_36dp);
@@ -53,13 +55,17 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 //		titel = context.getResources().getString(R.string.overview);
 //		mListeNavDrawerEntries.add(new NavDrawerLineEntry(drawable, titel, R.id.menu_overview));
 		
-		drawable = context.getResources().getDrawable( R.drawable.icon );
+//		drawable = context.getResources().getDrawable( R.drawable.icon );
+		Bitmap bitmap = BitmapFactory.decodeResource (context.getResources(), R.drawable.icon);
+		bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);		
 		titel = context.getResources().getString(R.string.all);
-		mListeNavDrawerEntries.add(new NavDrawerLineEntry(drawable, titel, R.id.menu_alle));
+		mListeNavDrawerEntries.add(new NavDrawerLineEntry(new BitmapDrawable(bitmap), titel, R.id.menu_alle));
 		
-		drawable = context.getResources().getDrawable( android.R.drawable.star_big_off );
+//		drawable = context.getResources().getDrawable( android.R.drawable.star_big_off );
+		bitmap = BitmapFactory.decodeResource (context.getResources(), android.R.drawable.star_big_off);
+		bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);		
 		titel = context.getResources().getString(R.string.favorites);
-		mListeNavDrawerEntries.add(new NavDrawerLineEntry(drawable, titel, R.id.menu_favorites));
+		mListeNavDrawerEntries.add(new NavDrawerLineEntry(new BitmapDrawable(bitmap), titel, R.id.menu_favorites));
 		
 		mListeNavDrawerEntries.add(new NavDrawerLineEntry(null, "", R.id.menu_overview));
 		
@@ -71,7 +77,6 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 		int iconPosition = cursor.getColumnIndex(FeedData.FeedColumns.ICON);
 		
 		int linkPosition = cursor.getColumnIndex(FeedData.FeedColumns.URL);
-		int buttonSize = Util.getButtonSizeInPixel(context);
 		
 		cursor.moveToFirst();
 		while (cursor.isAfterLast() == false) {
@@ -82,7 +87,7 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 			
 			if(!link.contains(".feedburner.com")){
 				if (iconBytes != null && iconBytes.length > 0) {
-					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+					bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
 					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
 					mListeNavDrawerEntries.add(new NavDrawerLineEntry(new BitmapDrawable(bitmap), name, id));
 				}else{

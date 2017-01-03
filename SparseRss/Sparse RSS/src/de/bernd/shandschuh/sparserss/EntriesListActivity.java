@@ -41,6 +41,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
@@ -104,8 +105,8 @@ public class EntriesListActivity extends AppCompatActivity {
 
 		setContentView(R.layout.entries);
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
-//		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		setSupportActionBar(toolbar);		
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 		long feedId = intent.getLongExtra(FeedData.FeedColumns._ID, 0);
 
@@ -120,11 +121,11 @@ public class EntriesListActivity extends AppCompatActivity {
 				if(iconBytes!=null  && iconBytes.length>0){
 					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
 					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-					getSupportActionBar().setIcon(new BitmapDrawable(bitmap));
+					getSupportActionBar().setHomeAsUpIndicator(new BitmapDrawable(bitmap));
 				}else{
 					if (title != null) {
 						TextDrawable textDrawable = Util.getRoundButtonImage(this, Long.valueOf(feedId), title);
-						getSupportActionBar().setIcon(textDrawable);
+						getSupportActionBar().setHomeAsUpIndicator(textDrawable);
 					}
 				}
 			}

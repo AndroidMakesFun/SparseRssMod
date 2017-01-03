@@ -29,6 +29,8 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Vector;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+
 import android.R.color;
 import android.app.Activity;
 import android.content.ContentValues;
@@ -99,6 +101,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	
 	private DateFormat timeFormat;
 	
+	private int buttonSize;
+	
 	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload) {
 		super(context, R.layout.entrylistitem, createManagedCursor(context, uri, true), autoreload);
 
@@ -126,6 +130,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		unfavorited = new Vector<Long>();
 		dateFormat = android.text.format.DateFormat.getDateFormat(context);
 		timeFormat = android.text.format.DateFormat.getTimeFormat(context);
+		
+		buttonSize=Util.getButtonSizeInPixel(context);
 	}
 
 	@Override
@@ -145,7 +151,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		
 		final long id = cursor.getLong(idColumn);
 		
-		view.setTag(cursor.getString(linkColumn));
+		String link=cursor.getString(linkColumn);
+		view.setTag(link);
 		
 		final boolean favorite = !unfavorited.contains(id) && (cursor.getInt(favoriteColumn) == 1 || favorited.contains(id));
 		
@@ -177,29 +184,31 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		});
 		
 		Date date = new Date(cursor.getLong(dateColumn));
-		
+		String feedName = cursor.getString(feedNameColumn);		
 		if (showFeedInfo && feedIconColumn > -1 && feedNameColumn > -1) {
 			byte[] iconBytes = cursor.getBlob(feedIconColumn);
 			
-			if (iconBytes != null && iconBytes.length > 0) {
+			if (iconBytes != null && iconBytes.length > 0  && !link.contains(".feedburner.com")) {
+				
 				Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
 				
-				if (bitmap != null) {
-					int bitmapSizeInDip = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f, context.getResources().getDisplayMetrics());
-					if (bitmap.getHeight() != bitmapSizeInDip) {
-						bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
-					}
-					dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(cursor.getString(feedNameColumn))); // bad style
+				if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
+					dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
+					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+					dateTextView.setCompoundDrawablesWithIntrinsicBounds(new BitmapDrawable(bitmap), null, null,  null);
 				} else {
-					dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(cursor.getString(feedNameColumn)));
+					dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName));
+					TextDrawable textDrawable = Util.getRoundButtonImage(context, "", feedName);
+					dateTextView.setCompoundDrawablesWithIntrinsicBounds(textDrawable, null, null, null);
 				}
-				dateTextView.setCompoundDrawablesWithIntrinsicBounds(new BitmapDrawable(bitmap), null, null,  null);
 			} else {
-				dateTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-				dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(cursor.getString(feedNameColumn)));
+				dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName));
+				TextDrawable textDrawable = Util.getRoundButtonImage(context, "", feedName);
+				dateTextView.setCompoundDrawablesWithIntrinsicBounds(textDrawable, null, null, null);
 			}
 			
 		} else {
+			// alles 1 feed - kein icon
 			textView.setText(cursor.getString(titleColumnPosition));
 			dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)));
 		}
