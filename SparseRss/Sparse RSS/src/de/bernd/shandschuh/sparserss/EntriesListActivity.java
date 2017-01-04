@@ -169,6 +169,7 @@ public class EntriesListActivity extends AppCompatActivity {
 		}
 
 		listview.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+			
 			public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
 				menu.setHeaderTitle(((TextView) ((AdapterView.AdapterContextMenuInfo) menuInfo).targetView.findViewById(android.R.id.text1)).getText());
 				menu.add(0, CONTEXTMENU_MARKASREAD_ID, Menu.NONE, R.string.contextmenu_markasread).setIcon(android.R.drawable.ic_menu_manage);
@@ -301,6 +302,13 @@ public class EntriesListActivity extends AppCompatActivity {
 		entriesListAdapter.markAsRead();
 		finish();
 	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		// Popup: Bearbeiten, etc.
+		return onOptionsItemSelected(item);
+	}
+
 	
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
