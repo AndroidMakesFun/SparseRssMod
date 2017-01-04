@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.bumptech.glide.Glide;
 
 import android.content.ContentUris;
@@ -95,7 +96,12 @@ public class EntryPagerAdapter extends PagerAdapter {
         
 		Toolbar toolbar = (Toolbar) layout.findViewById(R.id.toolbar);
 		mContext.setSupportActionBar(toolbar);
-		setHomeButtonActive();
+		setHomeButtonActive(); // noch für noTitel
+		
+//		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
+//		actionBar7.setDisplayHomeAsUpEnabled(true);		
+//		TextDrawable textDrawable = Util.getRoundButtonImage(mContext, null, "Hallo");
+//		actionBar7.setHomeAsUpIndicator(textDrawable);
 		
 		if(!showPics){
 			AppBarLayout aAppBarLayout =(AppBarLayout) layout.findViewById(R.id.appBarLayout);
@@ -104,10 +110,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 			}
 		}
 
-
 		String id=ermittleIdZuPosition(position);
 		DtoEntry dtoEntry =ladeDtoEntry(id);
 		refreshLayout(dtoEntry, layout);
+		
+
         
         collection.addView(layout);
         return layout;

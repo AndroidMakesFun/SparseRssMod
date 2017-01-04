@@ -143,7 +143,7 @@ public class Util {
 
 	public static int getButtonSizeInPixel(Context context){
         Resources r = context.getResources();
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80, r.getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, r.getDisplayMetrics());
 	}
 	
 	public static TextDrawable getRoundButtonImage(Context context, Object colorObject, String title){
