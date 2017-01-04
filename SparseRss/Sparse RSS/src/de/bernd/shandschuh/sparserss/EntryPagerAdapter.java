@@ -617,7 +617,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 //		String title = res.getTitle();
 		String imageUrl = res.getImageUrl();
 
-		if (imageUrl != null && !"".equals(imageUrl)) {
+		if (imageUrl != null && !"".equals(imageUrl) && !imageUrl.contains("leer.") && !imageUrl.contains("empty.")) {
 			dto.linkGrafik = imageUrl;
 		}
 
