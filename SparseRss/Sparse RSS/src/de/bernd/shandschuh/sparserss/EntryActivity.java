@@ -223,7 +223,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	// aus /sparss/src/net/etuldan/sparss/view/EntryView.java
 	private static final String FONT_SANS_SERIF = "font-family: sans-serif;";
 	private static final String TEXT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#000000" : "#C0C0C0";
-	private static final String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
+	public static final String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
 	private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
 	private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6"
 			: "#383b3f";

@@ -15,6 +15,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
@@ -253,7 +254,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 //		}else{
 //			dtoEntry.viewWeb.setBackgroundColor(Color.BLACK);
 //		}
-		
 		if(dtoEntry.viewImage==null){
 			if(layout!=null){
 				dtoEntry.viewImage = (ImageView) layout.findViewById(R.id.backdrop);
@@ -262,7 +262,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 				dtoEntry.viewImage = (ImageView) mContext.findViewById(R.id.backdrop);
 			}
 		}
-
+		if(dtoEntry.viewImage!=null){
+			// black / grey
+			dtoEntry.viewImage.setBackgroundColor(Color.parseColor(EntryActivity.BACKGROUND_COLOR) );
+		}
+		
 		if(dtoEntry.progressBar==null){
 			if(layout!=null){
 				dtoEntry.progressBar=(ProgressBar) layout.findViewById(R.id.progress_spinner);

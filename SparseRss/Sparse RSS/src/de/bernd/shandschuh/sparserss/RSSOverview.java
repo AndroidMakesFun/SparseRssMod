@@ -909,7 +909,12 @@ public class RSSOverview extends AppCompatActivity {
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_BACK:
-			mDrawerLayout.closeDrawers();
+			if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
+				mDrawerLayout.closeDrawer(mDrawerList);
+			}else{
+				finish();
+			}
+//			mDrawerLayout.closeDrawers();
 			return true;
 		}
 		return super.onKeyUp(keyCode, event);
