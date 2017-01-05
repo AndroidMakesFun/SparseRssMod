@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
-import com.amulyakhare.textdrawable.TextDrawable;
 import com.bumptech.glide.Glide;
 
 import android.content.ContentUris;
@@ -93,7 +92,12 @@ public class EntryPagerAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup collection, int position) {
     	
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.entry_pager, collection, false);
+        ViewGroup layout;
+        if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_READABILITY) {
+            layout = (ViewGroup) inflater.inflate(R.layout.entry_pager, collection, false);
+        }else{
+            layout = (ViewGroup) inflater.inflate(R.layout.entry_pager_not_collapsing, collection, false);
+        }
         
 		Toolbar toolbar = (Toolbar) layout.findViewById(R.id.toolbar);
 		mContext.setSupportActionBar(toolbar);
@@ -221,7 +225,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 		} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_AMP) {
 			new AsyncAmpRead().execute(dtoEntry);			
 		} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_MOBILIZE) {
-			new AsyncMobilizeBody().execute(dtoEntry);			
+			new AsyncMobilizeBody().execute(dtoEntry);
+		} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_GOOGLEWEBLIGHT) {
+			new AsyncGoogleRead().execute(dtoEntry);
 		}else{  
 			// Default: AUFRUFART_FEED
 			reload(dtoEntry, layout);
@@ -518,6 +524,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 	}
 
 	public void reload(DtoEntry dto, ViewGroup layout) {
+		// mit layout nur aus Create:instantiateItem
+		// reload wird von allen, ausser Readability genutzt!
+			// d.g. kein Immage !!! -> alles raus !!
 
 		checkViews(dto, null);
 
@@ -696,6 +705,44 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dto.progressBar.setVisibility(View.INVISIBLE);
 		}
 	}
-	
+
+	static final String googleweblight="https://googleweblight.com/?lite_url=";
+
+	public class AsyncGoogleRead extends AsyncTask<DtoEntry, Void, Void> {
+
+		DtoEntry dto;
+		
+		@Override
+		protected Void doInBackground(DtoEntry... params) {
+
+			try {
+				dto=params[0];
+					
+//				dto.linkAmp=googleweblight+dto.link;  // ansicht unverändert
+				dto.link=googleweblight+dto.link;
+					
+				fetchHtmlSeite(dto);
+					
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+
+			checkViews(dto, null);
+
+			if (dto.linkAmp != null) {
+				dto.viewWeb.loadUrl(dto.linkAmp);
+			} else {
+				reload(dto, null);
+			} 
+			dto.progressBar.setVisibility(View.INVISIBLE);
+		}
+	}
 	
 }

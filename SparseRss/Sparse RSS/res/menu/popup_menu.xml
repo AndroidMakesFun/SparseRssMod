@@ -25,6 +25,10 @@
         android:icon="@drawable/readability_400"
         android:showAsAction="ifRoom"
         android:title="Readability"/>
+    <item
+        android:id="@+id/menu_googleweblight"
+        android:showAsAction="ifRoom"
+        android:title="Google Weblight"/>
     
     <item
         android:id="@+id/menu_copytoclipboard"

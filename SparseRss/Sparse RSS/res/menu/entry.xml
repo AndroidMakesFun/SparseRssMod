@@ -16,7 +16,11 @@
         android:title="Readability"
         android:showAsAction="ifRoom"
         />
-	
+    <item
+        android:id="@+id/menu_googleweblight"
+        android:showAsAction="ifRoom"
+        android:title="Google Weblight"/>
+  		
     <item android:id="@+id/menu_copytoclipboard"
         android:icon="@android:drawable/ic_menu_upload"
         android:title="@string/contextmenu_copyurl"/>

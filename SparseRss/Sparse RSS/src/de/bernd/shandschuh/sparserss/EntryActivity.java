@@ -100,6 +100,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public static final int AUFRUFART_INSTAPAPER = 3;
 	public static final int AUFRUFART_READABILITY = 4;
 	public static final int AUFRUFART_AMP = 5;
+	public static final int AUFRUFART_GOOGLEWEBLIGHT = 6; // Leiche ?
 	private static final int AUFRUFART_WEBVIEW = 6; // Leiche ?
 
 	private int mAufrufart = 0;
@@ -1190,27 +1191,27 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		case R.id.menu_feed: {
 			_id = null;
-			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_FEED);
 			onClickReload(null);
 			// readUrl(); // TODO ???
 			break;
 		}
 
 		case R.id.menu_mobilize: {
-			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
 			onClickLoadMobilize(null);
 			break;
 		}
 
 		case R.id.menu_readability: {
-			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
 			onClickReadability(null);
 			break;
 		}
 
 		case R.id.menu_amp: {
-			Util.setViewerPrefs(this, "" + feedId, AUFRUFART_AMP);
 			onClickLoadAmp(null);
+			break;
+		}
+		case R.id.menu_googleweblight: {
+			onClickLoadGoogleweblight(null);
 			break;
 		}
 
@@ -1377,6 +1378,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public void onClickLoadAmp(View view) {
 		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_AMP);
 		mAufrufart=AUFRUFART_AMP;
+		mEntryPagerAdapter.notifyDataSetChanged();
+	}
+
+	public void onClickLoadGoogleweblight(View view) {
+		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_GOOGLEWEBLIGHT);
+		mAufrufart=AUFRUFART_GOOGLEWEBLIGHT;
 		mEntryPagerAdapter.notifyDataSetChanged();
 	}
 
