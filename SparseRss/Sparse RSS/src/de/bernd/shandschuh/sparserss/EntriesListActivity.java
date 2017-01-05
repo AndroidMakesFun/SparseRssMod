@@ -32,6 +32,7 @@ import android.app.AlertDialog.Builder;
 import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -121,7 +122,10 @@ public class EntriesListActivity extends AppCompatActivity {
 				if(iconBytes!=null  && iconBytes.length>0){
 					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
 					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-					getSupportActionBar().setHomeAsUpIndicator(new BitmapDrawable(bitmap));
+					BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+					int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
+					bitmapDrawable.setTargetDensity(densityDpi);	
+					getSupportActionBar().setHomeAsUpIndicator(bitmapDrawable);
 				}else{
 					if (title != null) {
 						TextDrawable textDrawable = Util.getRoundButtonImage(this, Long.valueOf(feedId), title);

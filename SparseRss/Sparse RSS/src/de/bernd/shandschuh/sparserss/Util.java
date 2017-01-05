@@ -14,6 +14,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.widget.Toast;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
@@ -141,9 +142,14 @@ public class Util {
 		return version;
 	}
 
+	/**
+	 * button immage size is 24 dp  ( button 32 dp)
+	 * ret button immage size in pixel 
+	 */
 	public static int getButtonSizeInPixel(Context context){
-        Resources r = context.getResources();
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, r.getDisplayMetrics());
+//        Resources r = context.getResources();
+//        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, r.getDisplayMetrics());
+        return (int) (24 * Resources.getSystem().getDisplayMetrics().density); // 4.0 * 24 = 96
 	}
 	
 	public static TextDrawable getRoundButtonImage(Context context, Object colorObject, String title){
@@ -156,8 +162,8 @@ public class Util {
         
         TextDrawable textDrawable = TextDrawable.builder()
                 .beginConfig()
-                    .width(buttonSize/3)  // width in px
-                    .height(buttonSize/3) // height in px
+                    .width(buttonSize)  // /3 entfernt width in px
+                    .height(buttonSize) // height in px
                 .endConfig()
                 .buildRound(letter, color);
         return textDrawable;

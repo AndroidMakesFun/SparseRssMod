@@ -35,6 +35,7 @@ import android.R.color;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -102,6 +103,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	private DateFormat timeFormat;
 	
 	private int buttonSize;
+	private int densityDpi;
 	
 	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload) {
 		super(context, R.layout.entrylistitem, createManagedCursor(context, uri, true), autoreload);
@@ -132,6 +134,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		timeFormat = android.text.format.DateFormat.getTimeFormat(context);
 		
 		buttonSize=Util.getButtonSizeInPixel(context);
+		densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
+
 	}
 
 	@Override
@@ -195,7 +199,9 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 				if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
 					dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
 					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-					dateTextView.setCompoundDrawablesWithIntrinsicBounds(new BitmapDrawable(bitmap), null, null,  null);
+					BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+					bitmapDrawable.setTargetDensity(densityDpi);	
+					dateTextView.setCompoundDrawablesWithIntrinsicBounds(bitmapDrawable, null, null,  null);
 				} else {
 					dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName));
 					TextDrawable textDrawable = Util.getRoundButtonImage(context, "", feedName);

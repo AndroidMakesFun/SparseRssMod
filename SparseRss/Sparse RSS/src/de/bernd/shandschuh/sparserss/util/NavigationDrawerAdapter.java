@@ -3,13 +3,12 @@ package de.bernd.shandschuh.sparserss.util;
 import java.util.ArrayList;
 
 import com.amulyakhare.textdrawable.TextDrawable;
-import com.bumptech.glide.request.animation.DrawableCrossFadeFactory;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -44,6 +43,7 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 		mListeNavDrawerEntries = new ArrayList<NavDrawerLineEntry>();
 		
 		int buttonSize = Util.getButtonSizeInPixel(context);
+		int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
 		
 		Drawable drawable;
 		String titel;
@@ -58,14 +58,18 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 //		drawable = context.getResources().getDrawable( R.drawable.icon );
 		Bitmap bitmap = BitmapFactory.decodeResource (context.getResources(), R.drawable.icon);
 		bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);		
+		BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+		bitmapDrawable.setTargetDensity(densityDpi);	
 		titel = context.getResources().getString(R.string.all);
-		mListeNavDrawerEntries.add(new NavDrawerLineEntry(new BitmapDrawable(bitmap), titel, R.id.menu_alle));
+		mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, titel, R.id.menu_alle));
 		
 //		drawable = context.getResources().getDrawable( android.R.drawable.star_big_off );
 		bitmap = BitmapFactory.decodeResource (context.getResources(), android.R.drawable.star_big_off);
 		bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);		
+		bitmapDrawable = new BitmapDrawable(bitmap);
+		bitmapDrawable.setTargetDensity(densityDpi);
 		titel = context.getResources().getString(R.string.favorites);
-		mListeNavDrawerEntries.add(new NavDrawerLineEntry(new BitmapDrawable(bitmap), titel, R.id.menu_favorites));
+		mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, titel, R.id.menu_favorites));
 		
 		mListeNavDrawerEntries.add(new NavDrawerLineEntry(null, "", R.id.menu_overview));
 		
@@ -89,7 +93,9 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 				if (iconBytes != null && iconBytes.length > 0) {
 					bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
 					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-					mListeNavDrawerEntries.add(new NavDrawerLineEntry(new BitmapDrawable(bitmap), name, id));
+					bitmapDrawable = new BitmapDrawable(bitmap);
+					bitmapDrawable.setTargetDensity(densityDpi);
+					mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, name, id));
 				}else{
 					TextDrawable textDrawable = Util.getRoundButtonImage(context, Long.valueOf(id), name);
 					mListeNavDrawerEntries.add(new NavDrawerLineEntry(textDrawable, name, id));

@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.bernd.shandschuh.sparserss"
     android:installLocation="auto"
-    android:versionCode="211"
-    android:versionName="2.11" >
+    android:versionCode="212"
+    android:versionName="2.12" >
 
     <uses-sdk
         android:minSdkVersion="16"
