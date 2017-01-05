@@ -383,7 +383,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 				dto.text = dto.titel + dto.text;
 
-				dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", null);
+//				dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", null);
+				String baseUrl=EntryActivity.getBaseUrl(dto.link);
+				dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html; charset=UTF-8", "utf-8", null);
 
 				if (showPics && dto.linkGrafik != null) {
 
@@ -566,7 +568,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 		dto.text = dto.titel + dto.text;
 		
 		checkViews(dto, null);
-		dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", "utf-8");
+		String baseUrl=EntryActivity.getBaseUrl(dto.link);
+		dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html; charset=UTF-8", "utf-8", null);
 		
 		dto.progressBar.setVisibility(View.INVISIBLE);
 		
