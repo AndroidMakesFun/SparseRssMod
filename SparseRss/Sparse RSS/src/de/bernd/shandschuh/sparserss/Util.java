@@ -156,7 +156,7 @@ public class Util {
 		
 		String letter;
 		if(title==null || "".equals(title)){
-			letter="F";
+			letter=title="F";
 		}else{
 			letter=title.substring(0, 1).toUpperCase();
 		}

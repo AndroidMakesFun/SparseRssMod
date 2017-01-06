@@ -84,11 +84,15 @@ public class FeedConfigActivity extends Activity {
 		if (intent.getAction().equals(Intent.ACTION_INSERT)) {
 			
 			ClipboardManager cm = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
-			if (cm.getPrimaryClip().getItemCount() > 0) {
-				String clip = "" + cm.getPrimaryClip().getItemAt(0).getText();
-				if (!"".equals(clip)) {
-					urlEditText.setText(clip);
+			try {
+				if (cm.getPrimaryClip().getItemCount() > 0) { // kann knallen...
+					String clip = "" + cm.getPrimaryClip().getItemAt(0).getText();
+					if (!"".equals(clip)) {
+						urlEditText.setText(clip);
+					}
 				}
+			} catch (Exception e) {
+				System.err.println("FeedConfigActivity - no Clipboard");
 			}
 			
 			setTitle(R.string.newfeed_title);
