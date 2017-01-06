@@ -192,22 +192,29 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		if (showFeedInfo && feedIconColumn > -1 && feedNameColumn > -1) {
 			byte[] iconBytes = cursor.getBlob(feedIconColumn);
 			
-			if (iconBytes != null && iconBytes.length > 0  && !link.contains(".feedburner.com")) {
-				
-				Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-				
-				if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
-					dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
-					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-					BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
-					bitmapDrawable.setTargetDensity(densityDpi);	
-					dateTextView.setCompoundDrawablesWithIntrinsicBounds(bitmapDrawable, null, null,  null);
+			try {
+				if (iconBytes != null && iconBytes.length > 0  && !link.contains(".feedburner.com")) {
+					
+					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+					
+					if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
+						dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
+						bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+						BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+						bitmapDrawable.setTargetDensity(densityDpi);	
+						dateTextView.setCompoundDrawablesWithIntrinsicBounds(bitmapDrawable, null, null,  null);
+					} else {
+						dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName));
+						TextDrawable textDrawable = Util.getRoundButtonImage(context, "", feedName);
+						dateTextView.setCompoundDrawablesWithIntrinsicBounds(textDrawable, null, null, null);
+					}
 				} else {
 					dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName));
 					TextDrawable textDrawable = Util.getRoundButtonImage(context, "", feedName);
 					dateTextView.setCompoundDrawablesWithIntrinsicBounds(textDrawable, null, null, null);
 				}
-			} else {
+			} catch (Exception e) {
+				System.err.println("Catched Exception for createScaledBitmap in EntriesListAdapter");
 				dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName));
 				TextDrawable textDrawable = Util.getRoundButtonImage(context, "", feedName);
 				dateTextView.setCompoundDrawablesWithIntrinsicBounds(textDrawable, null, null, null);

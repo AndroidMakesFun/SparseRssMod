@@ -93,7 +93,7 @@ public class EntryPagerAdapter extends PagerAdapter {
     	
         LayoutInflater inflater = LayoutInflater.from(mContext);
         ViewGroup layout;
-        if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_READABILITY) {
+        if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_READABILITY && showPics) {
             layout = (ViewGroup) inflater.inflate(R.layout.entry_pager, collection, false);
         }else{
             layout = (ViewGroup) inflater.inflate(R.layout.entry_pager_not_collapsing, collection, false);
@@ -108,15 +108,16 @@ public class EntryPagerAdapter extends PagerAdapter {
 //		TextDrawable textDrawable = Util.getRoundButtonImage(mContext, null, "Hallo");
 //		actionBar7.setHomeAsUpIndicator(textDrawable);
 		
-		if(!showPics){
-			AppBarLayout aAppBarLayout =(AppBarLayout) layout.findViewById(R.id.appBarLayout);
-			if(aAppBarLayout!=null){
-				aAppBarLayout.setExpanded(false,false);
-			}
-		}
-
 		String id=ermittleIdZuPosition(position);
-		DtoEntry dtoEntry =ladeDtoEntry(id);
+		DtoEntry dtoEntry;
+		if(id==null){
+			dtoEntry=new DtoEntry();
+			dtoEntry.titel="No Entry on Position " + position;
+			dtoEntry.link="";
+			dtoEntry.text="";
+		}else{
+			dtoEntry =ladeDtoEntry(id);
+		}
 		refreshLayout(dtoEntry, layout);
 		
 
@@ -310,7 +311,15 @@ public class EntryPagerAdapter extends PagerAdapter {
     
     
     public String ermittleIdZuPosition(int position) {
-    		return mListeIdsAsString.get(position);
+    	if(mListeIdsAsString==null){
+    		System.err.println("ermittleIdZuPosition mListeIdsAsString is empty");
+    		return null;
+    	}
+    	if(mListeIdsAsString.size() <= position){
+    		System.err.println("ermittleIdZuPosition mListeIdsAsString has not " + position);
+    		return null;
+    	}
+   		return mListeIdsAsString.get(position);
 	}
 
     /**
@@ -389,7 +398,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 				dto.text = dto.titel + dto.text;
 
-//				dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", null);
 				String baseUrl=EntryActivity.getBaseUrl(dto.link);
 				dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html; charset=UTF-8", "utf-8", null);
 
@@ -402,11 +410,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 						;
 					} catch (Exception e) {
 						e.printStackTrace();
-					}
-				}else{
-					AppBarLayout aAppBarLayout =(AppBarLayout) mContext.findViewById(R.id.appBarLayout);
-					if(aAppBarLayout!=null){
-						aAppBarLayout.setExpanded(false,false);
 					}
 				}
 
@@ -529,50 +532,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 			// d.g. kein Immage !!! -> alles raus !!
 
 		checkViews(dto, null);
-
-		if(layout!=null){  // nur Feed - kein Cover !
-			AppBarLayout aAppBarLayout =(AppBarLayout) layout.findViewById(R.id.appBarLayout);
-			if(aAppBarLayout!=null){
-				aAppBarLayout.setExpanded(false,false);
-			}
-		}else{
-			if(showPics){
-				boolean noPic=true;
-				int posImg = dto.text.indexOf("src=\"");
-				if (posImg > 0) {
-					posImg += 5;
-					int posImgEnde = dto.text.indexOf('"', posImg);
-					if (posImgEnde > 0) {
-						dto.linkGrafik = dto.text.substring(posImg, posImgEnde);
-						URL url;
-						try {
-							url = new URL(dto.linkGrafik);
-							Glide.with(mContext).load(url).centerCrop().into(dto.viewImage);
-							noPic=false;
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-		
-					// sonst ein anderes aus dem Artikel, wenn Bilder geladen
-					// wurden...
-				} else if (Util.getImageFolderFile(mContext) != null && Util.getImageFolderFile(mContext).exists()) {
-					PictureFilenameFilter filenameFilter = new PictureFilenameFilter(dto.id);
-		
-					File[] files = Util.getImageFolderFile(mContext).listFiles(filenameFilter);
-					if (files != null && files.length > 0) {
-						Glide.with(mContext).load(files[0]).centerCrop().into(dto.viewImage);
-						noPic=false;
-					}
-				}
-				if(noPic){
-					AppBarLayout aAppBarLayout =(AppBarLayout) mContext.findViewById(R.id.appBarLayout);
-					if(aAppBarLayout!=null){
-						aAppBarLayout.setExpanded(false,false);
-					}
-				}
-			} // showPics	
-		}	
 		
 		dto.text = dto.titel + dto.text;
 		

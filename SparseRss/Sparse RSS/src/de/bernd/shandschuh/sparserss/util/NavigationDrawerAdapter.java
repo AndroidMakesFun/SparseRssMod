@@ -89,18 +89,24 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 			byte[] iconBytes = cursor.getBlob(iconPosition);
 			String link = cursor.getString(linkPosition);
 			
-			if(!link.contains(".feedburner.com")){
-				if (iconBytes != null && iconBytes.length > 0) {
-					bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-					bitmapDrawable = new BitmapDrawable(bitmap);
-					bitmapDrawable.setTargetDensity(densityDpi);
-					mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, name, id));
+			try {
+				if(!link.contains(".feedburner.com")){
+					if (iconBytes != null && iconBytes.length > 0) {
+						bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+						bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+						bitmapDrawable = new BitmapDrawable(bitmap);
+						bitmapDrawable.setTargetDensity(densityDpi);
+						mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, name, id));
+					}else{
+						TextDrawable textDrawable = Util.getRoundButtonImage(context, Long.valueOf(id), name);
+						mListeNavDrawerEntries.add(new NavDrawerLineEntry(textDrawable, name, id));
+					}
 				}else{
 					TextDrawable textDrawable = Util.getRoundButtonImage(context, Long.valueOf(id), name);
 					mListeNavDrawerEntries.add(new NavDrawerLineEntry(textDrawable, name, id));
 				}
-			}else{
+			} catch (Exception e) {
+				System.err.println("Catched Exception for createScaledBitmap in NavigationDrawerAdapter");
 				TextDrawable textDrawable = Util.getRoundButtonImage(context, Long.valueOf(id), name);
 				mListeNavDrawerEntries.add(new NavDrawerLineEntry(textDrawable, name, id));
 			}

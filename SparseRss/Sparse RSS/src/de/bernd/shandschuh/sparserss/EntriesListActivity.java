@@ -120,12 +120,18 @@ public class EntriesListActivity extends AppCompatActivity {
 				title = cursor.isNull(0) ? cursor.getString(1) : cursor.getString(0);
 				iconBytes = cursor.getBlob(2);
 				if(iconBytes!=null  && iconBytes.length>0){
-					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
-					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-					BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
-					int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
-					bitmapDrawable.setTargetDensity(densityDpi);	
-					getSupportActionBar().setHomeAsUpIndicator(bitmapDrawable);
+					try {
+						Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
+						bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+						BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+						int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
+						bitmapDrawable.setTargetDensity(densityDpi);	
+						getSupportActionBar().setHomeAsUpIndicator(bitmapDrawable);
+					} catch (Exception e) {
+						System.err.println("Catched Exception for createScaledBitmap in EntriesListActivity");
+						TextDrawable textDrawable = Util.getRoundButtonImage(this, Long.valueOf(feedId), "X");
+						getSupportActionBar().setHomeAsUpIndicator(textDrawable);
+					}
 				}else{
 					if (title != null) {
 						TextDrawable textDrawable = Util.getRoundButtonImage(this, Long.valueOf(feedId), title);
@@ -157,17 +163,17 @@ public class EntriesListActivity extends AppCompatActivity {
 		if (title != null) {
 			setTitle(" " +title);
 		}
-		if (iconBytes != null && iconBytes.length > 0) {
-			int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
-			Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-			if (bitmap != null) {
-				if (bitmap.getHeight() != bitmapSizeInDip) {
-					bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
-				}
-
-//				setFeatureDrawable(Window.FEATURE_LEFT_ICON, new BitmapDrawable(bitmap));
-			}
-		}
+//		if (iconBytes != null && iconBytes.length > 0) {
+//			int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
+//			Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+//			if (bitmap != null) {
+//				if (bitmap.getHeight() != bitmapSizeInDip) {
+//					bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
+//				}
+//
+////				setFeatureDrawable(Window.FEATURE_LEFT_ICON, new BitmapDrawable(bitmap));
+//			}
+//		}
 		if (RSSOverview.notificationManager != null) {
 			RSSOverview.notificationManager.cancel(0);
 		}

@@ -200,7 +200,9 @@ public class FetcherService extends IntentService {
 	public void onCreate() {
 		super.onCreate();
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		RSSOverview.INSTANCE.zeigeProgressBar(true);
+		if(RSSOverview.INSTANCE!=null){
+			RSSOverview.INSTANCE.zeigeProgressBar(true);
+		}
 	}
 	
 	@Override

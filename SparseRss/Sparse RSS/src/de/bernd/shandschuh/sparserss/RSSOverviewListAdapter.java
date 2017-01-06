@@ -165,17 +165,24 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 
 		//http://feeds2.feedburner.com/aktuell/feeds/rss/     http://feeds.feedburner.com"
 		if(!link.contains(".feedburner.com")){
-			byte[] iconBytes = cursor.getBlob(iconPosition);
-			if (iconBytes != null && iconBytes.length > 0) {
-				Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-				
-				if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
-					bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-					BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
-					bitmapDrawable.setTargetDensity(densityDpi);	
-					textView.setCompoundDrawablesWithIntrinsicBounds(bitmapDrawable, null, null, null);
-					hatBild=true;
+			try {
+				byte[] iconBytes = cursor.getBlob(iconPosition);
+				if (iconBytes != null && iconBytes.length > 0) {
+					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+					
+					if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
+						bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+						BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+						bitmapDrawable.setTargetDensity(densityDpi);	
+						textView.setCompoundDrawablesWithIntrinsicBounds(bitmapDrawable, null, null, null);
+						hatBild=true;
+					}
 				}
+			} catch (Exception e) {
+				System.err.println("Catched Exception for createScaledBitmap in RSSOverviewListAdapter");
+				Object feedId=Long.parseLong(cursor.getString(idPosition));
+				TextDrawable textDrawable = Util.getRoundButtonImage(context, feedId, titel);
+				textView.setCompoundDrawablesWithIntrinsicBounds(textDrawable, null, null, null);
 			} 
 		}
 		if(!hatBild){

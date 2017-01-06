@@ -605,28 +605,28 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 						iconCursor.close();
 					}
 
-					if (iconBytes != null && iconBytes.length > 0) {
-						int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f,
-								getResources().getDisplayMetrics());
-						Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-						if (bitmap != null) {
-							if (bitmap.getHeight() != bitmapSizeInDip) {
-								bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
-							}
-							// setFeatureDrawable(Window.FEATURE_LEFT_ICON, new
-							// BitmapDrawable(bitmap));
-							// getSupportActionBar().setIcon(new
-							// BitmapDrawable(bitmap));
-							// getSupportActionBar().setLogo(new
-							// BitmapDrawable(bitmap));
-							// int flags = 0;
-							// int change =
-							// getSupportActionBar().getDisplayOptions() ^
-							// flags;
-							// getSupportActionBar().setDisplayOptions(change,
-							// flags);
-						}
-					}
+//					if (iconBytes != null && iconBytes.length > 0) {
+//						int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f,
+//								getResources().getDisplayMetrics());
+//						Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
+//						if (bitmap != null) {
+//							if (bitmap.getHeight() != bitmapSizeInDip) {
+//								bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
+//							}
+//							// setFeatureDrawable(Window.FEATURE_LEFT_ICON, new
+//							// BitmapDrawable(bitmap));
+//							// getSupportActionBar().setIcon(new
+//							// BitmapDrawable(bitmap));
+//							// getSupportActionBar().setLogo(new
+//							// BitmapDrawable(bitmap));
+//							// int flags = 0;
+//							// int change =
+//							// getSupportActionBar().getDisplayOptions() ^
+//							// flags;
+//							// getSupportActionBar().setDisplayOptions(change,
+//							// flags);
+//						}
+//					}
 				}
 
 				timestamp = entryCursor.getLong(datePosition);

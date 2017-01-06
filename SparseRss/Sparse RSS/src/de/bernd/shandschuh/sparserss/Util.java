@@ -154,7 +154,12 @@ public class Util {
 	
 	public static TextDrawable getRoundButtonImage(Context context, Object colorObject, String title){
 		
-		String letter=title.substring(0, 1).toUpperCase();
+		String letter;
+		if(title==null || "".equals(title)){
+			letter="F";
+		}else{
+			letter=title.substring(0, 1).toUpperCase();
+		}
 		
 		int buttonSize=getButtonSizeInPixel(context);
         ColorGenerator generator = ColorGenerator.DEFAULT;
