@@ -70,10 +70,13 @@ public class Util {
 	private static Boolean LIGHTTHEME;
 	
 	public static boolean isLightTheme(Context context) {
-		if (LIGHTTHEME == null) {
-			LIGHTTHEME = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_LIGHTTHEME, true);
+		if(context!=null){
+			if (LIGHTTHEME == null) {
+				LIGHTTHEME = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_LIGHTTHEME, true);
+			}
+			return LIGHTTHEME;
 		}
-		return LIGHTTHEME;
+		return true;
 	}
 
 	public static final String PREFERENCE_TEST_LIST_PREFS = "PREFERENCE_TEST_LIST_PREFS";

@@ -165,9 +165,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 			String abstractText = entryCursor.getString(abstractPosition);
 			
-			if(!showPics){
-				// webview Block Images scheint nicht zu ziehen...
-				abstractText = abstractText.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
+			if(abstractText!=null){
+				if(!showPics){
+					// webview Block Images scheint nicht zu ziehen...
+					abstractText = abstractText.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
+				}
 			}
 			
 			dto.text=abstractText + "<br><br>";
