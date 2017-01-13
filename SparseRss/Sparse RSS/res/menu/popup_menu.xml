@@ -9,26 +9,6 @@
         />
  -->
      
-    <item
-        android:id="@+id/menu_feed"
-        android:icon="@drawable/ic_action_crop"
-        android:showAsAction="ifRoom"
-        android:title="Feed"
-        />
-    <item
-        android:id="@+id/menu_amp"
-        android:icon="@android:drawable/ic_menu_gallery"
-        android:showAsAction="ifRoom"
-        android:title="AMP"/>
-    <item
-        android:id="@+id/menu_readability"
-        android:icon="@drawable/readability_400"
-        android:showAsAction="ifRoom"
-        android:title="Readability"/>
-    <item
-        android:id="@+id/menu_googleweblight"
-        android:showAsAction="ifRoom"
-        android:title="Google Weblight"/>
     
     <item
         android:id="@+id/menu_copytoclipboard"
@@ -47,5 +27,30 @@
         android:icon="@android:drawable/ic_menu_sort_alphabetically"
         android:title="Text Scale" 
         android:showAsAction="ifRoom"/>
+    
+<group android:checkableBehavior="single">
+    
+    <item
+        android:id="@+id/menu_amp"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:showAsAction="ifRoom"
+        android:title="AMP"/>
+    <item
+        android:id="@+id/menu_googleweblight"
+        android:showAsAction="ifRoom"
+        android:title="Google Weblight"/>
+    <item
+        android:id="@+id/menu_readability"
+        android:icon="@drawable/readability_400"
+        android:showAsAction="ifRoom"
+        android:title="Readability"/>
+    <item
+        android:id="@+id/menu_feed"
+        android:icon="@drawable/ic_action_crop"
+        android:showAsAction="ifRoom"
+        android:title="Feed"
+        />
+    
+</group>        
     
 </menu>

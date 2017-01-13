@@ -49,8 +49,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -68,7 +66,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -76,8 +73,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -839,6 +834,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.entry, menu);
+		
+		switch (mAufrufart) {
+		case AUFRUFART_READABILITY:
+			menu.findItem(R.id.menu_readability).setChecked(true);
+			break;
+		case AUFRUFART_GOOGLEWEBLIGHT:
+			menu.findItem(R.id.menu_googleweblight).setChecked(true);
+			break;
+		case AUFRUFART_AMP:
+			menu.findItem(R.id.menu_amp).setChecked(true);
+			break;
+			
+		default:
+			menu.findItem(R.id.menu_feed).setChecked(true);
+			break;
+		}
+		
 //		MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
 //		MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 //		markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
@@ -1359,6 +1371,22 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		
 		PopupMenu popup = new PopupMenu(EntryActivity.this, view);
 		popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+		
+		switch (mAufrufart) {
+		case AUFRUFART_READABILITY:
+			popup.getMenu().findItem(R.id.menu_readability).setChecked(true);
+			break;
+		case AUFRUFART_GOOGLEWEBLIGHT:
+			popup.getMenu().findItem(R.id.menu_googleweblight).setChecked(true);
+			break;
+		case AUFRUFART_AMP:
+			popup.getMenu().findItem(R.id.menu_amp).setChecked(true);
+			break;
+			
+		default:
+			popup.getMenu().findItem(R.id.menu_feed).setChecked(true);
+			break;
+		}
 		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
