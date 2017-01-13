@@ -51,7 +51,6 @@ public class EntryPagerAdapter extends PagerAdapter {
      */
     Uri mParentUri;
     
-    private ArrayList<String> mListeIdsAsString = new ArrayList<String>();
 	private boolean showPics; // Prefs Bilder laden und anzeigen
 	private boolean showRead; // EntriesListActivity gelesene anzeigen
     
@@ -78,12 +77,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 		mParentUri = FeedData.EntryColumns.PARENT_URI(mUri.getPath());
 		showPics = Util.showPics(context);
 		
-        ermittleAlleIds();
-        
         if(position<0){
-            mAnzahlFeedeintraege=mListeIdsAsString.size(); // statt anzahlFeedeintraege
         	String id = mUri.getLastPathSegment();
-        	position=ermittlePositionZuId(id);
+        	position=ermittlePositionZuId(id); 
         }
         setAktuellePosition(position);
     }
@@ -107,21 +103,15 @@ public class EntryPagerAdapter extends PagerAdapter {
 //		actionBar7.setDisplayHomeAsUpEnabled(true);		
 //		TextDrawable textDrawable = Util.getRoundButtonImage(mContext, null, "Hallo");
 //		actionBar7.setHomeAsUpIndicator(textDrawable);
-		
-		String id=ermittleIdZuPosition(position);
-		DtoEntry dtoEntry;
-		if(id==null){
+				
+		DtoEntry dtoEntry =ladeDtoEntry(position);
+		if(dtoEntry==null){
 			dtoEntry=new DtoEntry();
 			dtoEntry.titel="No Entry on Position " + position;
 			dtoEntry.link="";
-			dtoEntry.text="";
-		}else{
-			dtoEntry =ladeDtoEntry(id);
+			dtoEntry.text="";			
 		}
-		refreshLayout(dtoEntry, layout);
-		
-
-        
+		refreshLayout(dtoEntry, layout);       
         collection.addView(layout);
         return layout;
     }
@@ -134,31 +124,67 @@ public class EntryPagerAdapter extends PagerAdapter {
     		// never, da schon im Contructor - Wer setzt gelesen ?
         	System.out.println("setPrimaryItem " + position + " " + object);
         	setAktuellePosition(position);
-        	String id = ermittleIdZuPosition(position);
+//        	String id = ermittleIdZuPosition(position);
+        	DtoEntry dto = ladeDtoEntry(position);
+        	String id = dto.id;
 //        	if(!dto.isRead){
        		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
 //    	}
     }
 
 
-	public DtoEntry ladeDtoEntry(String id) {
-
+    /**
+     * ermittelt position in allen entries und Anzahl Aller Entries
+     */
+    public int ermittlePositionZuId(String id) {
 		if(id==null){
 			System.err.println("ladeDtoEntry id is null");
+			return -1;
+		}
+    	Cursor entryCursor;
+    	if(showRead){
+    		entryCursor = mContext.getContentResolver().query(mParentUri, null, null, null, "date DESC");    		
+    	}else{
+    		String READDATEISNULL = "readdate is null";
+    		entryCursor = mContext.getContentResolver().query(mParentUri, null, READDATEISNULL, null, "date DESC");
+    	}
+		
+    	int position=-1;
+		if (entryCursor.moveToFirst()) {
+			mAnzahlFeedeintraege=entryCursor.getCount(); 
+			while (entryCursor.isAfterLast() == false) {
+				++position;
+				final String idEntry = entryCursor.getString(0);
+				if(id.equals(idEntry)){
+					return position;
+				}
+				entryCursor.moveToNext();
+			}
+			entryCursor.close();
+		}
+		return -1;
+	}
+
+	public DtoEntry ladeDtoEntry(int position) {
+
+		if(position<0){
+			return null;
 		}
 		
-		Uri selectUri= FeedData.EntryColumns.ENTRY_CONTENT_URI(id);
-		Cursor entryCursor = mContext.getContentResolver().query(selectUri, null, null, null, null);
+		Uri selectUri= mParentUri;
+		Cursor entryCursor = mContext.getContentResolver().query(selectUri, null, null, null, "date DESC");
 		
-		final int linkPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.LINK);
-		final int abstractPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.ABSTRACT);
-		final int datePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.DATE);
-		final int titlePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.TITLE);
-		final int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
-
-		if (entryCursor.moveToFirst()) {
+		if (entryCursor.moveToPosition(position)) {
+			final int linkPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.LINK);
+			final int abstractPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.ABSTRACT);
+			final int datePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.DATE);
+			final int titlePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.TITLE);
+			final int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
+			final int readIdPosition = entryCursor.getColumnIndex(android.provider.BaseColumns._ID);
+			
 			DtoEntry dto=new DtoEntry();
-			dto.id=id;
+			long _id = entryCursor.getLong(readIdPosition);
+			dto.id=""+_id;
 			String link = entryCursor.getString(linkPosition);
 			link = EntryActivity.fixLink(link);
 			dto.link=link;
@@ -289,53 +315,29 @@ public class EntryPagerAdapter extends PagerAdapter {
 	}
 
 
-    public void ermittleAlleIds() {
-    	mListeIdsAsString.clear();
-    	Cursor cursor;
-    	if(showRead){
-    		cursor = mContext.getContentResolver().query(mParentUri, null, null, null, "date DESC");    		
-    	}else{
-    		String READDATEISNULL = "readdate is null";
-    		cursor = mContext.getContentResolver().query(mParentUri, null, READDATEISNULL, null, "date DESC");
-    	}
-		cursor.moveToFirst();
-		while (cursor.isAfterLast() == false) {
-			final String id = cursor.getString(0);
-			mListeIdsAsString.add(id);
-			cursor.moveToNext();
-		}
-		cursor.close();
-		if(!(mListeIdsAsString.size() == mAnzahlFeedeintraege)){
-			System.out.println("Wrong mListeIdsAsString " + mListeIdsAsString.size() + " " + mAnzahlFeedeintraege);
-//			Util.toastMessageLong(mContext, "Wrong mListeIdsAsString " + mListeIdsAsString.size() + " " + mAnzahlFeedeintraege);
-		}
-    }
+//    public void ermittleAlleIds() {
+//    	mListeIdsAsString.clear();
+//    	Cursor cursor;
+//    	if(showRead){
+//    		cursor = mContext.getContentResolver().query(mParentUri, null, null, null, "date DESC");    		
+//    	}else{
+//    		String READDATEISNULL = "readdate is null";
+//    		cursor = mContext.getContentResolver().query(mParentUri, null, READDATEISNULL, null, "date DESC");
+//    	}
+//		cursor.moveToFirst();
+//		while (cursor.isAfterLast() == false) {
+//			final String id = cursor.getString(0);
+//			mListeIdsAsString.add(id);
+//			cursor.moveToNext();
+//		}
+//		cursor.close();
+//		if(!(mListeIdsAsString.size() == mAnzahlFeedeintraege)){
+//			System.out.println("Wrong mListeIdsAsString " + mListeIdsAsString.size() + " " + mAnzahlFeedeintraege);
+////			Util.toastMessageLong(mContext, "Wrong mListeIdsAsString " + mListeIdsAsString.size() + " " + mAnzahlFeedeintraege);
+//		}
+//    }
     
     
-    public String ermittleIdZuPosition(int position) {
-    	if(mListeIdsAsString==null){
-    		System.err.println("ermittleIdZuPosition mListeIdsAsString is empty");
-    		return null;
-    	}
-    	if(mListeIdsAsString.size() <= position){
-    		System.err.println("ermittleIdZuPosition mListeIdsAsString has not " + position);
-    		return null;
-    	}
-   		return mListeIdsAsString.get(position);
-	}
-
-    /**
-     * Durchsucht mListeIdsAsString nach primaryKey ID und gibt seine Postiion in der Liste bzw. DB zurück
-     */
-    public int ermittlePositionZuId(String id) {
-    	for (int i = 0; i < mListeIdsAsString.size(); i++) {
-			if(id.equals(mListeIdsAsString.get(i))){
-				return i;
-			}
-		}
-    	return -1;
-}
-
 	@Override
     public void destroyItem(ViewGroup collection, int position, Object view) {
         collection.removeView((View) view);
@@ -523,8 +525,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 	public DtoEntry getAktuellenEntry() {
 		int akt=getAktuellePosition();
-		String id = this.ermittleIdZuPosition(akt);
-		DtoEntry dtoEntry = this.ladeDtoEntry(id);
+		DtoEntry dtoEntry = this.ladeDtoEntry(akt);
 		return dtoEntry;
 	}
 
