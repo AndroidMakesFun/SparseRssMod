@@ -139,7 +139,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, -1);  // !!
 
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
+		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 60);
 
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 		
@@ -467,7 +467,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		scrollY = 0;
 
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
+		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 60);
 
 		setZoomsScale(null);
 		MyWebViewClient myWebViewClient = new MyWebViewClient();
@@ -1052,7 +1052,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	
 	//// Für setZoomsScale und Dlg dafür ////
 	
-	private int mIntScalePercent = 50; // 0..100
+	private int mIntScalePercent = 60; // 0..100
 
 	SeekBar mSeekBar;
 
@@ -1090,6 +1090,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 				SharedPreferences.Editor editor = prefs.edit();
 				editor.putInt(PREFERENCE_SCALE + mAufrufart, mIntScalePercent);
 				editor.commit();
+				Util.toastMessage(mActivity, "Scale " + (mIntScalePercent * 2) );
 			}
 		});
 		mAlertDialog.show();
