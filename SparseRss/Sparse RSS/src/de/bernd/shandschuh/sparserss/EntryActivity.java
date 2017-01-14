@@ -139,7 +139,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, -1);  // !!
 
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 60);
+		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE, 60);
 
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 		
@@ -1088,7 +1088,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			public void onClick(DialogInterface dialog, int whichButton) {
 				SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt(PREFERENCE_SCALE + mAufrufart, mIntScalePercent);
+				editor.putInt(PREFERENCE_SCALE, mIntScalePercent);
 				editor.commit();
 				Util.toastMessage(mActivity, "Scale " + (mIntScalePercent * 2) );
 			}
