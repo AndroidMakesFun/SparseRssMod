@@ -1359,7 +1359,13 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	public void onClickLoadBrowser(View view) {
 		// Browser öffnen
 		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
-		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(dtoEntry.link)));
+		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(dtoEntry.link));
+		
+		boolean forcechrome = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("forcechrome", true);
+		if(forcechrome){
+			intent.setPackage("com.android.chrome");
+		}
+		startActivity(intent);
 	}
 
 	public void onClickReadability(View view) {

@@ -131,11 +131,19 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/settings_category_network">
+
+        <CheckBoxPreference
+            android:title="Force chrome"
+            android:defaultValue="true"
+            android:summary="Forces Chrome as your Browser to override Intents eG for feedproxy with other RSS Reader"
+            android:key="forcechrome" />
+        
         <CheckBoxPreference
             android:title="@string/settings_standarduseragent"
             android:defaultValue="false"
             android:summary="@string/settings_standarduseragent_description"
             android:key="standarduseragent" />
+        
         <CheckBoxPreference
             android:title="@string/settings_httphttpsredirects"
             android:defaultValue="true"
