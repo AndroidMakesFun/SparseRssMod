@@ -267,14 +267,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 			StringBuilder dateStringBuilder = new StringBuilder("");
 			
 			dateStringBuilder.append(mContext.getCSS());  // immer
-			
-//			if(aAsyncDtoEntry.isRead){
-//				dateStringBuilder.append(txtTitel );
-//			}else{
-				// immer fett als Überschrift
-				dateStringBuilder.append("<b>" + txtTitel + "</b>");
-//			}
-				
+			dateStringBuilder.append("<body>");
+			dateStringBuilder.append("<b>" + txtTitel + "</b>");
+
 			// + date align right
 			if(!dto.isRead){
 				dateStringBuilder.append("<b>");
