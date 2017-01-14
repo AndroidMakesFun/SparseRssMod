@@ -43,11 +43,15 @@ public class EntryPagerAdapter extends PagerAdapter {
     
     /**
      * content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/2/entries/8242
+     * alle: 
+     * content://de.bernd.shandschuh.sparserss.provider.FeedData/entries/458
      */
     Uri mUri;
     
     /**
      * content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/2/entries
+     * alle:
+     * content://de.bernd.shandschuh.sparserss.provider.FeedData/entries
      */
     Uri mParentUri;
     
@@ -77,10 +81,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 		mParentUri = FeedData.EntryColumns.PARENT_URI(mUri.getPath());
 		showPics = Util.showPics(context);
 		
-        if(position<0){
+//        if(position<0){
+		// Position immer aus DB neu ermitteln
         	String id = mUri.getLastPathSegment();
         	position=ermittlePositionZuId(id); 
-        }
+//        }
         setAktuellePosition(position);
     }
 
@@ -96,6 +101,7 @@ public class EntryPagerAdapter extends PagerAdapter {
         }
         
 		Toolbar toolbar = (Toolbar) layout.findViewById(R.id.toolbar);
+		toolbar.setTitle("");
 		mContext.setSupportActionBar(toolbar);
 		setHomeButtonActive(); // noch für noTitel
 		
@@ -181,6 +187,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 			final int titlePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.TITLE);
 			final int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
 			final int readIdPosition = entryCursor.getColumnIndex(android.provider.BaseColumns._ID);
+			
+			mAnzahlFeedeintraege=entryCursor.getCount();  // refresh for thisAdapter.getCount()
 			
 			DtoEntry dto=new DtoEntry();
 			long _id = entryCursor.getLong(readIdPosition);
@@ -371,6 +379,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 		int flags = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE;
 		int change = actionBar7.getDisplayOptions() ^ flags;
 		actionBar7.setDisplayOptions(change, flags);
+		actionBar7.setTitle("");
 	}
 
 	

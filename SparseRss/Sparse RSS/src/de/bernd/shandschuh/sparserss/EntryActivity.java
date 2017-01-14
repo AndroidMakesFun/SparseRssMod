@@ -117,20 +117,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		
 		String sFeedId=mUri.getPath();
 		int pos=sFeedId.indexOf("/feeds/");
-		if (pos>0){
+		if (pos>-1){
 			pos+=7;
 			int ende=sFeedId.indexOf("/", pos);
 			sFeedId=sFeedId.substring(pos, ende);
 			feedId = Integer.parseInt(sFeedId);
 		}else{
 			// Aufruf vom Widget
-			_id = mUri.getLastPathSegment();
-			feedId = getFeedIdZuEntryId(_id);
-			sFeedId=""+feedId;
-			mUri = FeedData.EntryColumns.FULL_CONTENT_URI(sFeedId, _id);
+//			_id = mUri.getLastPathSegment();
+//			feedId = getFeedIdZuEntryId(_id);
+//			sFeedId=""+feedId;
+//			mUri = FeedData.EntryColumns.FULL_CONTENT_URI(sFeedId, _id);
+			
+			feedId=0;	// Default für alle
+			sFeedId="0"; // Default für alle
 		}
 
-		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
+//		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
 		mAufrufart = Util.getViewerPrefs(mActivity, sFeedId);
 		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
 		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, -1);  // !!
@@ -1181,6 +1184,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		flags = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE;
 		int change = actionBar7.getDisplayOptions() ^ flags;
 		actionBar7.setDisplayOptions(change, flags);
+		actionBar7.setTitle("");
 
 	}
 
