@@ -13,10 +13,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.widget.Toast;
+import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
 
 public class Util {
@@ -177,4 +180,22 @@ public class Util {
         return textDrawable;
 	}
 
+	public static int getFeedIdZuEntryId(Context context, String id){
+		if(id==null || "".equals(id)){
+			return 0;
+		}
+		Uri selectUri= FeedData.EntryColumns.ENTRY_CONTENT_URI(id);
+		Cursor entryCursor = context.getContentResolver().query(selectUri, null, null, null, null);
+
+		int feedIdPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.FEED_ID);
+
+		int feedId = -1;
+		if (entryCursor.moveToFirst()) {
+			feedId = entryCursor.getInt(feedIdPosition); // bah			
+		}	
+		entryCursor.close();
+		return feedId;
+	}
+
+	
 }

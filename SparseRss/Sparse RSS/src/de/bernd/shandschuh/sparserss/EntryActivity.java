@@ -1477,21 +1477,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
 		viewPager.setCurrentItem(aktuellePosition, true);
 	}
-
-	public int getFeedIdZuEntryId(String id){
-	
-		Uri selectUri= FeedData.EntryColumns.ENTRY_CONTENT_URI(id);
-		Cursor entryCursor = getContentResolver().query(selectUri, null, null, null, null);
-
-		int feedIdPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.FEED_ID);
-
-		int feedId = -1;
-		if (entryCursor.moveToFirst()) {
-			feedId = entryCursor.getInt(feedIdPosition); // bah			
-		}	
-		entryCursor.close();
-		return feedId;
-	}
 	
 	private void onClickLoadMobilize(View view) {
 		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);

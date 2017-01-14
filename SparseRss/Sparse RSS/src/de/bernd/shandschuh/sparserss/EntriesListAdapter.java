@@ -193,7 +193,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			byte[] iconBytes = cursor.getBlob(feedIconColumn);
 			
 			try {
-				if (iconBytes != null && iconBytes.length > 0  && !link.contains(".feedburner.com")) {
+				if (iconBytes != null && iconBytes.length > 0  && !link.contains(".feedburner.com") && !link.contains("//feedproxy.google.com")) {
 					
 					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
 					

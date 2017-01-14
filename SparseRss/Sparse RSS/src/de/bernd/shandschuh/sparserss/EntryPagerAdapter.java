@@ -1,23 +1,26 @@
 package de.bernd.shandschuh.sparserss;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.bumptech.glide.Glide;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -30,7 +33,6 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import de.bernd.shandschuh.sparserss.handler.PictureFilenameFilter;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
@@ -103,12 +105,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 		Toolbar toolbar = (Toolbar) layout.findViewById(R.id.toolbar);
 		toolbar.setTitle("");
 		mContext.setSupportActionBar(toolbar);
-		setHomeButtonActive(); // noch für noTitel
-		
-//		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
-//		actionBar7.setDisplayHomeAsUpEnabled(true);		
-//		TextDrawable textDrawable = Util.getRoundButtonImage(mContext, null, "Hallo");
-//		actionBar7.setHomeAsUpIndicator(textDrawable);
+//		setHomeButtonActive(); // noch für noTitel
 				
 		DtoEntry dtoEntry =ladeDtoEntry(position);
 		if(dtoEntry==null){
@@ -117,12 +114,62 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dtoEntry.link="";
 			dtoEntry.text="";			
 		}
+		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
+		actionBar7.setDisplayHomeAsUpEnabled(true);
+		Drawable drawable=getDrawableForEntry(dtoEntry);
+		actionBar7.setHomeAsUpIndicator(drawable);
+		
 		refreshLayout(dtoEntry, layout);       
         collection.addView(layout);
         return layout;
     }
 
-    // Ermittlung der aktuell angezeigten Position
+    private Drawable getDrawableForEntry(DtoEntry dto) {
+    	Drawable ret=null;
+    	int feedId=Util.getFeedIdZuEntryId(mContext, dto.id);
+		if (feedId > 0) {
+			Cursor cursor = mContext.getContentResolver().query(FeedData.FeedColumns.CONTENT_URI(feedId), EntriesListActivity.FEED_PROJECTION, null, null, null);
+
+	        int buttonSize=Util.getButtonSizeInPixel(mContext);
+	        
+	        String title = null;
+	        
+			if (cursor.moveToFirst()) {
+				title = cursor.isNull(0) ? cursor.getString(1) : cursor.getString(0);
+				String link=cursor.getString(1);
+				if(!link.contains(".feedburner.com")){
+			        byte[] iconBytes=null;
+					iconBytes = cursor.getBlob(2);
+					if(iconBytes!=null  && iconBytes.length>0){
+						try {
+							Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
+							bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+							BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+							int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
+							bitmapDrawable.setTargetDensity(densityDpi);
+							ret=bitmapDrawable;
+						} catch (Exception e) {
+							System.err.println("Catched Exception for createScaledBitmap in EntriesListActivity");
+							TextDrawable textDrawable = Util.getRoundButtonImage(mContext, Long.valueOf(feedId), "X");
+							ret=textDrawable;
+						}
+					}
+				}
+				if (ret==null && title != null) {
+					TextDrawable textDrawable = Util.getRoundButtonImage(mContext, Long.valueOf(feedId), title);
+					ret=textDrawable;
+				}
+
+			}
+			cursor.close();
+		}
+    	if(ret==null){
+    		ret=Util.getRoundButtonImage(mContext, null, "Y");
+    	}
+		return ret;
+	}
+
+	// Ermittlung der aktuell angezeigten Position
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
 //    	super.setPrimaryItem(container, position, object);

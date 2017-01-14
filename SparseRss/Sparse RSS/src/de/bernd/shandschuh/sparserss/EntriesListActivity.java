@@ -79,7 +79,7 @@ public class EntriesListActivity extends AppCompatActivity {
 	public static final String EXTRA_ANZAHL = "anzahl";
 	public static final String EXTRA_POSITION = "position";
 
-	private static final String[] FEED_PROJECTION = { FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL, FeedData.FeedColumns.ICON };
+	public static final String[] FEED_PROJECTION = { FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL, FeedData.FeedColumns.ICON };
 
 	private Uri uri;
 
@@ -118,19 +118,27 @@ public class EntriesListActivity extends AppCompatActivity {
 			
 			if (cursor.moveToFirst()) {
 				title = cursor.isNull(0) ? cursor.getString(1) : cursor.getString(0);
-				iconBytes = cursor.getBlob(2);
-				if(iconBytes!=null  && iconBytes.length>0){
-					try {
-						Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
-						bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-						BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
-						int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
-						bitmapDrawable.setTargetDensity(densityDpi);	
-						getSupportActionBar().setHomeAsUpIndicator(bitmapDrawable);
-					} catch (Exception e) {
-						System.err.println("Catched Exception for createScaledBitmap in EntriesListActivity");
-						TextDrawable textDrawable = Util.getRoundButtonImage(this, Long.valueOf(feedId), "X");
-						getSupportActionBar().setHomeAsUpIndicator(textDrawable);
+				String link=cursor.getString(1);
+				if(!link.contains(".feedburner.com")){
+					iconBytes = cursor.getBlob(2);
+					if(iconBytes!=null  && iconBytes.length>0){
+						try {
+							Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
+							bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+							BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+							int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
+							bitmapDrawable.setTargetDensity(densityDpi);	
+							getSupportActionBar().setHomeAsUpIndicator(bitmapDrawable);
+						} catch (Exception e) {
+							System.err.println("Catched Exception for createScaledBitmap in EntriesListActivity");
+							TextDrawable textDrawable = Util.getRoundButtonImage(this, Long.valueOf(feedId), "X");
+							getSupportActionBar().setHomeAsUpIndicator(textDrawable);
+						}
+					}else{
+						if (title != null) {
+							TextDrawable textDrawable = Util.getRoundButtonImage(this, Long.valueOf(feedId), title);
+							getSupportActionBar().setHomeAsUpIndicator(textDrawable);
+						}
 					}
 				}else{
 					if (title != null) {
