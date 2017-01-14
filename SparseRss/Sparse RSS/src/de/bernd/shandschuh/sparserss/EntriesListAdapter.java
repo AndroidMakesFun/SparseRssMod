@@ -231,6 +231,9 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			textView.setEnabled(true);
 			dateTextView.setEnabled(true);
 		} else {
+			if (!Util.isLightTheme(context)) {
+				textView.setTextColor(Color.GRAY);
+			}
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
 			dateTextView.setEnabled(false);
