@@ -21,6 +21,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -59,6 +60,7 @@ public class EntryPagerAdapter extends PagerAdapter {
     
 	private boolean showPics; // Prefs Bilder laden und anzeigen
 	private boolean showRead; // EntriesListActivity gelesene anzeigen
+	private String sortOrder="date DESC";
     
     class DtoEntry{
     	String id;
@@ -80,6 +82,12 @@ public class EntryPagerAdapter extends PagerAdapter {
         mAnzahlFeedeintraege=anzahlFeedeintraege;
 		mUri = mContext.getIntent().getData();
 		showRead = mContext.getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
+		
+    	boolean bPriorize = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(Strings.SETTINGS_PRIORITIZE, false);
+    	if(bPriorize){
+    		sortOrder="length(readdate) ASC, date DESC";
+    	}
+
 		mParentUri = FeedData.EntryColumns.PARENT_URI(mUri.getPath());
 		showPics = Util.showPics(context);
 		
@@ -172,17 +180,17 @@ public class EntryPagerAdapter extends PagerAdapter {
 	// Ermittlung der aktuell angezeigten Position
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
-//    	super.setPrimaryItem(container, position, object);
-//    	if (getAktuellePosition()!=position){
-    		// never, da schon im Contructor - Wer setzt gelesen ?
+    	if (getAktuellePosition()!=position){
+    		// true nur noch für wischen ! d.h. der erste wurde bereits beim betreten auf gelesen gesetzt !?
         	System.out.println("setPrimaryItem " + position + " " + object);
         	setAktuellePosition(position);
-//        	String id = ermittleIdZuPosition(position);
         	DtoEntry dto = ladeDtoEntry(position);
         	String id = dto.id;
-//        	if(!dto.isRead){
-       		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
-//    	}
+        	if(!dto.isRead){
+           		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
+        	}
+       		System.out.println(dto.isRead);
+    	}
     }
 
 
@@ -191,15 +199,15 @@ public class EntryPagerAdapter extends PagerAdapter {
      */
     public int ermittlePositionZuId(String id) {
 		if(id==null){
-			System.err.println("ladeDtoEntry id is null");
+			System.err.println("ermittlePositionZuId id is null");
 			return -1;
 		}
-    	Cursor entryCursor;
+    	Cursor entryCursor;    	
+    	
     	if(showRead){
-    		entryCursor = mContext.getContentResolver().query(mParentUri, null, null, null, "date DESC");    		
+    		entryCursor = mContext.getContentResolver().query(mParentUri, null, null, null, sortOrder);    		
     	}else{
-    		String READDATEISNULL = "readdate is null";
-    		entryCursor = mContext.getContentResolver().query(mParentUri, null, READDATEISNULL, null, "date DESC");
+    		entryCursor = mContext.getContentResolver().query(mParentUri, null, EntriesListAdapter.READDATEISNULL, null, sortOrder);
     	}
 		
     	int position=-1;
@@ -209,13 +217,13 @@ public class EntryPagerAdapter extends PagerAdapter {
 				++position;
 				final String idEntry = entryCursor.getString(0);
 				if(id.equals(idEntry)){
-					return position;
+					break;
 				}
 				entryCursor.moveToNext();
 			}
 			entryCursor.close();
 		}
-		return -1;
+		return position;
 	}
 
 	public DtoEntry ladeDtoEntry(int position) {
@@ -225,7 +233,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 		}
 		
 		Uri selectUri= mParentUri;
-		Cursor entryCursor = mContext.getContentResolver().query(selectUri, null, null, null, "date DESC");
+		Cursor entryCursor = mContext.getContentResolver().query(selectUri, null, null, null, sortOrder);
 		
 		if (entryCursor.moveToPosition(position)) {
 			final int linkPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.LINK);

@@ -76,7 +76,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	
 	private int linkColumn;
 	
-	private static final String SQLREAD = "length(readdate) ASC, ";
+	public static final String SQLREAD = "length(readdate) ASC, ";
 	
 	public static final String READDATEISNULL = "readdate is null";
 

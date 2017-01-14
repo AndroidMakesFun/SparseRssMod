@@ -30,6 +30,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -159,29 +160,14 @@ public class EntriesListActivity extends AppCompatActivity {
 		entriesListAdapter = new EntriesListAdapter(this, uri, intent.getBooleanExtra(EXTRA_SHOWFEEDINFO, false), intent.getBooleanExtra(EXTRA_AUTORELOAD, false));
 		listview.setAdapter(entriesListAdapter);
 		
-
-		
 		emptyview = (TextView) findViewById(android.R.id.empty);
 		if(entriesListAdapter.getCount()>0){
 			emptyview.setVisibility(View.INVISIBLE);
 		}
-
-
-
+		
 		if (title != null) {
-			setTitle(" " +title);
+			setTitle(title);
 		}
-//		if (iconBytes != null && iconBytes.length > 0) {
-//			int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
-//			Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-//			if (bitmap != null) {
-//				if (bitmap.getHeight() != bitmapSizeInDip) {
-//					bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
-//				}
-//
-////				setFeatureDrawable(Window.FEATURE_LEFT_ICON, new BitmapDrawable(bitmap));
-//			}
-//		}
 		if (RSSOverview.notificationManager != null) {
 			RSSOverview.notificationManager.cancel(0);
 		}
@@ -208,19 +194,7 @@ public class EntriesListActivity extends AppCompatActivity {
 				view.findViewById(android.R.id.text2).setEnabled(false);
 				entriesListAdapter.neutralizeReadState();
 
-//				// AUFRUFART
 				int aufrufart = 0;
-//				Uri feedUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
-//				try {
-//					Cursor cursor = getContentResolver().query(feedUri, FeedConfigActivity.PROJECTION, null, null, null);
-//					if (cursor.moveToNext()) {
-//						aufrufart = cursor.getInt(3); // 0.. {"Feed", "Browser", "Mobilize", "Instapaper"};
-//						cursor.close();
-//					}
-//				} catch (Exception e) {
-//					Util.toastMessageLong(this, "feedUri:"+e);
-//					e.printStackTrace();
-//				}
 
 				// Link aus Content
 				Uri contenUri = ContentUris.withAppendedId(uri, id);
@@ -232,15 +206,16 @@ public class EntriesListActivity extends AppCompatActivity {
 
 					int feedNr = entryCursor.getColumnIndex(FeedData.EntryColumns.FEED_ID);
 					long feedid = entryCursor.getLong(feedNr);
-
 					
 					//mark read
 //					ContentValues values = new ContentValues();
 //					values.put(FeedData.EntryColumns.READDATE, System.currentTimeMillis());
 //					int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
 //					if (entryCursor.isNull(readDatePosition)) {
-//						getContentResolver().update(uri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
+//						getContentResolver().update(contenUri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
 //					}
+					
+					
 					entryCursor.close();
 					
 					// AUFRUFART
