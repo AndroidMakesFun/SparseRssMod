@@ -1365,7 +1365,12 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		if(forcechrome){
 			intent.setPackage("com.android.chrome");
 		}
-		startActivity(intent);
+		try {
+			startActivity(intent);
+		} catch (Exception e) {
+			Intent intent2 = new Intent(Intent.ACTION_VIEW, Uri.parse(dtoEntry.link));
+			startActivity(intent2);
+		}
 	}
 
 	public void onClickReadability(View view) {
