@@ -22,11 +22,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
+import android.util.Xml.Encoding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -397,7 +399,12 @@ public class EntryPagerAdapter extends PagerAdapter {
 				dto.text = dto.titel + dto.text;
 
 				String baseUrl=EntryActivity.getBaseUrl(dto.link);
-				dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html; charset=UTF-8", "utf-8", null);
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+					// BaseUrl unter android 4 zeigt html als Text
+					dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", "utf-8");
+				}else{
+					dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html",  Encoding.UTF_8.toString(), null);
+				}
 
 				if (showPics && dto.linkGrafik != null) {
 
@@ -534,7 +541,13 @@ public class EntryPagerAdapter extends PagerAdapter {
 		
 		checkViews(dto, null);
 		String baseUrl=EntryActivity.getBaseUrl(dto.link);
-		dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html; charset=UTF-8", "utf-8", null);
+		
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			// BaseUrl unter android 4 zeigt html als Text
+			dto.viewWeb.loadData(dto.text, "text/html; charset=UTF-8", "utf-8");
+		}else{
+			dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html",  Encoding.UTF_8.toString(), null);
+		}
 		
 		dto.progressBar.setVisibility(View.INVISIBLE);
 		
