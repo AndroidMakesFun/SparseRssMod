@@ -62,7 +62,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 	private boolean showRead; // EntriesListActivity gelesene anzeigen
 	private String sortOrder="date DESC";
 	
-	private int overritePosition=-1;
+//	private int overritePosition=-1;
+	private int lastPosition=-1;
     
     class DtoEntry{
     	String id;
@@ -98,19 +99,13 @@ public class EntryPagerAdapter extends PagerAdapter {
        	String id = mUri.getLastPathSegment();
        	int position2=ermittlePositionZuId(id);
        	if(position!=position2){
-       		overritePosition=position;
        		position=position2;
        	}
-//        }
         setAktuellePosition(position);
     }
 
     @Override
     public Object instantiateItem(ViewGroup collection, int position) {
-    	
-    	if(overritePosition==position){
-    		position=getAktuellePosition();
-    	}
     	
         LayoutInflater inflater = LayoutInflater.from(mContext);
         ViewGroup layout;
@@ -123,7 +118,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 		Toolbar toolbar = (Toolbar) layout.findViewById(R.id.toolbar);
 		toolbar.setTitle("");
 		mContext.setSupportActionBar(toolbar);
-//		setHomeButtonActive(); // noch für noTitel
 				
 		DtoEntry dtoEntry =ladeDtoEntry(position);
 		if(dtoEntry==null){
@@ -146,28 +140,32 @@ public class EntryPagerAdapter extends PagerAdapter {
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
 
-    	if (getAktuellePosition()==position){
-    		//nix, wie gehabt
+//    	if (getAktuellePosition()==position){
+//    		//nix, wie gehabt
+//    		return;
+//    	}
+//    	if (position==overritePosition){
+//			return;
+//		}
+//		// ggf. gewischt
+//		overritePosition=-1;
+    	
+    	if(lastPosition==position){
     		return;
     	}
+    	lastPosition=position; // reicht Position, oer besser auch id?
 
-    	if (position==overritePosition){
-			return;
-		}
-		// ggf. gewischt
-		overritePosition=-1;
-    	
-    		// true nur noch für wischen ! d.h. der erste wurde bereits beim betreten auf gelesen gesetzt !?
-    		
-        	System.out.println("setPrimaryItem " + position + " " + object);
-        	setAktuellePosition(position);
-        	DtoEntry dto = ladeDtoEntry(position);
-        	String id = dto.id;
-        	if(!dto.isRead){
-           		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
-        	}
+    	System.out.println("setPrimaryItem " + position + " " + object);
+    	setAktuellePosition(position);
+    	DtoEntry dto = ladeDtoEntry(position);
+    	String id = dto.id;
+    	if(!dto.isRead){
+       		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
+       		mAnzahlFeedeintraege--;  // Nur zusammen keine Exception
+       		notifyDataSetChanged();
+//       		refreshCount();
+    	}
     }
-
 
     /**
      * ermittelt position in allen entries und Anzahl Aller Entries
@@ -376,11 +374,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 //    }
     
     
-	@Override
-    public void destroyItem(ViewGroup collection, int position, Object view) {
-        collection.removeView((View) view);
-    }
-
     @Override
     public int getCount() {
         return mAnzahlFeedeintraege;
@@ -795,8 +788,33 @@ public class EntryPagerAdapter extends PagerAdapter {
 	}
 
     @Override
+    public void notifyDataSetChanged() {
+    	super.notifyDataSetChanged();
+    }
+    
+	@Override
+    public void destroyItem(ViewGroup collection, int position, Object view) {
+        collection.removeView((View) view);
+    }
+
+    @Override
     public void destroyItem(View container, int position, Object object) {
-    	System.out.println("destroyItem " + position);
     	super.destroyItem(container, position, object);
-    }	
+    }
+
+    
+    public void refreshCount() {
+    	Cursor entryCursor;    	
+    	
+    	if(showRead){
+    		entryCursor = mContext.getContentResolver().query(mParentUri, null, null, null, sortOrder);    		
+    	}else{
+    		entryCursor = mContext.getContentResolver().query(mParentUri, null, EntriesListAdapter.READDATEISNULL, null, sortOrder);
+    	}
+		
+//		if (entryCursor.moveToFirst()) {
+			mAnzahlFeedeintraege=entryCursor.getCount(); 
+			entryCursor.close();
+	}
+
 }
