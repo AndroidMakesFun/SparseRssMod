@@ -208,12 +208,12 @@ public class EntriesListActivity extends AppCompatActivity {
 					long feedid = entryCursor.getLong(feedNr);
 					
 					//mark read
-//					ContentValues values = new ContentValues();
-//					values.put(FeedData.EntryColumns.READDATE, System.currentTimeMillis());
-//					int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
-//					if (entryCursor.isNull(readDatePosition)) {
-//						getContentResolver().update(contenUri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
-//					}
+					ContentValues values = new ContentValues();
+					values.put(FeedData.EntryColumns.READDATE, System.currentTimeMillis());
+					int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
+					if (entryCursor.isNull(readDatePosition)) {
+						getContentResolver().update(contenUri, values, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
+					}
 					
 					
 					entryCursor.close();

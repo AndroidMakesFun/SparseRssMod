@@ -61,6 +61,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 	private boolean showPics; // Prefs Bilder laden und anzeigen
 	private boolean showRead; // EntriesListActivity gelesene anzeigen
 	private String sortOrder="date DESC";
+	
+	private int overritePosition=-1;
     
     class DtoEntry{
     	String id;
@@ -93,14 +95,22 @@ public class EntryPagerAdapter extends PagerAdapter {
 		
 //        if(position<0){
 		// Position immer aus DB neu ermitteln
-        	String id = mUri.getLastPathSegment();
-        	position=ermittlePositionZuId(id); 
+       	String id = mUri.getLastPathSegment();
+       	int position2=ermittlePositionZuId(id);
+       	if(position!=position2){
+       		overritePosition=position;
+       		position=position2;
+       	}
 //        }
         setAktuellePosition(position);
     }
 
     @Override
     public Object instantiateItem(ViewGroup collection, int position) {
+    	
+    	if(overritePosition==position){
+    		position=getAktuellePosition();
+    	}
     	
         LayoutInflater inflater = LayoutInflater.from(mContext);
         ViewGroup layout;
@@ -131,57 +141,24 @@ public class EntryPagerAdapter extends PagerAdapter {
         collection.addView(layout);
         return layout;
     }
-
-    private Drawable getDrawableForEntry(DtoEntry dto) {
-    	Drawable ret=null;
-    	int feedId=Util.getFeedIdZuEntryId(mContext, dto.id);
-		if (feedId > 0) {
-			Cursor cursor = mContext.getContentResolver().query(FeedData.FeedColumns.CONTENT_URI(feedId), EntriesListActivity.FEED_PROJECTION, null, null, null);
-
-	        int buttonSize=Util.getButtonSizeInPixel(mContext);
-	        
-	        String title = null;
-	        
-			if (cursor.moveToFirst()) {
-				title = cursor.isNull(0) ? cursor.getString(1) : cursor.getString(0);
-				String link=cursor.getString(1);
-				if(!link.contains(".feedburner.com")){
-			        byte[] iconBytes=null;
-					iconBytes = cursor.getBlob(2);
-					if(iconBytes!=null  && iconBytes.length>0){
-						try {
-							Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
-							bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
-							BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
-							int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
-							bitmapDrawable.setTargetDensity(densityDpi);
-							ret=bitmapDrawable;
-						} catch (Exception e) {
-							System.err.println("Catched Exception for createScaledBitmap in EntriesListActivity");
-							TextDrawable textDrawable = Util.getRoundButtonImage(mContext, Long.valueOf(feedId), "X");
-							ret=textDrawable;
-						}
-					}
-				}
-				if (ret==null && title != null) {
-					TextDrawable textDrawable = Util.getRoundButtonImage(mContext, Long.valueOf(feedId), title);
-					ret=textDrawable;
-				}
-
-			}
-			cursor.close();
-		}
-    	if(ret==null){
-    		ret=Util.getRoundButtonImage(mContext, null, "Y");
-    	}
-		return ret;
-	}
-
+    
 	// Ermittlung der aktuell angezeigten Position
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
-    	if (getAktuellePosition()!=position){
+
+    	if (getAktuellePosition()==position){
+    		//nix, wie gehabt
+    		return;
+    	}
+
+    	if (position==overritePosition){
+			return;
+		}
+		// ggf. gewischt
+		overritePosition=-1;
+    	
     		// true nur noch für wischen ! d.h. der erste wurde bereits beim betreten auf gelesen gesetzt !?
+    		
         	System.out.println("setPrimaryItem " + position + " " + object);
         	setAktuellePosition(position);
         	DtoEntry dto = ladeDtoEntry(position);
@@ -189,8 +166,6 @@ public class EntryPagerAdapter extends PagerAdapter {
         	if(!dto.isRead){
            		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
         	}
-       		System.out.println(dto.isRead);
-    	}
     }
 
 
@@ -232,8 +207,13 @@ public class EntryPagerAdapter extends PagerAdapter {
 			return null;
 		}
 		
-		Uri selectUri= mParentUri;
-		Cursor entryCursor = mContext.getContentResolver().query(selectUri, null, null, null, sortOrder);
+		Cursor entryCursor;
+    	if(showRead){
+    		entryCursor = mContext.getContentResolver().query(mParentUri, null, null, null, sortOrder);    		
+    	}else{
+    		entryCursor = mContext.getContentResolver().query(mParentUri, null, EntriesListAdapter.READDATEISNULL, null, sortOrder);
+    	}
+
 		
 		if (entryCursor.moveToPosition(position)) {
 			final int linkPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.LINK);
@@ -765,5 +745,58 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dto.progressBar.setVisibility(View.INVISIBLE);
 		}
 	}
+
 	
+
+    private Drawable getDrawableForEntry(DtoEntry dto) {
+    	Drawable ret=null;
+    	int feedId=Util.getFeedIdZuEntryId(mContext, dto.id);
+		if (feedId > 0) {
+			// Query only for FEED_PROJECTION
+			Cursor cursor = mContext.getContentResolver().query(FeedData.FeedColumns.CONTENT_URI(feedId), EntriesListActivity.FEED_PROJECTION, null, null, null);
+
+	        int buttonSize=Util.getButtonSizeInPixel(mContext);
+	        
+	        String title = null;
+	        
+			if (cursor.moveToFirst()) {
+				title = cursor.isNull(0) ? cursor.getString(1) : cursor.getString(0);
+				String link=cursor.getString(1);
+				if(!link.contains(".feedburner.com")){
+			        byte[] iconBytes=null;
+					iconBytes = cursor.getBlob(2);
+					if(iconBytes!=null  && iconBytes.length>0){
+						try {
+							Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
+							bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+							BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
+							int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
+							bitmapDrawable.setTargetDensity(densityDpi);
+							ret=bitmapDrawable;
+						} catch (Exception e) {
+							System.err.println("Catched Exception for createScaledBitmap in EntriesListActivity");
+							TextDrawable textDrawable = Util.getRoundButtonImage(mContext, Long.valueOf(feedId), "X");
+							ret=textDrawable;
+						}
+					}
+				}
+				if (ret==null && title != null) {
+					TextDrawable textDrawable = Util.getRoundButtonImage(mContext, Long.valueOf(feedId), title);
+					ret=textDrawable;
+				}
+
+			}
+			cursor.close();
+		}
+    	if(ret==null){
+    		ret=Util.getRoundButtonImage(mContext, null, "Y");
+    	}
+		return ret;
+	}
+
+    @Override
+    public void destroyItem(View container, int position, Object object) {
+    	System.out.println("destroyItem " + position);
+    	super.destroyItem(container, position, object);
+    }	
 }
