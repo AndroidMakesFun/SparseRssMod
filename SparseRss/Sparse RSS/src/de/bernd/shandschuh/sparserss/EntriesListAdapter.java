@@ -31,7 +31,6 @@ import java.util.Vector;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 
-import android.R.color;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -44,13 +43,11 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
-import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 
 public class EntriesListAdapter extends ResourceCursorAdapter {
@@ -231,9 +228,9 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			textView.setEnabled(true);
 			dateTextView.setEnabled(true);
 		} else {
-			if (!Util.isLightTheme(context)) {
-				textView.setTextColor(Color.GRAY);
-			}
+//			if (!Util.isLightTheme(context)) {
+//				textView.setTextColor(Color.GRAY);
+//			}
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
 			dateTextView.setEnabled(false);
