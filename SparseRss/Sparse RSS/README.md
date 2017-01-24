@@ -3,6 +3,7 @@ Sparse Rss Mod 2013-2017
 This is an android program to read RSS News. 
 Modified by android.makes.fun@gmail.com
 
+* [Playstore](https://play.google.com/store/apps/details?id=de.bernd.shandschuh.sparserss)
 * [Documentation](doc/doc.md)
 * [Changelog](doc/changelog.md)
 
