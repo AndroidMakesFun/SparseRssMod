@@ -15,3 +15,4 @@ To Be Done...
     This is a known Bug from Samsung Devices with the Support Library from Google.
    
   * 
+  *
