@@ -24,17 +24,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.PagerAdapter;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.util.Xml.Encoding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
@@ -296,13 +295,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 	        }
 		}
         
-//        MyWebViewClient myWebViewClient = new MyWebViewClient();
-//        webView.setWebViewClient(myWebViewClient);
-//		if (Util.isLightTheme(mContext)) {
-//			dtoEntry.viewWeb.setBackgroundColor(getBackgroundColor(mContext));
-//		}else{
-//			dtoEntry.viewWeb.setBackgroundColor(Color.BLACK);
-//		}
 		if(dtoEntry.viewImage==null){
 			if(layout!=null){
 				dtoEntry.viewImage = (ImageView) layout.findViewById(R.id.backdrop);
@@ -313,7 +305,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 		}
 		if(dtoEntry.viewImage!=null){
 			// black / grey
-//			dtoEntry.viewImage.setBackgroundColor(Color.parseColor(EntryActivity.BACKGROUND_COLOR) );
+			dtoEntry.viewImage.setBackgroundColor(Color.parseColor(EntryActivity.BACKGROUND_COLOR) );
 		}
 		
 		if(dtoEntry.progressBar==null){
@@ -467,9 +459,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 
-			checkViews(dto, null);
 			
 			if (dto.linkAmp != null) {
+				checkViews(dto, null);
 				dto.viewWeb.loadUrl(dto.linkAmp);
 			} else {
 				reload(dto, null);
@@ -489,8 +481,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 		// reload wird von allen, ausser Readability genutzt!
 			// d.g. kein Immage !!! -> alles raus !!
 
-		checkViews(dto, null);
-		
 		dto.text = dto.titel + dto.text;
 		
 		checkViews(dto, null);
@@ -502,7 +492,17 @@ public class EntryPagerAdapter extends PagerAdapter {
 		}else{
 			dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html",  Encoding.UTF_8.toString(), null);
 		}
-		
+
+		if(dto.viewImage!=null){
+//			int pixel = Util.getButtonSizeInPixel(mContext)*2;
+			int pixel = 1;
+			dto.viewImage.setLayoutParams(new LinearLayout.LayoutParams(1, pixel));
+			
+			AppBarLayout appBarLayout =(AppBarLayout) mContext.findViewById(R.id.appBarLayout);
+			appBarLayout.setExpanded(false);
+			
+		}
+
 		dto.progressBar.setVisibility(View.INVISIBLE);
 		
 	}
@@ -621,7 +621,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 
-			checkViews(dto, null);
+//			checkViews(dto, null);
 			
 			reload(dto, null);
 			
@@ -657,9 +657,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 
-			checkViews(dto, null);
-
 			if (dto.linkAmp != null) {
+				checkViews(dto, null);
 				dto.viewWeb.loadUrl(dto.linkAmp);
 			} else {
 				reload(dto, null);
