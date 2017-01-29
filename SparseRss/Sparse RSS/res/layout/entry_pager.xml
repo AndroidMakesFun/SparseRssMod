@@ -1,138 +1,35 @@
-    <android.support.design.widget.CoordinatorLayout
+
+    <android.support.v4.widget.NestedScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/coordinatorLayout"
-        android:fitsSystemWindows="true"
+        android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <!-- <include layout="@layout/toolbar"/> -->
-
-        <android.support.design.widget.AppBarLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/appBarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="256dp"
-            android:fitsSystemWindows="true"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" >
-
-            <android.support.design.widget.CollapsingToolbarLayout
-                android:id="@+id/collapsing_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_scrollFlags="scroll|snap"
-                android:fitsSystemWindows="true"
-                app:statusBarScrim="@android:color/transparent" >
-
-                <ImageView
-                    android:id="@+id/backdrop"
-				    android:background="@android:color/black"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_collapseMode="parallax"
-                    android:fitsSystemWindows="true"
-                    android:scaleType="centerCrop" />
-
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="pin"
-                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
-
-                    <ProgressBar
-                        android:id="@+id/progress_spinner"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="right"
-                        android:indeterminate="true"
-                        android:visibility="gone" />
-                </android.support.v7.widget.Toolbar>
-            </android.support.design.widget.CollapsingToolbarLayout>
-        </android.support.design.widget.AppBarLayout>
-
-        
-        
-
-<android.support.v4.widget.NestedScrollView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-        	xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/nested_scroll_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical" 
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            >
-
-            <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical" >
-
-                    <WebView
-                        android:id="@+id/web_view"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:textIsSelectable="true" />
-                    
-            </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
-
-
-
-
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:scrollbars="vertical" >
 
         <LinearLayout
-            android:id="@+id/button_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:background="#00000000"
-            android:orientation="horizontal" >
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+        	android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical" >
 
-            <ImageButton
-                android:id="@+id/prev_button"
-                android:onClick="onClickPrevious"
-                android:layout_width="80dp"
-                android:layout_height="50dp"
-                android:background="#00000000"
-                android:src="@android:drawable/ic_media_previous" />
+            <ImageView
+                android:id="@+id/backdrop"
+                android:layout_width="match_parent"
+	            android:layout_height="256dp"
+                app:layout_collapseMode="parallax"
+                android:background="@android:color/black"
+                android:fitsSystemWindows="true"
+                android:scaleType="centerCrop" />
 
-            <ImageButton
-                android:id="@+id/url_button"
-                android:layout_width="70dp"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:background="#00000000"
-                android:onClick="onClickLoadBrowser"
-                android:src="@android:drawable/ic_menu_view" />
-
-            <ImageButton
-                android:id="@+id/menu_markasread2"
-                android:onClick="clickMarkAsRead"
-                android:layout_width="80dp"
-                android:layout_height="50dp"
-                android:background="#00000000"
-                android:src="@android:drawable/ic_menu_revert" />
-
-            <ImageButton
-                android:id="@+id/menu_menu2"
-                android:onClick="onClickMenu2"
-                android:layout_width="70dp"
-                android:layout_height="50dp"
-                android:background="#00000000"
-                android:padding="12dp"
-                android:scaleType="centerInside"
-                android:src="?attr/ic_menu_moreoverflow_normal_holo" />
-
-            <ImageButton
-                android:id="@+id/next_button"
-                android:onClick="onClickNext"
-                android:layout_width="80dp"
-                android:layout_height="50dp"
-                android:background="#00000000"
-                android:src="@android:drawable/ic_media_next" />
+            <WebView
+                android:id="@+id/web_view"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:textIsSelectable="true" />
         </LinearLayout>
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.v4.widget.NestedScrollView>
+

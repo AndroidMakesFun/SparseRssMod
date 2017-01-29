@@ -38,6 +38,7 @@ import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.bumptech.glide.Glide;
 
 import android.app.AlertDialog;
@@ -140,6 +141,14 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE, 60);
+		
+		// jetzt hier
+		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+		toolbar.setTitle("");
+		setSupportActionBar(toolbar);
+		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
+		actionBar7.setDisplayHomeAsUpEnabled(true);
+		toolbar.setBackgroundColor(Color.TRANSPARENT);
 
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 		
@@ -151,7 +160,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		viewPager.setCurrentItem(positionInListe, true);
 		
 		if(Util.isLightTheme(mActivity)){
-			viewPager.setBackgroundColor( Color.parseColor("#f6f6f6"));  // Grau Weiss des CSS
+//			viewPager.setBackgroundColor( Color.parseColor("#f6f6f6"));  // Grau Weiss des CSS
 		}else{
 			viewPager.setBackgroundColor(Color.BLACK);
 		}
@@ -345,160 +354,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private String abstractText;
 
 	private boolean isFirstEntry = true;
-
-
-	// @Override
-	protected void onCreate_2(Bundle savedInstanceState) {
-		if (Util.isLightTheme(this)) {
-			setTheme(R.style.Theme_Light);
-		}
-		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
-		super.onCreate(savedInstanceState);
-
-		setContentView(R.layout.entry);
-
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-		appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
-		imageView = (ImageView) findViewById(R.id.backdrop);
-
-		setSupportActionBar(toolbar);
-		setHomeButtonActive();
-
-		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
-		zeigeProgressBar(true);
-
-		mActivity = this;
-
-		int titleId = -1;
-
-		// canShowIcon = requestWindowFeature(Window.FEATURE_LEFT_ICON);
-		canShowIcon = false;
-
-		titleId = android.R.id.title;
-
-		try {
-			titleTextView = (TextView) findViewById(titleId);
-			titleTextView.setSingleLine(true);
-			titleTextView.setHorizontallyScrolling(true);
-			titleTextView.setMarqueeRepeatLimit(1);
-			titleTextView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-			titleTextView.setFocusable(true);
-			titleTextView.setFocusableInTouchMode(true);
-		} catch (Exception e) {
-			// just in case for non standard android, nullpointer etc
-		}
-
-		uri = getIntent().getData();
-		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
-		showRead = getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
-		iconBytes = getIntent().getByteArrayExtra(FeedData.FeedColumns.ICON);
-		feedId = 0;
-
-		Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
-
-		titlePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.TITLE);
-		datePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.DATE);
-		abstractPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.ABSTRACT);
-		linkPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.LINK);
-		feedIdPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.FEED_ID);
-		favoritePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.FAVORITE);
-		readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
-
-		enclosurePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.ENCLOSURE);
-		authorPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.AUTHOR);
-
-		if (entryCursor.moveToFirst()) {
-			link = entryCursor.getString(linkPosition);
-			link = fixLink(link);
-			timestamp = entryCursor.getLong(datePosition);
-			abstractText = entryCursor.getString(abstractPosition);
-			feedId = entryCursor.getInt(feedIdPosition); // bah
-
-			// hierher kopiert - tilte immer ermitteln
-			Date date = new Date(timestamp);
-
-			StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date)).append(' ')
-					.append(DateFormat.getTimeFormat(this).format(date));
-
-			String txtTitel = entryCursor.getString(titlePosition);
-//			((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
-		}
-
-		entryCursor.close();
-		if (RSSOverview.notificationManager == null) {
-			RSSOverview.notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		}
-
-		nextButton = (ImageButton) findViewById(R.id.next_button);
-		markAsReadButton = (ImageButton) findViewById(R.id.menu_markasread2);
-		markAsReadButton.setAlpha(BUTTON_ALPHA);
-		urlButton = (ImageButton) findViewById(R.id.url_button);
-		urlButton.setAlpha(BUTTON_ALPHA + 30);
-		previousButton = (ImageButton) findViewById(R.id.prev_button);
-
-//		nestedScrollView = (View) findViewById(R.id.nested_scroll_view);
-
-		webView = new WebView(this);
-
-		OnKeyListener onKeyEventListener = new OnKeyListener() {
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				if (event.getAction() == KeyEvent.ACTION_DOWN) {
-					if (keyCode == 92 || keyCode == 94) {
-						scrollUp();
-						return true;
-					} else if (keyCode == 93 || keyCode == 95) {
-						scrollDown();
-						return true;
-					}
-				}
-				return false;
-			}
-		};
-		webView.setOnKeyListener(onKeyEventListener);
-
-//		content = findViewById(R.id.entry_content);
-
-		preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-		final boolean gestures = preferences.getBoolean(Strings.SETTINGS_GESTURESENABLED, true);
-
-		scrollX = 0;
-		scrollY = 0;
-
-		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 60);
-
-		setZoomsScale(null);
-		MyWebViewClient myWebViewClient = new MyWebViewClient();
-
-		webView.setWebViewClient(myWebViewClient);
-
-		// 1 Browser schon aus Liste herraus
-		if (mAufrufart == AUFRUFART_FEED) {
-			reload();
-		} else if (mAufrufart == AUFRUFART_MOBILIZE) {
-			loadMoblize();
-		} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
-			onClickInstapaper(null);
-		} else if (mAufrufart == AUFRUFART_READABILITY) {
-			loadReadability();
-		} else if (mAufrufart == AUFRUFART_WEBVIEW) {
-			loadWebview(null);
-		} else if (mAufrufart == AUFRUFART_AMP) {
-			onClickLoadAmp(null);
-		}
-
-		markAsReadButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
-
-		isFirstEntry = true;
-	}// onCreate
 
 
 	public void loadWebview(View view) {

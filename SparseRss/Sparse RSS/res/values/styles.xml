@@ -1,16 +1,11 @@
 <resources>
 
-    <style name="MyTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="MyTheme.Light" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="ic_menu_moreoverflow_normal_holo">@drawable/ic_menu_moreoverflow_normal_holo_light</item>
         
-        <!-- Muss vorher/global --> 
-	    <item name="android:statusBarColor">@android:color/transparent</item>
-	    
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         
-	    <!-- MyActionBar verwenden -->	    
-      	<item name="android:actionBarStyle">@style/MyActionBar</item>
-	    <item name="actionBarStyle">@style/MyActionBar</item>
-	      
     </style>
 
     <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
@@ -22,21 +17,24 @@
     </style>
 
     <!-- ACTION BAR STYLES -->
-<style name="MyActionBar" parent="">
-    
-    <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-    <item name="android:statusBarColor">@android:color/transparent</item>
-    
-    <item name="android:background">@android:color/transparent</item>
-    <item name="android:windowActionBarOverlay">true</item>
-    
+    <style name="MyActionBar" parent="">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowActionBarOverlay">true</item>
+
         <!-- Support library compatibility -->
-    <item name="background">@android:color/transparent</item>
-    <item name="windowActionBarOverlay">true</item>
-    
-    <!--  aus Vererbung/ (Base.) Widget.AppCompat.ActionBar -->
-    
-    
-</style>
+        <item name="background">@android:color/transparent</item>
+        <item name="windowActionBarOverlay">true</item>
+
+        <!-- aus Vererbung/ (Base.) Widget.AppCompat.ActionBar -->
+    </style>
+
+    <style name="CustomActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:windowActionBarOverlay">true</item>
+        <!-- Support library compatibility -->
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 
 </resources>

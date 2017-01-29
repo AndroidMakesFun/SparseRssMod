@@ -115,16 +115,8 @@ public class EntryPagerAdapter extends PagerAdapter {
     	
         LayoutInflater inflater = LayoutInflater.from(mContext);
         ViewGroup layout;
-        if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_READABILITY && showPics) {
-            layout = (ViewGroup) inflater.inflate(R.layout.entry_pager, collection, false);
-        }else{
-            layout = (ViewGroup) inflater.inflate(R.layout.entry_pager_not_collapsing, collection, false);
-        }
+        layout = (ViewGroup) inflater.inflate(R.layout.entry_pager, collection, false);
         
-		Toolbar toolbar = (Toolbar) layout.findViewById(R.id.toolbar);
-		toolbar.setTitle("");
-		mContext.setSupportActionBar(toolbar);
-				
 		DtoEntry dtoEntry =ladeDtoEntry(position);
 		if(dtoEntry==null){
 			dtoEntry=new DtoEntry();
@@ -132,11 +124,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dtoEntry.link="";
 			dtoEntry.text="";			
 		}
-		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
-		actionBar7.setDisplayHomeAsUpEnabled(true);
-		Drawable drawable=getDrawableForEntry(dtoEntry);
-		actionBar7.setHomeAsUpIndicator(drawable);
-		
+
 		refreshLayout(dtoEntry, layout);       
         collection.addView(layout);
         return layout;
@@ -151,6 +139,7 @@ public class EntryPagerAdapter extends PagerAdapter {
     	}
     	setAktuellePosition(position);
     	DtoEntry dto = ladeDtoEntry(position);
+		
     	String id = dto.id;
     	if(!dto.isRead){
        		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
@@ -324,7 +313,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 		}
 		if(dtoEntry.viewImage!=null){
 			// black / grey
-			dtoEntry.viewImage.setBackgroundColor(Color.parseColor(EntryActivity.BACKGROUND_COLOR) );
+//			dtoEntry.viewImage.setBackgroundColor(Color.parseColor(EntryActivity.BACKGROUND_COLOR) );
 		}
 		
 		if(dtoEntry.progressBar==null){
@@ -358,17 +347,6 @@ public class EntryPagerAdapter extends PagerAdapter {
     }
 
     
-	public void setHomeButtonActive() {
-		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
-		actionBar7.setHomeButtonEnabled(true);
-		
-		// Up Button, kein Titel
-		int flags = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE;
-		int change = actionBar7.getDisplayOptions() ^ flags;
-		actionBar7.setDisplayOptions(change, flags);
-		actionBar7.setTitle("");
-	}
-
 	
 	public class AsyncVeryNewReadability extends AsyncTask<DtoEntry, Void, Void> {
 
@@ -490,7 +468,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			super.onPostExecute(result);
 
 			checkViews(dto, null);
-
+			
 			if (dto.linkAmp != null) {
 				dto.viewWeb.loadUrl(dto.linkAmp);
 			} else {
@@ -498,30 +476,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 			} 
 			dto.progressBar.setVisibility(View.INVISIBLE);
 		}
-	}
-
-	/**
-	 * Für onPageFinished um ProzessBar an/aus zu knipsen da webview aSyncron
-	 * die animation trasht
-	 */
-	class MyWebViewClient extends WebViewClient {
-
-		@Override
-		public void onPageFinished(WebView view, String url) {
-//			if (!isFirstEntry) {
-//				nestedScrollView.scrollTo(0, 0);
-//			}
-//			view.scrollTo(0, 0);
-//			NestedScrollView nestedScrollView =(NestedScrollView) mContext.findViewById(R.id.nested_scroll_view);
-//			if(nestedScrollView!=null){
-//				System.out.println("nestedScrollView.scrollTo(0, 300);");
-//				nestedScrollView.scrollTo(0, -300);
-//			}
-//			zeigeProgressBar(false);
-			// kopiert
-			view.setVisibility(View.VISIBLE);
-			super.onPageFinished(view, url);
-		};
 	}
 
 	public DtoEntry getAktuellenEntry() {
