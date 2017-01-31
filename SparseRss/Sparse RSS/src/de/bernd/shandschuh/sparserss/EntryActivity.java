@@ -148,7 +148,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		setSupportActionBar(toolbar);
 		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
 		actionBar7.setDisplayHomeAsUpEnabled(true);
-		toolbar.setBackgroundColor(Color.TRANSPARENT);
+//		toolbar.setBackgroundColor(Color.TRANSPARENT);
+		toolbar.setBackgroundColor(0x33000000);
+		
 
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 		
