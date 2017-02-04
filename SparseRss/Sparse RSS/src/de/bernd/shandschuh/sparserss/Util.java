@@ -135,6 +135,23 @@ public class Util {
 		boolean ret=prefs.getBoolean(Strings.SETTINGS_DISABLEPICTURES, false);
 		return !ret; // disable != showPics
 	}
+	
+	public static final String SETTINGS_SHOW_COVER = "SETTINGS_SHOW_COVER";
+	
+	/**
+	 * boolean per feed to load and show a Background Cover 
+	 */
+	public static boolean showCover(Context context, String feedid) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean ret=prefs.getBoolean(SETTINGS_SHOW_COVER + feedid, true);
+		return ret; 
+	}
+	public static void setShowCover(Context context, String FeedId, boolean show) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(SETTINGS_SHOW_COVER+ FeedId, show);
+		editor.commit();
+	}
 
 	public static String getVersionNumber(Context context) {
 		String version = "?";

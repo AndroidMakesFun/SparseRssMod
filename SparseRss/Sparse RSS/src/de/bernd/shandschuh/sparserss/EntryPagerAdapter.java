@@ -62,7 +62,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 
     private ArrayList<String> mListeIdsAsString = new ArrayList<String>();
 
-	private boolean showPics; // Prefs Bilder laden und anzeigen
 	private boolean showRead; // EntriesListActivity gelesene anzeigen
 	private String sortOrder="date DESC";
 	private int startPosition=-1;
@@ -95,7 +94,6 @@ public class EntryPagerAdapter extends PagerAdapter {
     	}
 
 		mParentUri = FeedData.EntryColumns.PARENT_URI(mUri.getPath());
-		showPics = Util.showPics(context);
 
         ermittleAlleIds();  // setzt mAnzahlFeedeintraege auf mListeIdsAsString.size()
 
@@ -213,7 +211,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 			String abstractText = entryCursor.getString(abstractPosition);
 			
 			if(abstractText!=null){
-				if(!showPics){
+				if(!mContext.showPics){
 					// webview Block Images scheint nicht zu ziehen...
 					abstractText = abstractText.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
 				}
@@ -294,7 +292,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 				dtoEntry.viewWeb=(WebView) mContext.findViewById(R.id.web_view);
 			}
 	        mContext.setZoomsScale(dtoEntry.viewWeb);
-	        if(!showPics){
+	        if(!mContext.showPics){
 	        	dtoEntry.viewWeb.getSettings().setBlockNetworkImage(false);
 	        }
 		}
@@ -380,7 +378,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 					dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html",  Encoding.UTF_8.toString(), null);
 				}
 
-				if (showPics && dto.linkGrafik != null) {
+				EntryActivity mContext2 = mContext;
+				if (mContext2.showCover && dto.linkGrafik != null) {
 
 					URL url;
 					try {
@@ -389,6 +388,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 						;
 					} catch (Exception e) {
 						e.printStackTrace();
+					}
+				}else{
+					if(dto.viewImage!=null){
+						int pixel = 1;
+						dto.viewImage.setLayoutParams(new LinearLayout.LayoutParams(1, pixel));
 					}
 				}
 

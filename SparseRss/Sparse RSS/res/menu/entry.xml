@@ -23,6 +23,12 @@
             android:title="Google Weblight"/>
     </group>
 
+    <group android:checkableBehavior="all" >
+        <item
+            android:id="@+id/menu_cover"
+            android:title="Cover"/>
+    </group>
+    
     <item
         android:id="@+id/menu_copytoclipboard"
         android:icon="@android:drawable/ic_menu_upload"

@@ -39,6 +39,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.view.KeyEvent;
@@ -68,6 +69,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private EntryActivity mActivity = null;
 
 	EntryPagerAdapter mEntryPagerAdapter;	
+	
+	boolean showPics; 	// Prefs Bilder laden und anzeigen
+	boolean showCover; 	// Prefs Cover laden und anzeigen
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -116,9 +120,14 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 //		AppBarLayout appBarLayout =(AppBarLayout) findViewById(R.id.appBarLayout);
 //		appBarLayout.setExpanded(false);
 
-		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-		
+		showPics = Util.showPics(this);
+		showCover = Util.showCover(this, ""+feedId);
+		if(!showPics){
+			showCover=false;
+		}
 		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege);
+		
+		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 		viewPager.setAdapter(mEntryPagerAdapter);
 		if(positionInListe<0){
 			positionInListe=mEntryPagerAdapter.getAktuellePosition();  // dort neu ermittelt
@@ -323,6 +332,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			break;
 		}
 		
+		if(showCover){
+			menu.findItem(R.id.menu_cover).setChecked(true);
+		}
+		
 		MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
 		MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 		markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
@@ -481,7 +494,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			onClickShowSeekBarDialog(null);
 		}
 			break;
+		case R.id.menu_cover:{
+			if(showCover){
+				showCover=false;
+				item.setChecked(false);
+				Util.setShowCover(this, ""+feedId, false);
+				mEntryPagerAdapter.notifyDataSetChanged();
+			}else{
+				showCover=true;
+				item.setChecked(true);
+				Util.setShowCover(this, ""+feedId, true);
+				mEntryPagerAdapter.notifyDataSetChanged();
+			}
+			break;
 		}
+			
+			
+		}//switch
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -523,9 +552,39 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		mEntryPagerAdapter.notifyDataSetChanged();
 	}
 
-	public void onClickInstapaper(View view) {
-		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
-		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.instapaper.com/m?u=" + dtoEntry.link)));
+	public void onClickMenu2(View view) {
+
+		if(view==null){
+			view=this.getCurrentFocus();
+		}
+		
+		PopupMenu popup = new PopupMenu(EntryActivity.this, view);
+		popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+		
+		switch (mAufrufart) {
+		case AUFRUFART_READABILITY:
+			popup.getMenu().findItem(R.id.menu_readability).setChecked(true);
+			break;
+		case AUFRUFART_GOOGLEWEBLIGHT:
+			popup.getMenu().findItem(R.id.menu_googleweblight).setChecked(true);
+			break;
+		case AUFRUFART_AMP:
+			popup.getMenu().findItem(R.id.menu_amp).setChecked(true);
+			break;
+			
+		default:
+			popup.getMenu().findItem(R.id.menu_feed).setChecked(true);
+			break;
+		}
+		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+            	EntryActivity.this.onOptionsItemSelected( item);
+                return true;
+            }
+        });
+		popup.show();
+		
 	}
 
 	public void onClickLoadAmp(View view) {
