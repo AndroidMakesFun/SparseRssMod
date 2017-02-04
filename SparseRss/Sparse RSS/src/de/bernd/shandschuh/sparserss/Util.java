@@ -214,5 +214,18 @@ public class Util {
 		return feedId;
 	}
 
+	public static final String SETTINGS_SHOW_BOTTOM_BAR = "SETTINGS_SHOW_BOTTOM_BAR";
+	
+	public static boolean showBottomBar(Context context) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean ret=prefs.getBoolean(SETTINGS_SHOW_BOTTOM_BAR, true);
+		return ret;
+	}
+	public static void setShowBottomBar(Context context, boolean value) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(SETTINGS_SHOW_BOTTOM_BAR, value);
+		editor.commit();
+	}
 	
 }

@@ -37,7 +37,15 @@
             android:defaultValue="false"
             android:summary="@string/settings_disablepictures_description"
             android:key="pictures.disable"
-            android:disableDependentsState="true"/>
+            />
+        
+        <CheckBoxPreference
+            android:title="Bottom Bar"
+            android:defaultValue="true"
+            android:summary="Shows buttons at the bottom of the Entry Viewer"
+            android:key="SETTINGS_SHOW_BOTTOM_BAR"
+            />
+        
 <!--         
         <CheckBoxPreference
             android:title="@string/settings_fetchpictures"

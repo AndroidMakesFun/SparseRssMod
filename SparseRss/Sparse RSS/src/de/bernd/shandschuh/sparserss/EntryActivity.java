@@ -119,6 +119,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 //		AppBarLayout appBarLayout =(AppBarLayout) findViewById(R.id.appBarLayout);
 //		appBarLayout.setExpanded(false);
+		
+		if (!Util.showBottomBar(this)){
+			View viewBottomBar = findViewById(R.id.button_layout);
+			viewBottomBar.setVisibility(View.GONE);
+		}
 
 		showPics = Util.showPics(this);
 		showCover = Util.showCover(this, ""+feedId);
