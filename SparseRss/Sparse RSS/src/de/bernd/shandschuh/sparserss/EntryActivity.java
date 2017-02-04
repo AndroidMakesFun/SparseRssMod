@@ -36,9 +36,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.view.KeyEvent;
@@ -322,6 +322,15 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			menu.findItem(R.id.menu_feed).setChecked(true);
 			break;
 		}
+		
+		MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
+		MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+		markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
+
+		MenuItem browserItem = menu.add(0, R.id.url_button, 0, R.string.contextmenu_browser);
+		MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+		browserItem.setIcon(android.R.drawable.ic_menu_view);
+		
 		return true;
 	}
 

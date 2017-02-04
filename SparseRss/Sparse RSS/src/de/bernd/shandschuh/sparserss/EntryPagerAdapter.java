@@ -123,6 +123,10 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dtoEntry.link="";
 			dtoEntry.text="";			
 		}
+		
+		Drawable drawable=getDrawableForEntry(dtoEntry);
+		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
+		actionBar7.setHomeAsUpIndicator(drawable);
 
 		refreshLayout(dtoEntry, layout);       
         collection.addView(layout);
