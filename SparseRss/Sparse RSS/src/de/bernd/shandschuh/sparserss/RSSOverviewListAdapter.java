@@ -118,8 +118,10 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 		TextView textView = ((TextView) view.findViewById(android.R.id.text1));
 		if (Util.isLightTheme(context)) {
 			textView.setTextColor(Color.BLACK);
+		}else{
+			textView.setTextColor(Color.GRAY);
 		}
-
+		
 		textView.setSingleLine();
 		
 		Cursor countCursor = context.getContentResolver().query(

@@ -22,6 +22,9 @@
     <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="ic_menu_moreoverflow_normal_holo">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
         <item name="android:statusBarColor">@android:color/black</item>
+        
+        <item name="android:attr/textColorSecondary">@android:color/secondary_text_dark</item>
+
         <!--
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
@@ -41,7 +44,7 @@
         -->
 
 
-        <!-- Support library compatibility -->
+        <!-- Support library compatibility 
         <item name="background">@android:color/holo_blue_light</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="windowActionBarOverlay">true</item>
@@ -62,7 +65,7 @@
         <item name="backgroundSplit">@android:color/holo_green_light</item>
         <item name="backgroundStacked">@android:color/holo_green_light</item>
         <item name="android:backgroundStacked">@android:color/holo_green_light</item>
-
+-->
         <!-- aus Vererbung/ (Base.) Widget.AppCompat.ActionBar -->
     </style>
 

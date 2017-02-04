@@ -1,7 +1,7 @@
 Sample RSS Feeds
 ================
 
-English Feeds
+International Feeds
 -------------
 
 Android Weekly
@@ -14,12 +14,12 @@ https://www.sammobile.com/feed/
 German Feeds
 ------------
 
-ComputerBase
-http://www.computerbase.de/rss/news.xml
-
 Heise
 http://www.heise.de/newsticker/heise-atom.xml
 
 Stadt Bremerhaven
 http://feeds.feedburner.com/stadt-bremerhaven/dqXM?format=xml
+
+ComputerBase
+http://www.computerbase.de/rss/news.xml
 
