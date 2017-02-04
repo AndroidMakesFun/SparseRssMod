@@ -493,14 +493,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dto.viewWeb.loadDataWithBaseURL(baseUrl, dto.text, "text/html",  Encoding.UTF_8.toString(), null);
 		}
 
+		// reload ohne immage
 		if(dto.viewImage!=null){
 //			int pixel = Util.getButtonSizeInPixel(mContext)*2;
 			int pixel = 1;
 			dto.viewImage.setLayoutParams(new LinearLayout.LayoutParams(1, pixel));
-			
-			AppBarLayout appBarLayout =(AppBarLayout) mContext.findViewById(R.id.appBarLayout);
-			appBarLayout.setExpanded(false);
-			
 		}
 
 		dto.progressBar.setVisibility(View.INVISIBLE);

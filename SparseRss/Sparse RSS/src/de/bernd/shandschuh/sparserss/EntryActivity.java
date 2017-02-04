@@ -25,68 +25,33 @@
 
 package de.bernd.shandschuh.sparserss;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Date;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.safety.Cleaner;
-import org.jsoup.safety.Whitelist;
-import org.jsoup.select.Elements;
-
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.bumptech.glide.Glide;
-
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
-import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.view.ViewGroup.LayoutParams;
-import android.view.animation.Animation;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.EntryPagerAdapter.DtoEntry;
-import de.bernd.shandschuh.sparserss.handler.PictureFilenameFilter;
-import de.bernd.shandschuh.sparserss.provider.FeedData;
-import de.jetwick.snacktory.HtmlFetcher;
-import de.jetwick.snacktory.JResult;
 
 public class EntryActivity extends AppCompatActivity implements android.widget.SeekBar.OnSeekBarChangeListener {
 
@@ -107,7 +72,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
-			// setTheme(R.style.Theme_Light);
 			setTheme(R.style.MyTheme_Light);
 		}
 		super.onCreate(savedInstanceState);
@@ -148,9 +112,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		setSupportActionBar(toolbar);
 		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
 		actionBar7.setDisplayHomeAsUpEnabled(true);
-//		toolbar.setBackgroundColor(Color.TRANSPARENT);
-		toolbar.setBackgroundColor(0x33000000);
-		
+
+//		AppBarLayout appBarLayout =(AppBarLayout) findViewById(R.id.appBarLayout);
+//		appBarLayout.setExpanded(false);
 
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
 		
@@ -166,51 +130,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		}else{
 			viewPager.setBackgroundColor(Color.BLACK);
 		}
-		
-		
-		
-//		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
-//		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, 0);
-//		
-//		feedId = 0;
-//		boolean bDirektSprungVomWidget=false;
-//		String sFeedId=mUri.getPath();
-//		int pos=sFeedId.indexOf("/feeds/");
-//		if (pos>0){
-//			pos+=7;
-//			int ende=sFeedId.indexOf("/", pos);
-//			sFeedId=sFeedId.substring(pos, ende);
-//			feedId = Integer.parseInt(sFeedId);
-//		}else{
-//			bDirektSprungVomWidget=true;
-//			_id = mUri.getLastPathSegment();
-//			feedId = getFeedIdZuEntryId(_id);
-//		}
-//
-//		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
-//		mAufrufart = Util.getViewerPrefs(mActivity, sFeedId);
-//
-//		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-//		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE + mAufrufart, 50);
-//		
-//		Uri parentUri=FeedData.EntryColumns.PARENT_URI(mUri.getPath());
-//
-//		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-//		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege, parentUri);
-//		viewPager.setAdapter(mEntryPagerAdapter);
-//		if(!bDirektSprungVomWidget){
-//			viewPager.setCurrentItem(positionInListe, true);
-//		}else{
-//			int posID=mEntryPagerAdapter.ermittlePositionZuId(_id);
-//			viewPager.setCurrentItem(posID, true);
-//		}
-//		
-//		if(Util.isLightTheme(mActivity)){
-//			viewPager.setBackgroundColor( Color.parseColor("#f6f6f6"));  // Grau Weiss des CSS
-//		}else{
-//			viewPager.setBackgroundColor(Color.BLACK);
-//		}
-
 	}
 
 	private static final String TEXT_HTML = "text/html";
@@ -353,28 +272,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	private TextView titleTextView;
 
 	private long timestamp;
-	private String abstractText;
-
-	private boolean isFirstEntry = true;
 
 
-	public void loadWebview(View view) {
-		zeigeProgressBar(true);
-		webView.loadUrl(link);
-	}
-
-
-	private void loadReadability() {
-		zeigeProgressBar(true);
-		// webView.loadUrl("http://www.readability.com/m?url=" + link);
-		new AsyncNewReadability().execute();
-	}
-
-	private void loadMoblize() {
-		zeigeProgressBar(true);
-		readUrl();
-	}
-
+	
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
@@ -386,8 +286,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		if (RSSOverview.notificationManager != null) {
 			RSSOverview.notificationManager.cancel(0);
 		}
-//		uri = getIntent().getData();
-//		parentUri = FeedData.EntryColumns.PARENT_URI(uri.getPath());
 	}
 
 	public static String fixLink(String strLink) {
@@ -403,292 +301,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		setIntent(intent);
-	}
-
-	private void reload() {
-		if (_id != null && _id.equals(uri.getLastPathSegment())) {
-			return;
-		}
-
-		_id = uri.getLastPathSegment();
-
-		ContentValues values = new ContentValues();
-
-		values.put(FeedData.EntryColumns.READDATE, System.currentTimeMillis());
-
-		Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
-
-		if (entryCursor.moveToFirst()) {
-			String abstractText = entryCursor.getString(abstractPosition);
-
-			if (entryCursor.isNull(readDatePosition)) {
-				getContentResolver().update(uri, values,
-						new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
-			}
-			if (abstractText == null) {
-				String link = entryCursor.getString(linkPosition);
-
-				entryCursor.close();
-				finish();
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
-
-			} else {
-				String txtTitel = entryCursor.getString(titlePosition);
-				// setTitle(txtTitel);
-				if (titleTextView != null) {
-					titleTextView.requestFocus(); // restart ellipsize
-				}
-
-				int _feedId = entryCursor.getInt(feedIdPosition);
-
-				if (feedId != _feedId) {
-					if (feedId != 0) {
-						iconBytes = null; // triggers re-fetch of the icon
-					}
-					feedId = _feedId;
-				}
-
-				if (canShowIcon) {
-					if (iconBytes == null || iconBytes.length == 0) {
-						Cursor iconCursor = getContentResolver().query(
-								FeedData.FeedColumns.CONTENT_URI(Integer.toString(feedId)),
-								new String[] { FeedData.FeedColumns._ID, FeedData.FeedColumns.ICON }, null, null, null);
-
-						if (iconCursor.moveToFirst()) {
-							iconBytes = iconCursor.getBlob(1);
-						}
-						iconCursor.close();
-					}
-
-//					if (iconBytes != null && iconBytes.length > 0) {
-//						int bitmapSizeInDip = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f,
-//								getResources().getDisplayMetrics());
-//						Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
-//						if (bitmap != null) {
-//							if (bitmap.getHeight() != bitmapSizeInDip) {
-//								bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
-//							}
-//							// setFeatureDrawable(Window.FEATURE_LEFT_ICON, new
-//							// BitmapDrawable(bitmap));
-//							// getSupportActionBar().setIcon(new
-//							// BitmapDrawable(bitmap));
-//							// getSupportActionBar().setLogo(new
-//							// BitmapDrawable(bitmap));
-//							// int flags = 0;
-//							// int change =
-//							// getSupportActionBar().getDisplayOptions() ^
-//							// flags;
-//							// getSupportActionBar().setDisplayOptions(change,
-//							// flags);
-//						}
-//					}
-				}
-
-				timestamp = entryCursor.getLong(datePosition);
-
-				Date date = new Date(timestamp);
-
-				StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date))
-						.append(' ').append(DateFormat.getTimeFormat(this).format(date));
-
-				String author = entryCursor.getString(authorPosition);
-
-				if (author != null) {
-					dateStringBuilder.append(BRACKET).append(author).append(')');
-				}
-
-//				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
-
-				favorite = entryCursor.getInt(favoritePosition) == 1;
-
-				// loadData does not recognize the encoding without correct
-				// html-header
-				localPictures = abstractText.indexOf(Strings.IMAGEID_REPLACEMENT) > -1;
-
-				if (localPictures) {
-					abstractText = abstractText.replace(Strings.IMAGEID_REPLACEMENT,
-							_id + Strings.IMAGEFILE_IDSEPARATOR);
-				}
-
-				if (preferences.getBoolean(Strings.SETTINGS_DISABLEPICTURES, false)) {
-					abstractText = abstractText.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
-					webView.getSettings().setBlockNetworkImage(true);
-				} else {
-					if (webView.getSettings().getBlockNetworkImage()) {
-						/*
-						 * setBlockNetwortImage(false) calls postSync, which
-						 * takes time, so we clean up the html first and change
-						 * the value afterwards
-						 */
-						webView.loadData(Strings.EMPTY, TEXT_HTML, UTF8);
-						webView.getSettings().setBlockNetworkImage(false);
-					}
-				}
-
-				boolean keineBilder = true;
-				// alt erstmal online _erstes_ Bild
-				int posImg = abstractText.indexOf("src=\"");
-				if (posImg > 0) {
-					posImg += 5;
-					int posImgEnde = abstractText.indexOf('"', posImg);
-					if (posImgEnde > 0) {
-						mNewLink = abstractText.substring(posImg, posImgEnde);
-						URL url;
-						try {
-							url = new URL(mNewLink);
-							Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);
-							keineBilder = false;
-							;
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-
-					// sonst ein anderes aus dem Artikel, wenn Bilder geladen
-					// wurden...
-				} else if (Util.getImageFolderFile(this) != null && Util.getImageFolderFile(this).exists()) {
-					PictureFilenameFilter filenameFilter = new PictureFilenameFilter(_id);
-
-					File[] files = Util.getImageFolderFile(this).listFiles(filenameFilter);
-					if (files != null && files.length > 0) {
-						Glide.with(EntryActivity.this).load(files[0]).centerCrop().into(imageView);
-						keineBilder = false;
-					}
-				}
-
-				if (keineBilder) {
-					// System.out.println(appBarLayout.getMinimumHeight());
-					// appBarLayout.setMinimumHeight(100);
-					// System.out.println(imageView.getMinimumHeight());
-					// imageView.setMinimumHeight(2);
-				}
-
-				int fontsize = Integer.parseInt(preferences.getString(Strings.SETTINGS_FONTSIZE, Strings.ONE));
-
-				/*
-				 * if (abstractText.indexOf('<') > -1 &&
-				 * abstractText.indexOf('>') > -1) { abstractText =
-				 * abstractText.replace(NEWLINE, BR); }
-				 */
-
-				if (Util.isLightTheme(this) || preferences.getBoolean(Strings.SETTINGS_BLACKTEXTONWHITE, false)) {
-					if (fontsize > 0) {
-						webView.loadDataWithBaseURL(
-								null, new StringBuilder(CSS).append(FONTSIZE_START).append(fontsize)
-										.append(FONTSIZE_MIDDLE).append(abstractText).append(FONTSIZE_END).toString(),
-								TEXT_HTML, UTF8, null);
-					} else {
-						webView.loadDataWithBaseURL(null, new StringBuilder(CSS).append(BODY_START).append(abstractText)
-								.append(BODY_END).toString(), TEXT_HTML, UTF8, null);
-					}
-					webView.setBackgroundColor(Color.WHITE);
-//					content.setBackgroundColor(Color.WHITE);
-				} else {
-					if (fontsize > 0) {
-						webView.loadDataWithBaseURL(null, new StringBuilder(FONT_FONTSIZE_START).append(fontsize)
-								.append(FONTSIZE_MIDDLE).append(abstractText).append(FONT_END).toString(), TEXT_HTML,
-								UTF8, null);
-					} else {
-						webView.loadDataWithBaseURL(null,
-								new StringBuilder(FONT_START).append(abstractText).append(BODY_END).toString(),
-								TEXT_HTML, UTF8, null);
-					}
-					webView.setBackgroundColor(Color.BLACK);
-//					content.setBackgroundColor(Color.BLACK);
-				}
-
-				link = entryCursor.getString(linkPosition);
-				link = fixLink(link);
-
-				if (link != null && link.length() > 0) {
-					urlButton.setEnabled(true);
-					urlButton.setAlpha(BUTTON_ALPHA + 20);
-					urlButton.setOnClickListener(new OnClickListener() {
-						public void onClick(View view) {
-							startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(link)));
-						}
-					});
-
-				} else {
-					urlButton.setEnabled(false);
-					urlButton.setAlpha(80);
-				}
-
-				setupButton(previousButton, false, timestamp);
-				setupButton(nextButton, true, timestamp);
-				// webView.scrollTo(scrollX, scrollY); // resets the scrolling
-			}
-		} else {
-			entryCursor.close();
-		}
-
-		/*
-		 * new Thread() { public void run() { sendBroadcast(new
-		 * Intent(Strings.ACTION_UPDATEWIDGET)); // this is slow } }.start();
-		 */
-	}
-
-	private void setupButton(ImageButton button, final boolean successor, long date) {
-		StringBuilder queryString = new StringBuilder(DATE).append(date).append(AND_ID).append(successor ? '>' : '<')
-				.append(_id).append(')').append(OR_DATE).append(successor ? '<' : '>').append(date);
-
-		if (!showRead) {
-			queryString.append(Strings.DB_AND).append(EntriesListAdapter.READDATEISNULL);
-		}
-
-		Cursor cursor = getContentResolver().query(parentUri, new String[] { FeedData.EntryColumns._ID },
-				queryString.toString(), null, successor ? DESC : ASC);
-
-		if (cursor.moveToFirst()) {
-			button.setEnabled(true);
-			button.setAlpha(BUTTON_ALPHA);
-
-			final String id = cursor.getString(0);
-
-			if (successor) {
-				_nextId = id;
-			} else {
-				_previousId = id;
-			}
-			button.setOnClickListener(new OnClickListener() {
-				public void onClick(View view) {
-					if (successor) {
-						nextEntry(true);
-					} else {
-						previousEntry(true);
-					}
-				}
-			});
-		} else {
-			button.setEnabled(false);
-			button.setAlpha(60);
-		}
-		cursor.close();
-	}
-
-	private void nextEntry(boolean animate) {
-		isFirstEntry = false;
-		mAnimationDirection = android.R.anim.slide_out_right;
-		switchEntry(_nextId, animate, Animations.SLIDE_IN_RIGHT, Animations.SLIDE_OUT_LEFT);
-	}
-
-	private void previousEntry(boolean animate) {
-		isFirstEntry = false;
-		mAnimationDirection = android.R.anim.fade_out;
-		switchEntry(_previousId, animate, Animations.SLIDE_IN_LEFT, Animations.SLIDE_OUT_RIGHT);
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		// scrollX = webView.getScrollX();
-		// scrollY = webView.getScrollY();
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-//		webView.saveState(outState);
-		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -710,160 +322,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			menu.findItem(R.id.menu_feed).setChecked(true);
 			break;
 		}
-		
-//		MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
-//		MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-//		markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
-//
-//		MenuItem browserItem = menu.add(0, R.id.url_button, 0, R.string.contextmenu_browser);
-//		MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-//		browserItem.setIcon(android.R.drawable.ic_menu_view);
-//
-//		MenuItem readabilityItem = menu.add(0, R.id.menu_readability, 0, "Readability");
-//		MenuItemCompat.setShowAsAction(readabilityItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-//		readabilityItem.setIcon(R.drawable.readability_400);
-//
-//		MenuItem feedItem = menu.add(0, R.id.menu_feed, 0, "Feed");
-//		MenuItemCompat.setShowAsAction(feedItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-//		feedItem.setIcon(R.drawable.ic_action_crop);
-
 		return true;
-	}
-
-	public String bahtml = null;
-	public String mNewLink = null;
-
-	private void readUrl() {
-		zeigeProgressBar(true);
-		new AsyncReadUrl().execute();
-	}
-
-	class AsyncReadUrl extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... params) {
-
-			try {
-				long start = System.currentTimeMillis();// 0
-				URL url = new URL(link);
-				System.out.println("a" + (System.currentTimeMillis() - start));
-				// InputStream is = url.openStream();
-				URLConnection con = url.openConnection();
-				System.out.println("b" + (System.currentTimeMillis() - start));
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8")); // 950ms
-				System.out.println("c" + (System.currentTimeMillis() - start));
-				// baseUrl wechselt ab con.getInputStream (open?)
-				String baseUrl = con.getURL().getProtocol() + "://" + con.getURL().getHost();
-				if (con.getURL().getHost().endsWith("golem.de")) {
-					String[] arr = con.getURL().getPath().split("-");
-					String newLink = "http://www.golem.de/pda/pda-" + arr[arr.length - 1];
-					mNewLink = newLink;
-					return null;
-				}
-				if (con.getURL().getHost().endsWith("heise.de")) {
-					String newLink = baseUrl + con.getURL().getPath() + "?view=print";
-					mNewLink = newLink;
-					return null;
-				}
-				if (con.getURL().getHost().endsWith("wiwo.de")) {
-					String newLink = baseUrl + con.getURL().getPath();
-					int pos = newLink.lastIndexOf('/');
-					if (pos > 0) {
-						newLink = newLink.substring(0, pos) + "/v_detail_tab_print/"
-								+ newLink.substring(pos, newLink.length());
-					}
-					// bufferedReader = new BufferedReader(new
-					// InputStreamReader(con.getInputStream(), "UTF8"));
-					// webView.loadUrl(newLink);
-					// Wiwo print im Browser öffnen
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(newLink)));
-					finish();
-					return null;
-				}
-
-				// BufferedReader bufferedReader = new BufferedReader(new
-				// InputStreamReader(is));
-				String line = bufferedReader.readLine();
-				while (line != null) {
-					line = bufferedReader.readLine();
-					bahtml += line;
-				}
-				bufferedReader.close();
-				System.out.println("d" + (System.currentTimeMillis() - start));
-
-				// bahtml = Jsoup.clean(bahtml, Whitelist.basicWithImages());
-				// String baseUrl = con.getURL().getProtocol() + "://" +
-				// con.getURL().getHost();
-				System.out.println("e" + (System.currentTimeMillis() - start));
-
-				// long u=System.currentTimeMillis();
-				// int pBody=bahtml.indexOf("<body");
-				// System.out.println("pBody"+(System.currentTimeMillis() - u));
-				// int classCon=bahtml.indexOf("class=\"con\"",pBody);
-				// System.out.println("classCon"+(System.currentTimeMillis() -
-				// u));
-				// bahtml=bahtml.substring(classCon);
-				// System.out.println("f0 " + (System.currentTimeMillis() -
-				// start));
-
-				Document dirty = Jsoup.parseBodyFragment(bahtml, baseUrl); // 2300ms
-																			// !!
-				System.out.println("f" + (System.currentTimeMillis() - start));
-				Elements elements = dirty.getElementsByClass("content");
-				System.out.println("g" + (System.currentTimeMillis() - start));
-				if (elements.size() > 0) {
-					// dirty auf content setzen, 2.parse
-					bahtml = elements.first().html();
-					dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
-				} else {
-					elements = dirty.getElementsByClass("con"); // Tagesschau
-					if (elements.size() > 0) {
-						bahtml = elements.first().html();
-						dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
-					} else {
-						elements = dirty.getElementsByAttributeValue("id", "content"); // Heise
-						if (elements.size() > 0) {
-							bahtml = elements.first().html();
-							dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
-							// } else {
-							// elements =
-							// dirty.getElementsByClass("hcf-content"); // Wiwo
-							// - nope, unsused!!
-							// if (elements.size() > 0) {
-							// bahtml = elements.first().html();
-							// dirty = Jsoup.parseBodyFragment(bahtml, baseUrl);
-							// }
-						}
-					}
-				}
-				Whitelist whitelist = Whitelist.basic(); // 500ms
-				// Whitelist whitelist = Whitelist.basicWithImages(); // 500ms
-				whitelist.addTags("h1", "h2", "h3");
-				System.out.println("x" + (System.currentTimeMillis() - start));
-				Cleaner cleaner2 = new Cleaner(whitelist);
-				System.out.println("h" + (System.currentTimeMillis() - start));
-				Document clean = cleaner2.clean(dirty);
-				System.out.println("i" + (System.currentTimeMillis() - start));
-				// clean.body().removeAttr(attributeKey)
-				bahtml = clean.body().html();
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				Util.toastMessageLong(EntryActivity.this, "" + e);
-			}
-
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			if (mNewLink != null) {
-				webView.loadUrl(mNewLink);
-			} else if (bahtml != null) {
-				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
-			}
-		}
 	}
 
 	@Override
@@ -953,98 +412,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		mAlertDialog.show();
 	}
 
-	/**
-	 * Für onPageFinished um ProzessBar an/aus zu knipsen da webview aSyncron
-	 * die animation trasht
-	 */
-	private class MyWebViewClient extends WebViewClient {
-
-		@Override
-		public void onPageFinished(WebView view, String url) {
-			if (!isFirstEntry) {
-				nestedScrollView.scrollTo(0, 0);
-			}
-			zeigeProgressBar(false);
-			// kopiert
-			view.setVisibility(View.VISIBLE);
-			super.onPageFinished(view, url);
-		};
-	}
-
 	int mAnimationDirection = android.R.anim.slide_out_right;
-
-	private ProgressBar progressBar;
-	private CollapsingToolbarLayout collapsingToolbar;
-	private AppBarLayout appBarLayout;
-
-	private View nestedScrollView;
-
-	private void switchEntry(String id, boolean animate, Animation inAnimation, Animation outAnimation) {
-
-		// webView.setVisibility(View.GONE);
-		zeigeProgressBar(true);
-
-		uri = parentUri.buildUpon().appendPath(id).build();
-		getIntent().setData(uri);
-		scrollX = 0;
-		scrollY = 0;
-
-		if (mAufrufart > 0) {
-			// link laden
-			Cursor entryCursor = getContentResolver().query(uri, null, null, null, null);
-			if (entryCursor.moveToFirst()) {
-				link = entryCursor.getString(linkPosition);
-				link = fixLink(link);
-				timestamp = entryCursor.getLong(datePosition);
-				abstractText = entryCursor.getString(abstractPosition);
-
-				Date date = new Date(timestamp);
-				StringBuilder dateStringBuilder = new StringBuilder(DateFormat.getDateFormat(this).format(date))
-						.append(' ').append(DateFormat.getTimeFormat(this).format(date));
-				String txtTitel = entryCursor.getString(titlePosition);
-//				((TextView) findViewById(R.id.entry_date)).setText(txtTitel + "  " + dateStringBuilder);
-
-			}
-			entryCursor.close();
-
-			if (mAufrufart == AUFRUFART_MOBILIZE) {
-				loadMoblize();
-			} else if (mAufrufart == AUFRUFART_INSTAPAPER) {
-				onClickInstapaper(null); 
-			} else if (mAufrufart == AUFRUFART_READABILITY) {
-				loadReadability();
-			}
-
-			// markRead 2
-			getContentResolver().update(uri, RSSOverview.getReadContentValues(),
-					new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null);
-
-			setupButton(previousButton, false, timestamp);
-			setupButton(nextButton, true, timestamp);
-		} else {
-			reload();
-		}
-
-	}
-
-	public void setHomeButtonActive() {
-		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
-		actionBar7.setHomeButtonEnabled(true);
-		// durchsichtige Actionbar
-		actionBar7.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#51000000")));
-		android.app.ActionBar actionBar = getActionBar();
-		if (actionBar != null) {
-			actionBar.hide(); // immer weil doppelt...
-		}
-
-		// Up Button, funkt per Default automatisch
-		int flags = 0;
-		flags = ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE;
-		int change = actionBar7.getDisplayOptions() ^ flags;
-		actionBar7.setDisplayOptions(change, flags);
-		actionBar7.setTitle("");
-
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -1108,96 +476,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void zeigeProgressBar(boolean zeigen) {
-		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
-		if (progressBar == null) {
-			return;
-		}
-
-		if (zeigen) {
-			progressBar.setVisibility(View.VISIBLE);
-		} else {
-			progressBar.setVisibility(View.INVISIBLE);
-		}
-	}
-
-	class AsyncNewReadability extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... params) {
-
-			try {
-
-				HtmlFetcher fetcher2 = new HtmlFetcher();
-				fetcher2.setMaxTextLength(50000);
-				JResult res = fetcher2.fetchAndExtract(link, 10000, true);
-				String text = res.getText();
-				String title = res.getTitle();
-				String imageUrl = res.getImageUrl();
-
-				if (imageUrl != null && !"".equals(imageUrl)) {
-					mNewLink = imageUrl;
-				}
-
-				if (text != null) {
-					bahtml = text + "<br>";
-				}
-				return null;
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			if (bahtml != null) {
-
-				// Bilder auf 100% runter sizen
-				// content is the content of the HTML or XML.
-				String stringToAdd = "width=\"100%\" height=\"auto\" ";
-				// Create a StringBuilder to insert string in the middle of
-				// content.
-				StringBuilder sb = new StringBuilder(bahtml);
-				int i = 0;
-				int cont = 0;
-				// Check for the "src" substring, if it exists, take the index
-				// where
-				// it appears and insert the stringToAdd there, then increment a
-				// counter
-				// because the string gets altered and you should sum the length
-				// of the inserted substring
-				while (i != -1) {
-					i = bahtml.indexOf("src", i + 1);
-					if (i != -1)
-						sb.insert(i + (cont * stringToAdd.length()), stringToAdd);
-					++cont;
-				}
-				bahtml = sb.toString();
-
-				webView.loadData(bahtml, "text/html; charset=UTF-8", null);
-				// webView.loadDataWithBaseURL(mNewLink, bahtml, "text/html;
-				// charset=UTF-8", null, null);
-
-				if (mNewLink != null) {
-
-					URL url;
-					try {
-						url = new URL(mNewLink);
-						Glide.with(EntryActivity.this).load(url).centerCrop().into(imageView);
-						;
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-
-			} // else bahatml leer - nix machen, ggf. feed (neu) laden ?!
-		}
-	}
-
 	// aus net.etuldan.sparss.utils.NetworkUtils
 	public static String getBaseUrl(String link) {
 		String baseUrl = link;
@@ -1234,41 +512,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
 		mAufrufart=AUFRUFART_READABILITY;		
 		mEntryPagerAdapter.notifyDataSetChanged();
-	}
-	
-	public void onClickMenu2(View view) {
-
-		if(view==null){
-			view=this.getCurrentFocus();
-		}
-		
-		PopupMenu popup = new PopupMenu(EntryActivity.this, view);
-		popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
-		
-		switch (mAufrufart) {
-		case AUFRUFART_READABILITY:
-			popup.getMenu().findItem(R.id.menu_readability).setChecked(true);
-			break;
-		case AUFRUFART_GOOGLEWEBLIGHT:
-			popup.getMenu().findItem(R.id.menu_googleweblight).setChecked(true);
-			break;
-		case AUFRUFART_AMP:
-			popup.getMenu().findItem(R.id.menu_amp).setChecked(true);
-			break;
-			
-		default:
-			popup.getMenu().findItem(R.id.menu_feed).setChecked(true);
-			break;
-		}
-		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-            	EntryActivity.this.onOptionsItemSelected( item);
-                return true;
-            }
-        });
-		popup.show();
-		
 	}
 
 	public void onClickInstapaper(View view) {
