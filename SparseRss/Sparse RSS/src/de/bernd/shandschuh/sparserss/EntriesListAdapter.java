@@ -197,6 +197,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 					if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
 						dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
 						bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+						bitmap = Util.getRoundedBitmap(bitmap);
 						BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
 						bitmapDrawable.setTargetDensity(densityDpi);	
 						dateTextView.setCompoundDrawablesWithIntrinsicBounds(bitmapDrawable, null, null,  null);

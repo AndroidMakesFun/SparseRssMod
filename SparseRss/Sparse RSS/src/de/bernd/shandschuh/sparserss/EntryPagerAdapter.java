@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.PagerAdapter;
 import android.text.format.DateFormat;
 import android.util.Xml.Encoding;
@@ -712,6 +711,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 						try {
 							Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);			
 							bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+							bitmap = Util.getRoundedBitmap(bitmap);
 							BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
 							int densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
 							bitmapDrawable.setTargetDensity(densityDpi);

@@ -94,6 +94,7 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 					if (iconBytes != null && iconBytes.length > 0) {
 						bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
 						bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
+						bitmap = Util.getRoundedBitmap(bitmap);
 						bitmapDrawable = new BitmapDrawable(bitmap);
 						bitmapDrawable.setTargetDensity(densityDpi);
 						mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, name, id));

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.EntriesListAdapter;
 import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.RSSOverview;
+import de.bernd.shandschuh.sparserss.Util;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 
 public class RecycleListActivity extends AppCompatActivity {
@@ -83,6 +84,7 @@ public class RecycleListActivity extends AppCompatActivity {
 			if (bitmap != null) {
 				if (bitmap.getHeight() != bitmapSizeInDip) {
 					bitmap = Bitmap.createScaledBitmap(bitmap, bitmapSizeInDip, bitmapSizeInDip, false);
+					bitmap = Util.getRoundedBitmap(bitmap);
 				}
 
 //				setFeatureDrawable(Window.FEATURE_LEFT_ICON, new BitmapDrawable(bitmap));
