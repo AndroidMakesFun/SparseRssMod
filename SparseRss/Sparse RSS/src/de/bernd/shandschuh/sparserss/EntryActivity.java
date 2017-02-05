@@ -495,6 +495,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 			onClickShare(null);
 			break;
 		}
+		case R.id.menu_share_entry: {
+			onClickShareEntry(null);
+			break;
+		}
 		case R.id.menu_text_scale: {
 			onClickShowSeekBarDialog(null);
 		}
@@ -611,6 +615,15 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		
 	}
 
+	
+	public void onClickShareEntry(View view) {
+		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
+		String share=dtoEntry.link + "<br><br>" + dtoEntry.text;
+		startActivity(Intent.createChooser(
+				new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, share).setType(TEXTPLAIN),
+				getString(R.string.menu_share)));
+	}
+	
 	public void onClickShare(View view) {
 		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
 		startActivity(Intent.createChooser(

@@ -46,6 +46,8 @@ public class EntryPagerAdapter extends PagerAdapter {
     private int mAktuellePosition=-1;
     private int mAnzahlFeedeintraege;
     
+    private DtoEntry mDtoEntry;
+    
     /**
      * content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/2/entries/8242
      * alle: 
@@ -121,6 +123,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dtoEntry.link="";
 			dtoEntry.text="";			
 		}
+		if (getAktuellePosition()==position){
+			mDtoEntry=dtoEntry;
+		}
 		
 		Drawable drawable=getDrawableForEntry(dtoEntry);
 		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
@@ -135,12 +140,21 @@ public class EntryPagerAdapter extends PagerAdapter {
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
 
+    	int lastPosition=getAktuellePosition();
     	if (getAktuellePosition()==position && startPosition!=position){
+    		// && startPosition!=position wegen startPosition gleich auf gelesen setzen
     		return;
     	}
     	setAktuellePosition(position);
-    	DtoEntry dto = ladeDtoEntry(position);
-		
+    	DtoEntry dto;
+    	if(lastPosition!=position){
+    		// erst ab dem 2. durchlauf/Entry
+        	dto = ladeDtoEntry(position);
+        	mDtoEntry=dto;
+    	}else{
+    		dto=mDtoEntry;
+    	}
+    	
     	String id = dto.id;
     	if(!dto.isRead){
        		mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(id)), RSSOverview.getReadContentValues(), null, null);
@@ -479,6 +493,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 	}
 
 	public DtoEntry getAktuellenEntry() {
+		if(mDtoEntry!=null){
+			return mDtoEntry;
+		}
 		int akt=getAktuellePosition();
 		DtoEntry dtoEntry = this.ladeDtoEntry(akt);
 		return dtoEntry;
