@@ -59,6 +59,7 @@ From Left to Right:
 * "..." Opens an Popup Menu, see Menu for a description.
 
 * Next Entry - opens an older entry, like swipe left.
+
   
 Menu
 ----
@@ -78,6 +79,7 @@ Menu
 
 * Copy Link - Copies the Link to clipboard. 
 
+
 Preferences
 -----------
 * Light Theme - Default, light Theme, of changes to a dark Theme ( Night Mode ).
@@ -93,8 +95,10 @@ Preferences
 * Auto Sync - Periodical look for new Feed Entries.
 
 * Refresh on Start - Looks for new Feed Entries at start time.
+
   
 [back to Readme](..//README.md)
 
-[Syntax on GitHub](https://help.github.com/articles/basic-writing-and-formatting-syntax)
+
+
 

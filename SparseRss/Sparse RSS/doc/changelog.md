@@ -1,5 +1,5 @@
 Changelog - Sparse RSS Mod
-==============================
+==========================
 
 2.25
 * Share Entry e.g. as eMail
