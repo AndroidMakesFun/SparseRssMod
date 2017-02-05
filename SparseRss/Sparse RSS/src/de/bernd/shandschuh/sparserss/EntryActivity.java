@@ -25,6 +25,9 @@
 
 package de.bernd.shandschuh.sparserss;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -53,6 +56,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.EntryPagerAdapter.DtoEntry;
+import de.jetwick.snacktory.OutputFormatter;
 
 public class EntryActivity extends AppCompatActivity implements android.widget.SeekBar.OnSeekBarChangeListener {
 
@@ -617,11 +621,17 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	
 	public void onClickShareEntry(View view) {
-		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
-		String share=dtoEntry.link + "<br><br>" + dtoEntry.text;
-		startActivity(Intent.createChooser(
-				new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, share).setType(TEXTPLAIN),
-				getString(R.string.menu_share)));
+		try {
+			DtoEntry dto = mEntryPagerAdapter.getAktuellenEntry();
+			OutputFormatter out = new OutputFormatter();
+			Document document = Jsoup.parse(dto.titel + dto.text);
+			String share=dto.link + "\n\n" + out.getFormattedText(document);
+			startActivity(Intent.createChooser(
+					new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_HTML_TEXT, dto.text).putExtra(Intent.EXTRA_SUBJECT, dto.link).putExtra(Intent.EXTRA_TEXT, share).setType(TEXTPLAIN),
+					getString(R.string.menu_share)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void onClickShare(View view) {

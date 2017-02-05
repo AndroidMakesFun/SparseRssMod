@@ -1,7 +1,7 @@
 Changelog - Sparse RSS Mod
 ==============================
 
-2.24
+2.25
 * Share Entry e.g. as eMail
 * Option to disable Cover per View
 * Settings for Hide Bottom Bar
@@ -50,5 +50,6 @@ Changelog - Sparse RSS Mod
 * Old Version from 2015
   
 
+[back to Readme](..//README.md)
 
 
