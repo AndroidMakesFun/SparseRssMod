@@ -1,11 +1,32 @@
 Changelog - Sparse RSS Mod
 ==============================
 
-1.96
-* Version copied from Stefan Handschuh
-* Fixed some Errors
-* Add Readability, Fullscreen,...
-* Old Version from 2015
+2.24
+* Share Entry e.g. as eMail
+* Option to disable Cover per View
+* Settings for Hide Bottom Bar
+* ReLayout Bottom Bar
+* ReLayout ViewPager with Toolbar behavior like Chrome, hidden at opening
+* Black Status Bar
+* Round Logos as Buttons
+
+2.22
+* Update Support Libs 25.1
+* Create some Documentation, Changelog, etc.
+
+2.21
+* Last Version for Android 4
+
+2.14 
+* Catch some Nullpointer, thanks for your Reports and Logs!
+* Add GoogleWeblight	
+
+2.13
+* BaseUrl
+* Navigation for "All" entries, Favorites..
+* White Background for Images
+* Info/About Dialog shows current Version
+* Disable Images global and for Feeds
 
 2.04
 * Improved Swipe with loading in the background via PageAdapter, like Google Kiosk does.
@@ -22,33 +43,12 @@ Changelog - Sparse RSS Mod
 * Widget fixed
 * Export/Import fixed
 
-2.13
-* BaseUrl
-* Navigation for "All" entries, Favorites..
-* White Background for Images
-* Info/About Dialog shows current Version
-* Disable Images global and for Feeds
-
-
-2.14 
-* Catch some Nullpointer, thanks for your Reports and Logs!
-* Add GoogleWeblight	
-
-2.21
-* Last Version for Android 4
-
-
-2.22
-* Update Support Libs 25.1
-* Create some Documentation, Changelog, etc.
-
-2.23
-* Option for Cover per View
-* Settings for Hide Bottom Bar
-* ReLayout Bottom Bar
-* ReLayout ViewPager with Toolbar behavior like Chrome, hidden at opening
-* Black Status Bar
+1.96
+* Version copied from Stefan Handschuh
+* Fixed some Errors
+* Add Readability, Fullscreen,...
+* Old Version from 2015
   
-To Be Continue...
+
 
 

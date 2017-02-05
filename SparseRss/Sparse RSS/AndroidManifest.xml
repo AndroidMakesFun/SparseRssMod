@@ -3,8 +3,8 @@
     package="de.bernd.shandschuh.sparserss"
     android:installLocation="auto"
     
-    android:versionCode="221"
-    android:versionName="2.21" >
+    android:versionCode="224"
+    android:versionName="2.24" >
 
     <uses-sdk
         android:minSdkVersion="21"

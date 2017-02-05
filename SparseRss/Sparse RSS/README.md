@@ -15,13 +15,13 @@ Thanks
 * [HTMLFetcher](https://github.com/karussell/snacktory)
 * [Glide](https://github.com/bumptech/glide/blob/master/README.md)
 * [TextDrawable](https://github.com/amulyakhare/TextDrawable)
-* Google for Android and there Support Libs
+* Google for Android and their Support Libs
 
 
 Older Versions
 --------------
 * [2.21](https://apkplz.com/android-apps/sparse-rss-mod/sparse-rss-mod-2-21) Last Version for Android 4
-* [1.96](https://apkplz.com/android-apps/sparse-rss-mod/sparse-rss-mod-1-96) Old Version without Support Libs and Big Pictures
+* [1.96](https://apkplz.com/android-apps/sparse-rss-mod/sparse-rss-mod-1-96) Old Version without Support Libs and Cover
 
 
 Original Readme
