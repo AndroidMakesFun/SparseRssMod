@@ -45,5 +45,4 @@ The file "LICENSE" contains the license information for the program.
 
 Icons and artwork are distributed under the CC-BY 3.0 license.
 
-Test
 
