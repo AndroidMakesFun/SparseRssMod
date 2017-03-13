@@ -48,7 +48,7 @@ public class FeedDataContentProvider extends ContentProvider {
 	
 	private static final String DATABASE_NAME = "sparserss.db";
 	
-	private static final int DATABASE_VERSION = 13;
+	private static final int DATABASE_VERSION = 14;
 	
 	private static final int URI_FEEDS = 1;
 	
@@ -178,6 +178,9 @@ public class FeedDataContentProvider extends ContentProvider {
 			}
 			if (oldVersion < 13) {
 				executeCatchedSQL(database, new StringBuilder(ALTER_TABLE).append(TABLE_ENTRIES).append(ADD).append(FeedData.EntryColumns.GRAFIKLINK).append(' ').append(FeedData.TYPE_TEXT).toString());
+			}
+			if (oldVersion < 14) {
+				executeCatchedSQL(database, new StringBuilder(ALTER_TABLE).append(TABLE_FEEDS).append(ADD).append(FeedData.FeedColumns.SYNC).append(' ').append(FeedData.TYPE_BOOLEAN).toString());
 			}
 		}
 		

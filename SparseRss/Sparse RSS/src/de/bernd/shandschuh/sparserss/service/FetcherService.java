@@ -196,8 +196,20 @@ public class FetcherService extends IntentService {
 			}//newCount
 			
 			System.out.println("****** LADE IM BACKEND  ****");
-			myFetchFullHtml(1); //TS
-			myFetchFullHtml(3);//Hei
+			String[] SYNC_PROJECTION = { BaseColumns._ID, FeedData.FeedColumns.SYNC };
+			Cursor cursor = FetcherService.this.getContentResolver().query(FeedData.FeedColumns.CONTENT_URI , SYNC_PROJECTION, null, null, null);
+			cursor.moveToFirst();
+			while (cursor.isAfterLast() == false) {
+				String id = cursor.getString(0);
+				int iSysnc = cursor.getInt(1);
+				if(iSysnc!=0){
+					System.out.println("Sync Feed " + id);
+					myFetchFullHtml(Integer.parseInt(id));
+				}
+				
+				cursor.moveToNext();			
+			}
+			cursor.close();
 		}
 	}
 

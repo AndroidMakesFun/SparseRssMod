@@ -46,14 +46,14 @@ import de.bernd.shandschuh.sparserss.provider.FeedData;
 
 public class FeedConfigActivity extends Activity {
 	private static final String WASACTIVE = "wasactive";
-	public static final String[] PROJECTION = new String[] {FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL, FeedData.FeedColumns.WIFIONLY, FeedData.FeedColumns.BEIMLADEN};
-//	public static final String[] PROJECTION = new String[] {FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL, FeedData.FeedColumns.WIFIONLY};
+	public static final String[] PROJECTION = new String[] {FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL, FeedData.FeedColumns.WIFIONLY, FeedData.FeedColumns.BEIMLADEN, FeedData.FeedColumns.SYNC};
 	
 	private EditText nameEditText;
 	
 	private EditText urlEditText;
 	
 	private CheckBox refreshOnlyWifiCheckBox;
+	private CheckBox syncCheckBox;
 	private CheckBox listViewCheckBox;
 	
 	private Spinner spinner;
@@ -70,6 +70,7 @@ public class FeedConfigActivity extends Activity {
 		nameEditText = (EditText) findViewById(R.id.feed_title);
 		urlEditText = (EditText) findViewById(R.id.feed_url);
 		refreshOnlyWifiCheckBox = (CheckBox) findViewById(R.id.wifionlycheckbox);
+		syncCheckBox = (CheckBox) findViewById(R.id.synccheckbox);
 		listViewCheckBox = (CheckBox) findViewById(R.id.listviewcheckbox);
 		listViewCheckBox.setChecked(Util.getTestListPrefs(getApplicationContext()));
 		
@@ -115,6 +116,7 @@ public class FeedConfigActivity extends Activity {
 						ContentValues values = new ContentValues();
 						
 						values.put(FeedData.FeedColumns.WIFIONLY, refreshOnlyWifiCheckBox.isChecked() ? 1 : 0);
+						values.put(FeedData.FeedColumns.SYNC, syncCheckBox.isChecked() ? 1 : 0);
 						values.put(FeedData.FeedColumns.BEIMLADEN, spinner.getSelectedItemPosition() );
 						values.put(FeedData.FeedColumns.URL, url);
 						values.put(FeedData.FeedColumns.ERROR, (String) null);
@@ -137,19 +139,22 @@ public class FeedConfigActivity extends Activity {
 			setTitle(R.string.editfeed_title);
 			
 			if (!restoreInstanceState(savedInstanceState)) {
-				Cursor cursor = getContentResolver().query(intent.getData(), PROJECTION, null, null, null);
+				Uri uri = intent.getData();
+				Cursor cursor = getContentResolver().query(uri, PROJECTION, null, null, null);
 					
 				if (cursor.moveToNext()) {
 					nameEditText.setText(cursor.getString(0));
 					urlEditText.setText(cursor.getString(1));
 					refreshOnlyWifiCheckBox.setChecked(cursor.getInt(2) == 1);
 			        spinner.setSelection(cursor.getInt(3));
+					syncCheckBox.setChecked(cursor.getInt(4) == 1);
 					cursor.close();
 				} else {
 					cursor.close();
 					Toast.makeText(FeedConfigActivity.this, R.string.error, Toast.LENGTH_LONG).show();
 					finish();
 				}
+				spinner.setSelection(Util.getViewerPrefs(FeedConfigActivity.this, uri.getLastPathSegment()));
 			}
 			((Button) findViewById(R.id.button_ok)).setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
@@ -174,6 +179,7 @@ public class FeedConfigActivity extends Activity {
 						values.put(FeedData.FeedColumns.NAME, name.trim().length() > 0 ? name : null);
 						values.put(FeedData.FeedColumns.FETCHMODE, 0);
 						values.put(FeedData.FeedColumns.WIFIONLY, refreshOnlyWifiCheckBox.isChecked() ? 1 : 0);
+						values.put(FeedData.FeedColumns.SYNC, syncCheckBox.isChecked() ? 1 : 0);
 						values.put(FeedData.FeedColumns.BEIMLADEN, spinner.getSelectedItemPosition() );
 						values.put(FeedData.FeedColumns.ERROR, (String) null);
 						getContentResolver().update(getIntent().getData(), values, null, null);
@@ -207,6 +213,7 @@ public class FeedConfigActivity extends Activity {
 			urlEditText.setText(savedInstanceState.getCharSequence(FeedData.FeedColumns.URL));
 			refreshOnlyWifiCheckBox.setChecked(savedInstanceState.getBoolean(FeedData.FeedColumns.WIFIONLY));
 			spinner.setSelection(savedInstanceState.getInt(FeedData.FeedColumns.BEIMLADEN));
+			syncCheckBox.setChecked(savedInstanceState.getBoolean(FeedData.FeedColumns.SYNC));
 			return true;
 		} else {
 			return false;
@@ -220,6 +227,7 @@ public class FeedConfigActivity extends Activity {
 		outState.putCharSequence(FeedData.FeedColumns.URL, urlEditText.getText());
 		outState.putBoolean(FeedData.FeedColumns.WIFIONLY, refreshOnlyWifiCheckBox.isChecked());
 		outState.putInt(FeedData.FeedColumns.BEIMLADEN, spinner.getSelectedItemPosition());
+		outState.putBoolean(FeedData.FeedColumns.SYNC, syncCheckBox.isChecked());
 	}
 
 }
