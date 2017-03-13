@@ -47,6 +47,7 @@ import android.app.Notification;
 import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -59,14 +60,19 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.provider.BaseColumns;
 import android.util.Xml;
 import de.bernd.shandschuh.sparserss.BASE64;
-import de.bernd.shandschuh.sparserss.MainTabActivity;
+import de.bernd.shandschuh.sparserss.EntriesListAdapter;
 import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.RSSOverview;
 import de.bernd.shandschuh.sparserss.Strings;
+import de.bernd.shandschuh.sparserss.Util;
 import de.bernd.shandschuh.sparserss.handler.RSSHandler;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
+import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
+import de.jetwick.snacktory.HtmlFetcher;
+import de.jetwick.snacktory.JResult;
 
 public class FetcherService extends IntentService {
 	private static final int FETCHMODE_DIRECT = 1;
@@ -187,10 +193,62 @@ public class FetcherService extends IntentService {
 				} else {
 					notificationManager.cancel(0);
 				}
-			}
+			}//newCount
+			
+			System.out.println("****** LADE IM BACKEND  ****");
+			myFetchFullHtml(1); //TS
+			myFetchFullHtml(3);//Hei
 		}
 	}
+
+	public static final String FULLTEXTISNULL = "fulltext is null";
 	
+	public static final String[] ENTRY_UPDATE_PROJECTION = { BaseColumns._ID, FeedData.EntryColumns.LINK, FeedData.EntryColumns.ABSTRACT};
+	public static final String sortOrder="_id DESC"; // neueste zuerst
+
+	public void myFetchFullHtml(int feedId) {
+		Cursor cursor;
+		
+		Uri parentUri = Uri.parse("content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/" + feedId + "/entries"); 
+
+		cursor = FetcherService.this.getContentResolver().query(parentUri, ENTRY_UPDATE_PROJECTION, FULLTEXTISNULL, null, sortOrder);
+		cursor.moveToFirst();
+		System.out.println("FetchFullHtml for " + cursor.getCount());
+		
+		HtmlFetcher fetcher2 = new HtmlFetcher();
+		fetcher2.setMaxTextLength(50000);
+
+		while (cursor.isAfterLast() == false) {
+			String id = cursor.getString(0);
+			String link = cursor.getString(1);
+			String rssText = cursor.getString(2);
+			System.out.println(id + " " + link);
+			int rssLen=0;
+			if(rssText!=null){
+				rssLen=rssText.length();
+			}
+			try {
+				JResult res = fetcher2.fetchAndExtract(link, 10000, true);
+				String text = res.getText();
+				String imageUrl = res.getImageUrl();
+				if(text!=null && text.length()>rssLen){
+					ContentValues values = FeedDataContentProvider.createContentValuesForFulltext(text, imageUrl);
+					Uri updateUri = ContentUris.withAppendedId(parentUri,Long.parseLong(id));
+					FetcherService.this.getContentResolver().update(updateUri, values, null, null);
+				}
+			} catch (Exception e) {
+				String str="Err Sync Fulltext " + e;
+				System.err.println(str);
+				e.printStackTrace();
+				cursor.close();
+				return;
+			}
+			
+			cursor.moveToNext();			
+		}
+		cursor.close();
+	}
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
