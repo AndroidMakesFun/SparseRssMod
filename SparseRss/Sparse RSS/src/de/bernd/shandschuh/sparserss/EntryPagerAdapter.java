@@ -11,6 +11,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.bumptech.glide.Glide;
 
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -36,6 +37,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
+import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
 
@@ -75,6 +77,7 @@ public class EntryPagerAdapter extends PagerAdapter {
     	String titel;
     	String text;
     	boolean isRead;
+    	boolean isFulltext;
     	TextView viewTitel;
     	WebView viewWeb;
     	ImageView viewImage;
@@ -209,6 +212,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 		if (entryCursor.moveToFirst()) {
 			final int linkPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.LINK);
 			final int abstractPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.ABSTRACT);
+			final int fulltextPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.FULLTEXT);
+			final int grafikPosition = entryCursor.getColumnIndex(FeedData.EntryColumns.GRAFIKLINK);
 			final int datePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.DATE);
 			final int titlePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.TITLE);
 			final int readDatePosition = entryCursor.getColumnIndex(FeedData.EntryColumns.READDATE);
@@ -222,15 +227,26 @@ public class EntryPagerAdapter extends PagerAdapter {
 			dto.link=link;
 
 			String abstractText = entryCursor.getString(abstractPosition);
+			String fullText = entryCursor.getString(fulltextPosition);
 			
-			if(abstractText!=null){
-				if(!mContext.showPics){
-					// webview Block Images scheint nicht zu ziehen...
-					abstractText = abstractText.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
-				}
+			if(fullText!=null){
+				// eigentlich reicht dann fullText
+				if(abstractText==null || fullText.length() > abstractText.length()){
+					dto.text=fullText;
+					dto.isFulltext=true;
+				}				
+			}else{
+				dto.text=abstractText;
 			}
+			String linkGrafik = entryCursor.getString(grafikPosition);
+			dto.linkGrafik=linkGrafik;
 			
-			dto.text=abstractText + "<br><br>";
+			if(!mContext.showPics){
+				// webview Block Images scheint nicht zu ziehen...
+				dto.text = dto.text.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
+			}
+			dto.text += "<br><br>";  // Verschieben zur Anzeige !!
+			
 
 			if (entryCursor.isNull(readDatePosition)){
 				dto.isRead=false;
@@ -364,7 +380,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 			try {
 				dto=params[0];
-				fetchHtmlSeite(dto);
+				if(!dto.isFulltext){
+					fetchHtmlSeite(dto);
+				}
 
 			} catch (Exception e) {
 				Util.toastMessage(mContext, "" + e);
@@ -582,7 +600,14 @@ public class EntryPagerAdapter extends PagerAdapter {
 		}
 
 		if (text != null) {
-			dto.text = text + "<br>";
+			text += "<br>";
+			if(dto.text==null || text.length()>dto.text.length()){
+				dto.text = text;
+				dto.isFulltext=true;
+				// update Readability Fulltext to DB
+				ContentValues values = FeedDataContentProvider.createContentValuesForFulltext(dto.text, dto.linkGrafik);
+				mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri,Long.parseLong(dto.id)), values, null, null);
+			}
 		}
 	}
 

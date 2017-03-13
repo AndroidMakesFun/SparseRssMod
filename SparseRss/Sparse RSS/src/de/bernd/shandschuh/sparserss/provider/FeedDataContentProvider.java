@@ -48,7 +48,7 @@ public class FeedDataContentProvider extends ContentProvider {
 	
 	private static final String DATABASE_NAME = "sparserss.db";
 	
-	private static final int DATABASE_VERSION = 11;
+	private static final int DATABASE_VERSION = 13;
 	
 	private static final int URI_FEEDS = 1;
 	
@@ -172,6 +172,12 @@ public class FeedDataContentProvider extends ContentProvider {
 			}
 			if (oldVersion < 11) {
 				executeCatchedSQL(database, new StringBuilder(ALTER_TABLE).append(TABLE_ENTRIES).append(ADD).append(FeedData.EntryColumns.AUTHOR).append(' ').append(FeedData.TYPE_TEXT).toString());
+			}
+			if (oldVersion < 12) {
+					executeCatchedSQL(database, new StringBuilder(ALTER_TABLE).append(TABLE_ENTRIES).append(ADD).append(FeedData.EntryColumns.FULLTEXT).append(' ').append(FeedData.TYPE_TEXT).toString());
+			}
+			if (oldVersion < 13) {
+				executeCatchedSQL(database, new StringBuilder(ALTER_TABLE).append(TABLE_ENTRIES).append(ADD).append(FeedData.EntryColumns.GRAFIKLINK).append(' ').append(FeedData.TYPE_TEXT).toString());
 			}
 		}
 		
@@ -563,4 +569,16 @@ public class FeedDataContentProvider extends ContentProvider {
 		return count;
 	}
 
+	/**
+	 * zum anschliessenden persistieren
+	 */
+	public static final ContentValues createContentValuesForFulltext(String text, String grafikLink) {
+		ContentValues values = new ContentValues();
+
+		values.put(FeedData.EntryColumns.FULLTEXT, text);
+		values.put(FeedData.EntryColumns.GRAFIKLINK, grafikLink);
+		return values;
+	}
+
+	
 }
