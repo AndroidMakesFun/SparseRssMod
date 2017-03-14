@@ -18,4 +18,9 @@
             android:icon="@android:drawable/ic_menu_delete"
             android:title="@string/contextmenu_deleteallentries"/>
     </group>
+    
+    <group android:checkableBehavior="all" >
+        <item android:id="@+id/menu_cardview"
+            android:title="Card View"/>
+    </group>
 </menu>

@@ -58,11 +58,10 @@
 
         <CheckBox
 	        android:layout_margin="5dp"
-            android:id="@+id/listviewcheckbox"
+            android:id="@+id/cardviewcheckbox"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:text="List View" />
+            android:text="Card View" />
     </LinearLayout>
 
 </ScrollView>

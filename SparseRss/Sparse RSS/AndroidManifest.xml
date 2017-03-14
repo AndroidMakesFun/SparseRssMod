@@ -135,7 +135,7 @@
             android:label="@string/title_activity_send_log" >
         </activity>
         <activity
-            android:name="de.bernd.shandschuh.sparserss.endlessscroll.RecycleListActivity"
+            android:name="de.bernd.shandschuh.sparserss.RecycleListActivity"
             android:label="@string/title_activity_recycle_list" >
         </activity>
     </application>

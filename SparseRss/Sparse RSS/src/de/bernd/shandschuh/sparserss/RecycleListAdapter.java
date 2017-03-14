@@ -25,16 +25,13 @@
 
 package de.bernd.shandschuh.sparserss;
 
-import java.text.DateFormat;
 import java.util.Date;
-import java.util.Vector;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,102 +39,18 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
-import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 
-public class EntriesListAdapter extends ResourceCursorAdapter {
-	protected static final int STATE_NEUTRAL = 0;
-	
-	protected static final int STATE_ALLREAD = 1;
-	
-	protected static final int STATE_ALLUNREAD = 2;
-	
-	protected int titleColumnPosition;
-	
-	protected int abstractColumnPosition;
-	protected int fulltextColumnPosition;
-	
-	protected int dateColumn;
-	
-	protected int readDateColumn;
-	
-	protected int favoriteColumn;
-	
-	protected int idColumn;
-	
-	protected int feedIconColumn;
-	
-	protected int feedNameColumn;
-	
-	protected int linkColumn;
-	
-	public static final String SQLREAD = "length(readdate) ASC, ";
-	
-	public static final String READDATEISNULL = "readdate is null";
+public class RecycleListAdapter extends EntriesListAdapter {
 
-	protected boolean showRead;
 	
-	protected Activity context;
 	
-	protected Uri uri;
-	
-	protected boolean showFeedInfo;
-	
-	protected int forcedState;
-	
-	protected Vector<Long> markedAsRead;
-	
-	protected Vector<Long> markedAsUnread;
-	
-	protected Vector<Long> favorited;
-	
-	protected Vector<Long> unfavorited;
-	
-	protected DateFormat dateFormat;
-	
-	protected DateFormat timeFormat;
-	
-	protected int buttonSize;
-	protected int densityDpi;
-	
-	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout) {
-		super(context, layout, createManagedCursor(context, uri, true), autoreload);
-
-		showRead = true;
-		this.context = context;
-		this.uri = uri;
-		
-		Cursor cursor = getCursor();
-		
-		titleColumnPosition = cursor.getColumnIndex(FeedData.EntryColumns.TITLE);
-		fulltextColumnPosition = cursor.getColumnIndex(FeedData.EntryColumns.FULLTEXT);
-		abstractColumnPosition = cursor.getColumnIndex(FeedData.EntryColumns.ABSTRACT);
-		dateColumn = cursor.getColumnIndex(FeedData.EntryColumns.DATE);
-		readDateColumn = cursor.getColumnIndex(FeedData.EntryColumns.READDATE);
-		favoriteColumn = cursor.getColumnIndex(FeedData.EntryColumns.FAVORITE);
-		idColumn = cursor.getColumnIndex(FeedData.EntryColumns._ID);
-		linkColumn = cursor.getColumnIndex(FeedData.EntryColumns.LINK);
-		this.showFeedInfo = showFeedInfo;
-		if (showFeedInfo) {
-			feedIconColumn = cursor.getColumnIndex(FeedData.FeedColumns.ICON);
-			feedNameColumn = cursor.getColumnIndex(FeedData.FeedColumns.NAME);
-		}
-		forcedState = STATE_NEUTRAL;
-		markedAsRead = new Vector<Long>();
-		markedAsUnread = new Vector<Long>();
-		favorited = new Vector<Long>();
-		unfavorited = new Vector<Long>();
-		dateFormat = android.text.format.DateFormat.getDateFormat(context);
-		timeFormat = android.text.format.DateFormat.getTimeFormat(context);
-		
-		buttonSize=Util.getButtonSizeInPixel(context);
-		densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
-
+	public RecycleListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout) {
+		super(context, uri,showFeedInfo, autoreload,layout);
 	}
 
 	@Override
@@ -154,6 +67,16 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		TextView dateTextView = (TextView) view.findViewById(android.R.id.text2);
 		
 		final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
+		
+		TextView feedTextView = (TextView) view.findViewById(R.id.text3);
+		String str=cursor.getString(abstractColumnPosition);
+		int cut=200;
+		if(str!=null && str.length()>cut){
+			str=str.substring(0, cut);
+		}
+		feedTextView.setText(str);
+		
+		
 		
 		final long id = cursor.getLong(idColumn);
 		
@@ -238,63 +161,5 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			textView.setEnabled(false);
 			dateTextView.setEnabled(false);
 		}
-	}
-
-	public void showRead(boolean showRead) {
-		if (showRead != this.showRead) {
-			context.stopManagingCursor(getCursor());
-			changeCursor(createManagedCursor(context, uri, showRead));
-			this.showRead = showRead;
-		}
-	}
-	
-	public boolean isShowRead() {
-		return showRead;
-	}
-	
-	private static Cursor createManagedCursor(Activity context, Uri uri, boolean showRead) {
-		String str=new StringBuilder(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_PRIORITIZE, false) ? SQLREAD : Strings.EMPTY).append(FeedData.EntryColumns.DATE).append(Strings.DB_DESC).toString();
-		return context.managedQuery(uri, null, 
-				showRead ? null : READDATEISNULL, 
-				null,str);
-	}
-	
-	public void markAsRead() {
-		forcedState = STATE_ALLREAD;
-		markedAsRead.clear();
-		markedAsUnread.clear();
-		notifyDataSetInvalidated();
-	}
-	
-	public void markAsUnread() {
-		forcedState = STATE_ALLUNREAD;
-		markedAsRead.clear();
-		markedAsUnread.clear();
-		notifyDataSetInvalidated();
-	}
-	
-	public void neutralizeReadState() {
-		forcedState = STATE_NEUTRAL;
-	}
-
-	public void markAsRead(long id) {
-		markedAsRead.add(id);
-		markedAsUnread.remove(id);
-		notifyDataSetInvalidated();
-	}
-
-	public void markAsUnread(long id) {
-		markedAsUnread.add(id);
-		markedAsRead.remove(id);
-		notifyDataSetInvalidated();
-	}
-
-	public long getDateFromFirst(){
-		Cursor cursor = getCursor();
-		if(cursor.moveToFirst()){
-			long l =cursor.getLong(dateColumn);
-			return l;
-		}
-		return 0;
 	}
 }

@@ -54,7 +54,7 @@ public class FeedConfigActivity extends Activity {
 	
 	private CheckBox refreshOnlyWifiCheckBox;
 	private CheckBox syncCheckBox;
-	private CheckBox listViewCheckBox;
+	private CheckBox cardViewCheckBox;
 	
 	private Spinner spinner;
 	
@@ -71,8 +71,8 @@ public class FeedConfigActivity extends Activity {
 		urlEditText = (EditText) findViewById(R.id.feed_url);
 		refreshOnlyWifiCheckBox = (CheckBox) findViewById(R.id.wifionlycheckbox);
 		syncCheckBox = (CheckBox) findViewById(R.id.synccheckbox);
-		listViewCheckBox = (CheckBox) findViewById(R.id.listviewcheckbox);
-		listViewCheckBox.setChecked(Util.getTestListPrefs(getApplicationContext()));
+		cardViewCheckBox = (CheckBox) findViewById(R.id.cardviewcheckbox);
+		cardViewCheckBox.setChecked(Util.getTestListPrefs(getApplicationContext()));
 		
 		spinner = (Spinner) findViewById(R.id.spinner1);
 		
@@ -189,7 +189,7 @@ public class FeedConfigActivity extends Activity {
 						Util.setViewerPrefs(FeedConfigActivity.this, getIntent().getData().getLastPathSegment(), spinner.getSelectedItemPosition());
 
 						//listViewCheckBox erstmal ohne db über alle Feeds
-						Util.setTestListPrefs(getApplicationContext(), listViewCheckBox.isChecked());
+						Util.setTestListPrefs(getApplicationContext(), cardViewCheckBox.isChecked());
 						
 						setResult(RESULT_OK);
 						finish();
