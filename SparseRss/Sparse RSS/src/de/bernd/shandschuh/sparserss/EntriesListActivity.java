@@ -91,6 +91,8 @@ public class EntriesListActivity extends AppCompatActivity {
 	private ListView listview;
 	private TextView emptyview;
 
+	private long mDateFromFirst;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
@@ -160,6 +162,8 @@ public class EntriesListActivity extends AppCompatActivity {
 		}
 		entriesListAdapter = new EntriesListAdapter(this, uri, intent.getBooleanExtra(EXTRA_SHOWFEEDINFO, false), intent.getBooleanExtra(EXTRA_AUTORELOAD, false));
 		listview.setAdapter(entriesListAdapter);
+		
+		mDateFromFirst = entriesListAdapter.getDateFromFirst();
 		
 		emptyview = (TextView) findViewById(android.R.id.empty);
 		if(entriesListAdapter.getCount()>0){
@@ -289,8 +293,9 @@ public class EntriesListActivity extends AppCompatActivity {
 
 	public void clickMarkAsRead(View view) { 
 		new Thread() { // the update process takes some time
-			public void run() {
-				getContentResolver().update(uri, RSSOverview.getReadContentValues(), null, null);
+			public void run() {				
+				String where=FeedData.EntryColumns.DATE + "<="+EntriesListActivity.this.mDateFromFirst;
+				getContentResolver().update(uri, RSSOverview.getReadContentValues(), where, null);
 			}
 		}.start();
 		entriesListAdapter.markAsRead();

@@ -283,5 +283,13 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		markedAsRead.remove(id);
 		notifyDataSetInvalidated();
 	}
-	
+
+	public long getDateFromFirst(){
+		Cursor cursor = getCursor();
+		if(cursor.moveToFirst()){
+			long l =cursor.getLong(dateColumn);
+			return l;
+		}
+		return 0;
+	}
 }
