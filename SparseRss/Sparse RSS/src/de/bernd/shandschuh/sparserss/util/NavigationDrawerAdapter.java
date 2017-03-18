@@ -63,7 +63,20 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 		titel = context.getResources().getString(R.string.all);
 		mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, titel, R.id.menu_alle));
 		
-//		drawable = context.getResources().getDrawable( android.R.drawable.star_big_off );
+		bitmap = BitmapFactory.decodeResource (context.getResources(), R.drawable.ic_terrain_grey600_48dp);
+		bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);		
+		bitmapDrawable = new BitmapDrawable(bitmap);
+		bitmapDrawable.setTargetDensity(densityDpi);
+		titel = context.getResources().getString(R.string.topfeeds);
+		mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, titel, R.id.menu_alle_top_feeds));
+		
+		bitmap = BitmapFactory.decodeResource (context.getResources(), R.drawable.ic_save_grey600_48dp);
+		bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);		
+		bitmapDrawable = new BitmapDrawable(bitmap);
+		bitmapDrawable.setTargetDensity(densityDpi);		
+		titel = context.getResources().getString(R.string.offline);
+		mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, titel, R.id.menu_alle_offline));
+		
 		bitmap = BitmapFactory.decodeResource (context.getResources(), android.R.drawable.star_big_off);
 		bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);		
 		bitmapDrawable = new BitmapDrawable(bitmap);

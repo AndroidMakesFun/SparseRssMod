@@ -270,14 +270,19 @@ public class RSSOverview extends AppCompatActivity {
 				setFeedSortEnabled(false);
 
 				if (Util.getTestListPrefs(getApplicationContext())) {
-					Intent intent = new Intent(getApplicationContext(), RecycleListActivity.class);
+					Intent intent = new Intent(getApplicationContext(), EntriesListActivity.class);
 					intent.setData(FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
 					intent.putExtra(FeedData.FeedColumns._ID, id);
 					startActivity(intent);
 				} else {
-					Intent intent = new Intent(Intent.ACTION_VIEW,FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
+					Intent intent = new Intent(getApplicationContext(), RecycleListActivity.class);
+					intent.setData(FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
 					intent.putExtra(FeedData.FeedColumns._ID, id);
 					startActivity(intent);
+					
+//					Intent intent = new Intent(Intent.ACTION_VIEW,FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
+//					intent.putExtra(FeedData.FeedColumns._ID, id);
+//					startActivity(intent);
 				}
 			}
 
@@ -648,6 +653,14 @@ public class RSSOverview extends AppCompatActivity {
 			clickShowAll(null);
 			break;
 		}
+		case R.id.menu_alle_top_feeds: {
+			clickShowAlleTopFeads(null);
+			break;
+		}
+		case R.id.menu_alle_offline: {
+			clickShowOffline(null);
+			break;
+		}
 		case R.id.menu_favorites: {
 			clickShowFav(null);
 			break;
@@ -655,6 +668,7 @@ public class RSSOverview extends AppCompatActivity {
 		}
 		return true;
 	}
+
 
 	public static final ContentValues getReadContentValues() {
 		ContentValues values = new ContentValues();
@@ -838,10 +852,25 @@ public class RSSOverview extends AppCompatActivity {
 
 	public void clickShowAll(View view) {
 		Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI);
-		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDINFO, true); // ?
+		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDINFO, true); // für icon 
+		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDFILTER, EntriesListActivity.EXTRA_FILTER_ALL); 
 		startActivity(intent);
 	}
 
+	private void clickShowAlleTopFeads(View view) {
+		Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI);
+		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDINFO, true);
+		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDFILTER, EntriesListActivity.EXTRA_FILTER_TOP_FEEDS); 
+		startActivity(intent);
+	}
+
+	public void clickShowOffline(View view) {
+		Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.CONTENT_URI);
+		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDINFO, true);
+		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDFILTER, EntriesListActivity.EXTRA_FILTER_OFFLINE); 
+		startActivity(intent);
+	}
+	
 	public void clickShowFav(View view) {
 		Intent intent = new Intent(Intent.ACTION_VIEW, FeedData.EntryColumns.FAVORITES_CONTENT_URI);
 		intent.putExtra(EntriesListActivity.EXTRA_SHOWFEEDINFO, true); // ?
@@ -870,6 +899,15 @@ public class RSSOverview extends AppCompatActivity {
 			clickShowAll(null);
 			break;
 		}
+		case R.id.menu_alle_top_feeds: {
+			clickShowAlleTopFeads(null);
+			break;
+		}
+		case R.id.menu_alle_offline: {
+			clickShowOffline(null);
+			break;
+		}
+		
 		case R.id.menu_favorites:{
 			clickShowFav(null);
 			break;

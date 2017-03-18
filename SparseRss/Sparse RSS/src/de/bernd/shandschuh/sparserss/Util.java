@@ -100,6 +100,9 @@ public class Util {
 		editor.commit();
 	}
 
+	/**
+	 * True means Textlist, not CardView !
+	 */
 	public static boolean getTestListPrefs(Context context) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		return prefs.getBoolean(PREFERENCE_TEST_LIST_PREFS, true);

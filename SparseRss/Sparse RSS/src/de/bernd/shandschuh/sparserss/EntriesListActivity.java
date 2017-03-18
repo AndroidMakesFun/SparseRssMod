@@ -32,19 +32,10 @@ public class EntriesListActivity extends ParentActivity {
 	}
 	
 	protected void createAdapter(){
-		mAdapter = new EntriesListAdapter(this, uri, getIntent().getBooleanExtra(EXTRA_SHOWFEEDINFO, false), getIntent().getBooleanExtra(EXTRA_AUTORELOAD, false), R.layout.entrylistitem);
+		boolean bShowFeedInfo = getIntent().getBooleanExtra(EXTRA_SHOWFEEDINFO, false);
+		boolean bAutoreload = getIntent().getBooleanExtra(EXTRA_AUTORELOAD, false);
+		int iFeedFilter=getIntent().getIntExtra(EntriesListActivity.EXTRA_SHOWFEEDFILTER, EntriesListActivity.EXTRA_FILTER_ALL);
+		mAdapter = new EntriesListAdapter(this, uri, bShowFeedInfo, bAutoreload, R.layout.entrylistitem, iFeedFilter);
 	}
-
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		
-//		// Menues in die Toolbar, SHOW_AS_ACTION_ALWAYS zieht nur hier
-//        MenuItem markAsRead = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread); 
-//        MenuItemCompat.setShowAsAction(markAsRead, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-//        markAsRead.setIcon(android.R.drawable.ic_menu_revert);
-//		
-//		getMenuInflater().inflate(R.menu.entrylist, menu);
-//		return true;
-//	}
 
 }

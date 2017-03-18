@@ -49,6 +49,8 @@ import android.widget.ImageView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
+import de.bernd.shandschuh.sparserss.provider.FeedData.EntryColumns;
+import de.bernd.shandschuh.sparserss.provider.FeedData.FeedColumns;
 
 public class EntriesListAdapter extends ResourceCursorAdapter {
 	protected static final int STATE_NEUTRAL = 0;
@@ -82,7 +84,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 
 	protected boolean showRead;
 	
-	protected Activity context;
+	protected static Activity mActivity;
 	
 	protected Uri uri;
 	
@@ -105,14 +107,14 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	protected int buttonSize;
 	protected int densityDpi;
 	
-	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout) {
-		super(context, layout, createManagedCursor(context, uri, true), autoreload);
+	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout, int iFeedFilter) {
+		super(context, layout, createManagedCursor(context, uri, true, iFeedFilter), autoreload);
 
 		showRead = true;
-		this.context = context;
 		this.uri = uri;
 		
 		Cursor cursor = getCursor();
+		System.out.println("Count: " + cursor.getCount());
 		
 		titleColumnPosition = cursor.getColumnIndex(FeedData.EntryColumns.TITLE);
 		fulltextColumnPosition = cursor.getColumnIndex(FeedData.EntryColumns.FULLTEXT);
@@ -242,8 +244,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 
 	public void showRead(boolean showRead) {
 		if (showRead != this.showRead) {
-			context.stopManagingCursor(getCursor());
-			changeCursor(createManagedCursor(context, uri, showRead));
+			mActivity.stopManagingCursor(getCursor());
+			changeCursor(createManagedCursor(mActivity, uri, showRead, mFeedFilter));
 			this.showRead = showRead;
 		}
 	}
@@ -252,12 +254,65 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		return showRead;
 	}
 	
-	private static Cursor createManagedCursor(Activity context, Uri uri, boolean showRead) {
-		String str=new StringBuilder(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_PRIORITIZE, false) ? SQLREAD : Strings.EMPTY).append(FeedData.EntryColumns.DATE).append(Strings.DB_DESC).toString();
-		return context.managedQuery(uri, null, 
-				showRead ? null : READDATEISNULL, 
-				null,str);
+	private static int mFeedFilter=1;
+	private static String mSelection=null;
+	/**
+	 * readdate is null AND _id in (1,2,3) 
+	 */
+	public String getSelection(){
+		return mSelection;
 	}
+	
+	private static Cursor createManagedCursor(Activity context, Uri uri, boolean showRead, int iFeedFilter) {
+		String str=new StringBuilder(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_PRIORITIZE, false) ? SQLREAD : Strings.EMPTY).append(FeedData.EntryColumns.DATE).append(Strings.DB_DESC).toString();
+		mActivity = context;
+
+		mFeedFilter=iFeedFilter;
+		// READDATEISNULL = "readdate is null";
+		String selection = null;
+		if(!showRead) selection="readdate is null";
+
+		String ret=getAllTopFeeds();
+		if(ret!=null){
+			if(selection ==null){
+				
+				selection=EntryColumns.FEED_ID + " in (" + ret + ")";
+			}else{
+				selection += " AND _id in (" + ret + ")";
+			}
+		}
+		mSelection=selection;
+		return context.managedQuery(uri, null, selection, null,str);
+	}
+	
+	public static String[]TOPFEED_PROJECTION={"_ID", FeedData.FeedColumns.TOPFEED, FeedData.FeedColumns.SYNC};
+	
+	public static String getAllTopFeeds(){
+		String ret=null;
+		String selectionWhere=null;
+		if(mFeedFilter==EntriesListActivity.EXTRA_FILTER_TOP_FEEDS){
+			selectionWhere="TOPFEED=1";
+		}else if(mFeedFilter==EntriesListActivity.EXTRA_FILTER_OFFLINE){
+			selectionWhere="SYNC=1";
+		}
+		String liste=null;
+		Cursor cursor = mActivity.getContentResolver().query(FeedColumns.CONTENT_URI, TOPFEED_PROJECTION, selectionWhere,null, null);
+		if (cursor.moveToFirst()) {
+			while (cursor.isAfterLast() == false) {
+				int i= (cursor.getInt(0));
+				if(ret==null){
+					ret=""+i;
+				}else{
+					ret=ret + "," +i;
+				}
+				cursor.moveToNext();
+			}
+		}
+		cursor.close();		
+		return ret;
+	}
+
+	
 	
 	public void markAsRead() {
 		forcedState = STATE_ALLREAD;

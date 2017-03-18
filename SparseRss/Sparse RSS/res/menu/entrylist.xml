@@ -22,5 +22,9 @@
     <group android:checkableBehavior="all" >
         <item android:id="@+id/menu_cardview"
             android:title="Card View"/>
-    </group>
+        <item android:id="@+id/menu_topfeed"
+            android:title="@string/topfeeds"/>
+        <item android:id="@+id/menu_offline"
+            android:title="@string/offline"/>
+        </group>
 </menu>

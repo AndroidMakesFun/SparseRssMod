@@ -49,8 +49,8 @@ public class RecycleListAdapter extends EntriesListAdapter {
 
 	
 	
-	public RecycleListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout) {
-		super(context, uri,showFeedInfo, autoreload,layout);
+	public RecycleListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout, int iFeedFilter) {
+		super(context, uri,showFeedInfo, autoreload,layout, iFeedFilter);
 	}
 
 	@Override

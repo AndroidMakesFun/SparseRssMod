@@ -46,7 +46,7 @@ import de.bernd.shandschuh.sparserss.provider.FeedData;
 
 public class FeedConfigActivity extends Activity {
 	private static final String WASACTIVE = "wasactive";
-	public static final String[] PROJECTION = new String[] {FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL, FeedData.FeedColumns.WIFIONLY, FeedData.FeedColumns.BEIMLADEN, FeedData.FeedColumns.SYNC};
+	public static final String[] PROJECTION = new String[] {FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL, FeedData.FeedColumns.WIFIONLY, FeedData.FeedColumns.BEIMLADEN, FeedData.FeedColumns.SYNC, FeedData.FeedColumns.TOPFEED};
 	
 	private EditText nameEditText;
 	
@@ -55,6 +55,7 @@ public class FeedConfigActivity extends Activity {
 	private CheckBox refreshOnlyWifiCheckBox;
 	private CheckBox syncCheckBox;
 	private CheckBox cardViewCheckBox;
+	private CheckBox topfeedCheckBox;
 	
 	private Spinner spinner;
 	
@@ -73,6 +74,7 @@ public class FeedConfigActivity extends Activity {
 		syncCheckBox = (CheckBox) findViewById(R.id.synccheckbox);
 		cardViewCheckBox = (CheckBox) findViewById(R.id.cardviewcheckbox);
 		cardViewCheckBox.setChecked(Util.getTestListPrefs(getApplicationContext()));
+		topfeedCheckBox = (CheckBox) findViewById(R.id.topfeedcheckbox);
 		
 		spinner = (Spinner) findViewById(R.id.spinner1);
 		
@@ -118,6 +120,7 @@ public class FeedConfigActivity extends Activity {
 						values.put(FeedData.FeedColumns.WIFIONLY, refreshOnlyWifiCheckBox.isChecked() ? 1 : 0);
 						values.put(FeedData.FeedColumns.SYNC, syncCheckBox.isChecked() ? 1 : 0);
 						values.put(FeedData.FeedColumns.BEIMLADEN, spinner.getSelectedItemPosition() );
+						values.put(FeedData.FeedColumns.TOPFEED, topfeedCheckBox.isChecked() ? 1 : 0);
 						values.put(FeedData.FeedColumns.URL, url);
 						values.put(FeedData.FeedColumns.ERROR, (String) null);
 						
@@ -148,6 +151,7 @@ public class FeedConfigActivity extends Activity {
 					refreshOnlyWifiCheckBox.setChecked(cursor.getInt(2) == 1);
 			        spinner.setSelection(cursor.getInt(3));
 					syncCheckBox.setChecked(cursor.getInt(4) == 1);
+					topfeedCheckBox.setChecked(cursor.getInt(5) == 1);
 					cursor.close();
 				} else {
 					cursor.close();
@@ -180,6 +184,7 @@ public class FeedConfigActivity extends Activity {
 						values.put(FeedData.FeedColumns.FETCHMODE, 0);
 						values.put(FeedData.FeedColumns.WIFIONLY, refreshOnlyWifiCheckBox.isChecked() ? 1 : 0);
 						values.put(FeedData.FeedColumns.SYNC, syncCheckBox.isChecked() ? 1 : 0);
+						values.put(FeedData.FeedColumns.TOPFEED, topfeedCheckBox.isChecked() ? 1 : 0);
 						values.put(FeedData.FeedColumns.BEIMLADEN, spinner.getSelectedItemPosition() );
 						values.put(FeedData.FeedColumns.ERROR, (String) null);
 						getContentResolver().update(getIntent().getData(), values, null, null);
@@ -214,6 +219,7 @@ public class FeedConfigActivity extends Activity {
 			refreshOnlyWifiCheckBox.setChecked(savedInstanceState.getBoolean(FeedData.FeedColumns.WIFIONLY));
 			spinner.setSelection(savedInstanceState.getInt(FeedData.FeedColumns.BEIMLADEN));
 			syncCheckBox.setChecked(savedInstanceState.getBoolean(FeedData.FeedColumns.SYNC));
+			topfeedCheckBox.setChecked(savedInstanceState.getBoolean(FeedData.FeedColumns.TOPFEED));
 			return true;
 		} else {
 			return false;
@@ -228,6 +234,7 @@ public class FeedConfigActivity extends Activity {
 		outState.putBoolean(FeedData.FeedColumns.WIFIONLY, refreshOnlyWifiCheckBox.isChecked());
 		outState.putInt(FeedData.FeedColumns.BEIMLADEN, spinner.getSelectedItemPosition());
 		outState.putBoolean(FeedData.FeedColumns.SYNC, syncCheckBox.isChecked());
+		outState.putBoolean(FeedData.FeedColumns.TOPFEED, topfeedCheckBox.isChecked());
 	}
 
 }
