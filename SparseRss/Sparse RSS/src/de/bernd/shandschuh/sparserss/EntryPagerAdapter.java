@@ -65,9 +65,10 @@ public class EntryPagerAdapter extends PagerAdapter {
 
     private ArrayList<String> mListeIdsAsString = new ArrayList<String>();
 
-	private boolean showRead; // EntriesListActivity gelesene anzeigen
+//	private boolean showRead; // EntriesListActivity gelesene anzeigen
 	private String sortOrder="date DESC";
 	private int startPosition=-1;
+	private String mSelectionFilter=null;
 
     class DtoEntry{
     	String id;
@@ -89,7 +90,8 @@ public class EntryPagerAdapter extends PagerAdapter {
         mContext = context;
         mAnzahlFeedeintraege=anzahlFeedeintraege;
 		mUri = mContext.getIntent().getData();
-		showRead = mContext.getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
+//		showRead = mContext.getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD, true);
+		mSelectionFilter = mContext.getIntent().getStringExtra(EntriesListActivity.EXTRA_SELECTION_FILTER);
 		startPosition=position;
 		
     	boolean bPriorize = PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(Strings.SETTINGS_PRIORITIZE, false);
@@ -173,11 +175,13 @@ public class EntryPagerAdapter extends PagerAdapter {
 		}
     	Cursor entryCursor;    	
     	
-    	if(showRead){
-    		entryCursor = mContext.getContentResolver().query(mParentUri, null, null, null, sortOrder);    		
-    	}else{
-    		entryCursor = mContext.getContentResolver().query(mParentUri, null, EntriesListAdapter.READDATEISNULL, null, sortOrder);
-    	}
+//    	if(showRead){
+//    		entryCursor = mContext.getContentResolver().query(mParentUri, null, null, null, sortOrder);    		
+//    	}else{
+//    		entryCursor = mContext.getContentResolver().query(mParentUri, null, EntriesListAdapter.READDATEISNULL, null, sortOrder);
+//    	}
+		entryCursor = mContext.getContentResolver().query(mParentUri, null, mSelectionFilter, null, sortOrder);    		
+    	
 		
     	int position=-1;
 		if (entryCursor.moveToFirst()) {
@@ -796,11 +800,13 @@ public class EntryPagerAdapter extends PagerAdapter {
     public void ermittleAlleIds() {
     	mListeIdsAsString.clear();
     	Cursor cursor;
-    	if(showRead){
-    		cursor = mContext.getContentResolver().query(mParentUri, null, null, null, sortOrder);    		
-    	}else{
-    		cursor = mContext.getContentResolver().query(mParentUri, null, EntriesListAdapter.READDATEISNULL, null, sortOrder);
-    	}
+//    	if(showRead){
+//    		cursor = mContext.getContentResolver().query(mParentUri, null, null, null, sortOrder);    		
+//    	}else{
+//    		cursor = mContext.getContentResolver().query(mParentUri, null, EntriesListAdapter.READDATEISNULL, null, sortOrder);
+//    	}
+		cursor = mContext.getContentResolver().query(mParentUri, null, mSelectionFilter, null, sortOrder);    		
+    	
 		cursor.moveToFirst();
 		while (cursor.isAfterLast() == false) {
 			final String id = cursor.getString(0);

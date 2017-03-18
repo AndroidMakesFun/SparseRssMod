@@ -57,6 +57,7 @@ public class ParentActivity extends AppCompatActivity {
 	public static final String EXTRA_AUFRUFART = "aufrufart";
 	public static final String EXTRA_ANZAHL = "anzahl";
 	public static final String EXTRA_POSITION = "position";
+	public static final String EXTRA_SELECTION_FILTER = "EXTRA_SELECTION_FILTER";
 
 	public static final String[] FEED_PROJECTION = { FeedData.FeedColumns.NAME, FeedData.FeedColumns.URL,
 			FeedData.FeedColumns.ICON };	
@@ -251,7 +252,9 @@ public class ParentActivity extends AppCompatActivity {
 				startActivity(new Intent(Intent.ACTION_VIEW, contenUri)
 						.putExtra(EXTRA_SHOWREAD, ((EntriesListAdapter) mAdapter).isShowRead())
 						.putExtra(FeedData.FeedColumns.ICON, iconBytes).putExtra(EXTRA_POSITION, position)
-						.putExtra(EXTRA_ANZAHL, mAdapter.getCount()).putExtra(EXTRA_AUFRUFART, aufrufart));
+						.putExtra(EXTRA_ANZAHL, mAdapter.getCount()).putExtra(EXTRA_AUFRUFART, aufrufart)
+						.putExtra(EXTRA_SELECTION_FILTER, mAdapter.getSelectionFilter())
+						);
 
 			}
 		});
@@ -270,9 +273,9 @@ public class ParentActivity extends AppCompatActivity {
 		MenuItem item = menu.findItem(R.id.menu_cardview);
 		if (item != null) {
 			if (Util.getTestListPrefs(getApplicationContext())) {
-				item.setChecked(true);
-			} else {
 				item.setChecked(false);
+			} else {
+				item.setChecked(true);
 			}
 		}
 		MenuItem itemTop = menu.findItem(R.id.menu_topfeed);
@@ -285,7 +288,7 @@ public class ParentActivity extends AppCompatActivity {
 		}
 		MenuItem itemOffline = menu.findItem(R.id.menu_offline);
 		if (itemOffline != null) {
-			if (getTopFeed(mLongFeedId)) {
+			if (getOfflineFeed(mLongFeedId)) {
 				itemOffline.setChecked(true);
 			} else {
 				itemOffline.setChecked(false);
@@ -311,7 +314,7 @@ public class ParentActivity extends AppCompatActivity {
 			public void run() {
 //				String where = FeedData.EntryColumns.DATE + "<=" + ParentActivity.this.mDateFromFirst;
 				String where = FeedData.EntryColumns.DATE + "<=" + ParentActivity.this.mDateFromFirst;
-				where+= " AND " + mAdapter.getSelection(); //readdate is null AND _id in (1,2,3)
+				where+= " AND " + mAdapter.getSelectionFilter(); //readdate is null AND _id in (1,2,3)
 				getContentResolver().update(uri, RSSOverview.getReadContentValues(), where, null);
 			}
 		}.start();
@@ -444,16 +447,20 @@ public class ParentActivity extends AppCompatActivity {
 		case R.id.menu_topfeed: {
 			if (getTopFeed(mLongFeedId)) {
 				setTopFeed(mLongFeedId,false);
+				item.setChecked(false);
 			}else{
 				setTopFeed(mLongFeedId,true);
+				item.setChecked(true);
 			}
 			break;
 		}
 		case R.id.menu_offline: {
 			if (getOfflineFeed(mLongFeedId)) {
 				setOfflineFeed(mLongFeedId,false);
+				item.setChecked(false);
 			}else{
 				setOfflineFeed(mLongFeedId,true);
+				item.setChecked(true);
 			}
 			break;
 		}

@@ -84,7 +84,7 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 		titel = context.getResources().getString(R.string.favorites);
 		mListeNavDrawerEntries.add(new NavDrawerLineEntry(bitmapDrawable, titel, R.id.menu_favorites));
 		
-		mListeNavDrawerEntries.add(new NavDrawerLineEntry(null, "", R.id.menu_overview));
+//		mListeNavDrawerEntries.add(new NavDrawerLineEntry(null, "", R.id.menu_overview));
 		
 		Cursor cursor;
 		cursor = context.getContentResolver().query(FeedData.FeedColumns.CONTENT_URI, null, null, null, null);

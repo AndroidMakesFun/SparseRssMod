@@ -255,12 +255,12 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	}
 	
 	private static int mFeedFilter=1;
-	private static String mSelection=null;
+	private static String mSelectionFilter=null;
 	/**
 	 * readdate is null AND _id in (1,2,3) 
 	 */
-	public String getSelection(){
-		return mSelection;
+	public String getSelectionFilter(){
+		return mSelectionFilter;
 	}
 	
 	private static Cursor createManagedCursor(Activity context, Uri uri, boolean showRead, int iFeedFilter) {
@@ -281,7 +281,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 				selection += " AND _id in (" + ret + ")";
 			}
 		}
-		mSelection=selection;
+		mSelectionFilter=selection;
 		return context.managedQuery(uri, null, selection, null,str);
 	}
 	

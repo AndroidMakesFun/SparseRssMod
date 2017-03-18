@@ -42,12 +42,6 @@
             android:layout_height="wrap_content"
             android:text="@string/refreshonwifionly" />
 
-        <CheckBox
-	        android:layout_margin="5dp"
-            android:id="@+id/synccheckbox"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/offline" />
         
         <Spinner
 	        android:layout_margin="10dp"
@@ -55,19 +49,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawSelectorOnTop="true" />
-
+<!-- 
         <CheckBox
 	        android:layout_margin="5dp"
             android:id="@+id/cardviewcheckbox"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Card View" />
+ -->            
         <CheckBox
 	        android:layout_margin="5dp"
             android:id="@+id/topfeedcheckbox"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/topfeeds" />
+        
+        <CheckBox
+	        android:layout_margin="5dp"
+            android:id="@+id/synccheckbox"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/offline" />
+        
         </LinearLayout>
 
 </ScrollView>
