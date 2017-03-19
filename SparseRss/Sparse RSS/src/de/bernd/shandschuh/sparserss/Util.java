@@ -158,6 +158,9 @@ public class Util {
 	 * boolean per feed to load and show a Background Cover
 	 */
 	public static boolean showCover(Context context, String feedid) {
+		if(!showPics(context)){
+			return false;
+		}
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		boolean ret = prefs.getBoolean(SETTINGS_SHOW_COVER + feedid, true);
 		return ret;

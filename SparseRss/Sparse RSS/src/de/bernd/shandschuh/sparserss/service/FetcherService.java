@@ -27,6 +27,7 @@ package de.bernd.shandschuh.sparserss.service;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -216,6 +217,19 @@ public class FetcherService extends IntentService {
 			}
 			cursor.close();
 		}
+		
+		// Del old Pics
+		File[] files = Util.getImageFolderFile(getBaseContext()).listFiles();
+		if(files!=null){
+			Date today = new Date();
+			long lastWeek = today.getTime() - 604800000l; // 1000* 60*60*24*7 = 7 Tage
+			for (int i = 0; i < files.length; i++) {
+				File f=files[i];
+				if(f.lastModified() < lastWeek){
+					f.delete();
+				}
+			}
+		}
 	}
 
 	public static final String FULLTEXTISNULL = "fulltext is null";
@@ -223,6 +237,7 @@ public class FetcherService extends IntentService {
 	public static final String[] ENTRY_UPDATE_PROJECTION = { BaseColumns._ID, FeedData.EntryColumns.LINK, FeedData.EntryColumns.ABSTRACT};
 	public static final String sortOrder="_id DESC"; // neueste zuerst
 
+	
 	public void myFetchFullHtml(int feedId) {
 		Cursor cursor;
 		
@@ -234,6 +249,8 @@ public class FetcherService extends IntentService {
 		
 		HtmlFetcher fetcher2 = new HtmlFetcher();
 		fetcher2.setMaxTextLength(50000);
+		
+		boolean showCover = Util.showCover(this, ""+feedId);
 
 		while (cursor.isAfterLast() == false) {
 			String id = cursor.getString(0);
@@ -253,7 +270,7 @@ public class FetcherService extends IntentService {
 					Uri updateUri = ContentUris.withAppendedId(parentUri,Long.parseLong(id));
 					FetcherService.this.getContentResolver().update(updateUri, values, null, null);
 				}
-				if(imageUrl!=null && !"".equals(imageUrl) && imageUrl.endsWith(".jpg")){
+				if(showCover && imageUrl!=null && !"".equals(imageUrl) && imageUrl.toLowerCase().endsWith(".jpg")){
 					try {
 						String pathToImage=mImageFolder + "/" + id + "_cover.jpg";
 						byte[] data = FetcherService.getBytes(new URL(imageUrl).openStream());

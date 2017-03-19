@@ -74,7 +74,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 	EntryPagerAdapter mEntryPagerAdapter;	
 	
-	boolean showPics; 	// Prefs Bilder laden und anzeigen
+	boolean showPics; 	// Prefs Bilder laden und anzeigen -> für Adapter
 	boolean showCover; 	// Prefs Cover laden und anzeigen
 
 	@Override
@@ -131,9 +131,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
 		showPics = Util.showPics(this);
 		showCover = Util.showCover(this, ""+feedId);
-		if(!showPics){
-			showCover=false;
-		}
+
 		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege);
 		
 		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
