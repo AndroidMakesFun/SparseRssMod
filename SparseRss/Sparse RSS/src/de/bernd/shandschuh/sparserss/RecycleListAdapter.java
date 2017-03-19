@@ -25,9 +25,14 @@
 
 package de.bernd.shandschuh.sparserss;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -44,6 +49,8 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
+import de.jetwick.snacktory.ArticleTextExtractor;
+import de.jetwick.snacktory.JResult;
 
 public class RecycleListAdapter extends EntriesListAdapter {
 
@@ -60,7 +67,8 @@ public class RecycleListAdapter extends EntriesListAdapter {
 			textView.setTextColor(Color.BLACK);
 		}
 
-		textView.setText(cursor.getString(titleColumnPosition));
+		String strTitle=cursor.getString(titleColumnPosition);
+		textView.setText(strTitle);
 		float fsize=15.0f;
 		textView.setTextSize(fsize); // etwas größer
 
@@ -68,15 +76,32 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		
 		final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
 		
+		
 		TextView feedTextView = (TextView) view.findViewById(R.id.text3);
-		String str=cursor.getString(abstractColumnPosition);
+		String strAbstract=cursor.getString(abstractColumnPosition);
 		int cut=200;
-		if(str!=null && str.length()>cut){
-			str=str.substring(0, cut);
+		String linkGrafik=null;
+		if(strAbstract==null){
+			strAbstract=cursor.getString(fulltextColumnPosition);
 		}
-		feedTextView.setText(str);
-		
-		
+		if(strAbstract!=null){
+			if(strAbstract.startsWith("<")){
+				try {
+					JResult result = new ArticleTextExtractor().extractContent(strAbstract, true);
+					linkGrafik=result.getImageUrl();
+					if(linkGrafik==null || "".equals(linkGrafik)){
+						linkGrafik=takeFirstSrc(strAbstract);
+					}
+					strAbstract=result.getText();
+				} catch (Exception e) {
+					System.err.println("Err Extracting " + strTitle + " " + e);
+				}
+			}
+			if(strAbstract.length()>cut){
+				strAbstract=strAbstract.substring(0, cut);
+			}
+			feedTextView.setText(strAbstract);
+		}
 		
 		final long id = cursor.getLong(idColumn);
 		
@@ -161,5 +186,44 @@ public class RecycleListAdapter extends EntriesListAdapter {
 			textView.setEnabled(false);
 			dateTextView.setEnabled(false);
 		}
+		
+		final ImageView coverView = (ImageView) view.findViewById(R.id.coverimage);
+		String mImageFolder = Util.getImageFolderFile(context).toString();
+		String pathToImage = mImageFolder + "/" + id + "_cover.jpg";
+//		Drawable d = Drawable.createFromPath(pathToImage);
+		File imageFile = new File(pathToImage);
+		if(imageFile.exists()){
+			BitmapImageViewTarget roundedImageTarget = Util.getRoundedImageTarget(context, coverView, 30.0f);
+			Glide.with(context).load(imageFile).asBitmap().centerCrop().into(roundedImageTarget);
+//			Glide.with(context).load(imageFile).centerCrop().into(coverView);
+		}else {
+			if (linkGrafik==null){
+				linkGrafik=cursor.getString(grafikLinkColumn);				
+			}
+			if (linkGrafik!=null){
+				try {
+					URL url = new URL(linkGrafik);
+					BitmapImageViewTarget roundedImageTarget = Util.getRoundedImageTarget(context, coverView, 30.0f);
+					Glide.with(context).load(url).asBitmap().centerCrop().into(roundedImageTarget);
+				} catch (Exception e) {
+					System.err.println("Err Loading dierect " + linkGrafik);
+				}
+			}
+		}
+	}
+
+	private String takeFirstSrc(String strHtml) {
+		if(strHtml!=null && !"".equals(strHtml)){
+			int pos = strHtml.indexOf("src=\"");
+			if(pos>0){
+				pos+=5;
+				int posEnd=strHtml.indexOf("\"", pos);
+				if(posEnd>-1){
+					String url=strHtml.substring(pos,posEnd);
+					return url;
+				}
+			}
+		}
+		return null;
 	}
 }

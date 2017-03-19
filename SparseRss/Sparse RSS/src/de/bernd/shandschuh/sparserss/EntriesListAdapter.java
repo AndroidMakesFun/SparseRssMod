@@ -77,6 +77,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	protected int feedNameColumn;
 	
 	protected int linkColumn;
+	protected int grafikLinkColumn;
 	
 	public static final String SQLREAD = "length(readdate) ASC, ";
 	
@@ -124,6 +125,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		favoriteColumn = cursor.getColumnIndex(FeedData.EntryColumns.FAVORITE);
 		idColumn = cursor.getColumnIndex(FeedData.EntryColumns._ID);
 		linkColumn = cursor.getColumnIndex(FeedData.EntryColumns.LINK);
+		grafikLinkColumn = cursor.getColumnIndex(FeedData.EntryColumns.GRAFIKLINK);
 		this.showFeedInfo = showFeedInfo;
 		if (showFeedInfo) {
 			feedIconColumn = cursor.getColumnIndex(FeedData.FeedColumns.ICON);

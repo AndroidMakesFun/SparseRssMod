@@ -106,7 +106,10 @@ public class ArticleTextExtractor {
         return extractContent(new JResult(), doc, formatter);
     }
 
-    public JResult extractContent(String html) throws Exception {
+    boolean bahClean=false;
+    
+    public JResult extractContent(String html, boolean bahClean) throws Exception {
+    	this.bahClean=bahClean;
         return extractContent(new JResult(), html);
     }
 
@@ -161,7 +164,13 @@ public class ArticleTextExtractor {
             // clean before grabbing text
 //            String text = formatter.getFormattedText(bestMatchElement);
             formatter.removeNodesWithoutScore(bestMatchElement); // bah
-            String text = bestMatchElement.toString();
+            
+            String text;
+            if(bahClean){
+            	text = formatter.getFormattedText(bestMatchElement);
+            }else{
+            	text = bestMatchElement.toString();
+            }
             
             text = removeTitleFromText(text, res.getTitle());
             // this fails for short facebook post and probably tweets: text.length() > res.getDescription().length()

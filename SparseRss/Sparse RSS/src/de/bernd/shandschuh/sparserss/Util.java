@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -24,8 +25,9 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.widget.ImageView;
 import android.widget.Toast;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
@@ -111,7 +113,8 @@ public class Util {
 	private static File imageFolder = null;
 
 	/**
-	 * /storage/emulated/0/Android/data/de.bernd.shandschuh.sparserss/files/images
+	 * /storage/emulated/0/Android/data/de.bernd.shandschuh.sparserss/files/
+	 * images
 	 */
 	public static File getImageFolderFile(Context context) {
 		if (imageFolder != null) {
@@ -158,7 +161,7 @@ public class Util {
 	 * boolean per feed to load and show a Background Cover
 	 */
 	public static boolean showCover(Context context, String feedid) {
-		if(!showPics(context)){
+		if (!showPics(context)) {
 			return false;
 		}
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -239,8 +242,9 @@ public class Util {
 		paint.setAntiAlias(true);
 		canvas.drawARGB(0, 0, 0, 0);
 		paint.setColor(color);
-//		canvas.drawRoundRect(rectF, roundPx, roundPx, paint); //getRoundedCornerBitmap
-		canvas.drawOval(rectF, paint);	// getRoundedBitmap
+		// canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+		// //getRoundedCornerBitmap
+		canvas.drawOval(rectF, paint); // getRoundedBitmap
 
 		paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
 		canvas.drawBitmap(bitmap, rect, rect, paint);
@@ -278,6 +282,21 @@ public class Util {
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(SETTINGS_SHOW_BOTTOM_BAR, value);
 		editor.commit();
+	}
+
+	
+	public static BitmapImageViewTarget getRoundedImageTarget(final Context context, final ImageView imageView,
+			final float radius) {
+		
+		return new BitmapImageViewTarget(imageView) {
+			@Override
+			protected void setResource(final Bitmap resource) {
+				RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory
+						.create(context.getResources(), resource);
+				circularBitmapDrawable.setCornerRadius(radius);
+				imageView.setImageDrawable(circularBitmapDrawable);
+			}
+		};
 	}
 
 }
