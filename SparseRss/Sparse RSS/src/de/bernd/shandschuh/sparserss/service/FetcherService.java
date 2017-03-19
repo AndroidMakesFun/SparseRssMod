@@ -28,6 +28,7 @@ package de.bernd.shandschuh.sparserss.service;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -110,6 +111,8 @@ public class FetcherService extends IntentService {
 	private static SharedPreferences preferences = null;
 	
 	private static Proxy proxy;
+	
+	private String mImageFolder=null; 
 	
 	public FetcherService() {
 		super(SERVICENAME);
@@ -196,6 +199,8 @@ public class FetcherService extends IntentService {
 			}//newCount
 			
 			System.out.println("****** LADE IM BACKEND  ****");
+			mImageFolder = Util.getImageFolderFile(FetcherService.this).toString();
+
 			String[] SYNC_PROJECTION = { BaseColumns._ID, FeedData.FeedColumns.SYNC };
 			Cursor cursor = FetcherService.this.getContentResolver().query(FeedData.FeedColumns.CONTENT_URI , SYNC_PROJECTION, null, null, null);
 			cursor.moveToFirst();
@@ -247,6 +252,17 @@ public class FetcherService extends IntentService {
 					ContentValues values = FeedDataContentProvider.createContentValuesForFulltext(text, imageUrl);
 					Uri updateUri = ContentUris.withAppendedId(parentUri,Long.parseLong(id));
 					FetcherService.this.getContentResolver().update(updateUri, values, null, null);
+				}
+				if(imageUrl!=null && !"".equals(imageUrl) && imageUrl.endsWith(".jpg")){
+					try {
+						String pathToImage=mImageFolder + "/" + id + "_cover.jpg";
+						byte[] data = FetcherService.getBytes(new URL(imageUrl).openStream());
+						FileOutputStream fos = new FileOutputStream(pathToImage);
+						fos.write(data);
+						fos.close();
+					} catch (Exception e) {
+						System.err.println("Err getting image " + imageUrl + " " + e);
+					}
 				}
 			} catch (Exception e) {
 				String str="Err Sync Fulltext " + e;

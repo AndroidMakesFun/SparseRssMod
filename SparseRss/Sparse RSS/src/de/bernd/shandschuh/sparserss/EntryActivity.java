@@ -691,5 +691,17 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 		mEntryPagerAdapter.notifyDataSetChanged();
 	}
 
+	/**
+	 * ret false wenn !showPics !showCoder !linkGrafilk
+	 */
+	public boolean shouldShowCover(DtoEntry dto){
+		if(!showCover){
+			return false;
+		}
+		if (dto.linkGrafik != null && !"".equals(dto.linkGrafik)) {
+			return true;
+		}
+		return false;
+	}
 
 }

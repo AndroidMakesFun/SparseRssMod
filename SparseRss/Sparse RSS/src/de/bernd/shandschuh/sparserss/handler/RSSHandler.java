@@ -552,7 +552,9 @@ public class RSSHandler extends DefaultHandler {
 								
 								byte[] data = FetcherService.getBytes(new URL(images.get(n)).openStream());
 								
-								FileOutputStream fos = new FileOutputStream(new StringBuilder(Util.getImageFolderFile(context).toString()).append("/").append(entryId).append(Strings.IMAGEFILE_IDSEPARATOR).append(match.substring(match.lastIndexOf('/')+1)).toString());
+								FileOutputStream fos = new FileOutputStream(new StringBuilder(Util.getImageFolderFile(context).toString())
+										.append("/").append(entryId).append(Strings.IMAGEFILE_IDSEPARATOR)
+										.append(match.substring(match.lastIndexOf('/')+1)).toString());
 								
 								fos.write(data);
 								fos.close();

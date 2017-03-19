@@ -110,6 +110,9 @@ public class Util {
 
 	private static File imageFolder = null;
 
+	/**
+	 * /storage/emulated/0/Android/data/de.bernd.shandschuh.sparserss/files/images
+	 */
 	public static File getImageFolderFile(Context context) {
 		if (imageFolder != null) {
 			return imageFolder;
