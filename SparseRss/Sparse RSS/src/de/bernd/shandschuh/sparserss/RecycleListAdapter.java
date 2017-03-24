@@ -90,7 +90,7 @@ public class RecycleListAdapter extends EntriesListAdapter {
 					JResult result = new ArticleTextExtractor().extractContent(strAbstract, true);
 					linkGrafik=result.getImageUrl();
 					if(linkGrafik==null || "".equals(linkGrafik)){
-						linkGrafik=takeFirstSrc(strAbstract);
+						linkGrafik=Util.takeFirstSrc(strAbstract);
 					}
 					strAbstract=result.getText();
 				} catch (Exception e) {
@@ -101,6 +101,8 @@ public class RecycleListAdapter extends EntriesListAdapter {
 				strAbstract=strAbstract.substring(0, cut);
 			}
 			feedTextView.setText(strAbstract);
+			
+			feedTextView.setVisibility(View.GONE);
 		}
 		
 		final long id = cursor.getLong(idColumn);
@@ -211,19 +213,5 @@ public class RecycleListAdapter extends EntriesListAdapter {
 			}
 		}
 	}
-
-	private String takeFirstSrc(String strHtml) {
-		if(strHtml!=null && !"".equals(strHtml)){
-			int pos = strHtml.indexOf("src=\"");
-			if(pos>0){
-				pos+=5;
-				int posEnd=strHtml.indexOf("\"", pos);
-				if(posEnd>-1){
-					String url=strHtml.substring(pos,posEnd);
-					return url;
-				}
-			}
-		}
-		return null;
-	}
+	
 }

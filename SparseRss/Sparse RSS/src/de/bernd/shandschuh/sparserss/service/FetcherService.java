@@ -257,14 +257,18 @@ public class FetcherService extends IntentService {
 			String link = cursor.getString(1);
 			String rssText = cursor.getString(2);
 			System.out.println(id + " " + link);
+			String imageUrl = null;
 			int rssLen=0;
 			if(rssText!=null){
 				rssLen=rssText.length();
+				imageUrl = Util.takeFirstSrc(rssText);
 			}
 			try {
 				JResult res = fetcher2.fetchAndExtract(link, 10000, true);
 				String text = res.getText();
-				String imageUrl = res.getImageUrl();
+				if(imageUrl==null){
+					imageUrl = res.getImageUrl();
+				}
 				if(text!=null && text.length()>rssLen){
 					ContentValues values = FeedDataContentProvider.createContentValuesForFulltext(text, imageUrl);
 					Uri updateUri = ContentUris.withAppendedId(parentUri,Long.parseLong(id));

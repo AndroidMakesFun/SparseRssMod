@@ -244,6 +244,12 @@ public class EntryPagerAdapter extends PagerAdapter {
 			String abstractText = entryCursor.getString(abstractPosition);
 			String fullText = entryCursor.getString(fulltextPosition);
 
+			String linkGrafik = entryCursor.getString(grafikPosition);
+			dto.linkGrafik = linkGrafik;
+			if (dto.linkGrafik==null && abstractText != null){
+				dto.linkGrafik = Util.takeFirstSrc(abstractText);
+			}
+
 			if (fullText != null) {
 				// eigentlich reicht dann fullText
 				if (abstractText == null || fullText.length() > abstractText.length()) {
@@ -253,8 +259,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 			} else {
 				dto.text = abstractText;
 			}
-			String linkGrafik = entryCursor.getString(grafikPosition);
-			dto.linkGrafik = linkGrafik;
 
 			if (!mContext.showPics) {
 				// webview Block Images scheint nicht zu ziehen...
@@ -628,10 +632,12 @@ public class EntryPagerAdapter extends PagerAdapter {
 		JResult res = fetcher2.fetchAndExtract(dto.link, 10000, true);
 		String text = res.getText();
 		// String title = res.getTitle();
-		String imageUrl = res.getImageUrl();
 
-		if (imageUrl != null && !"".equals(imageUrl) && !imageUrl.contains("leer.") && !imageUrl.contains("empty.")) {
-			dto.linkGrafik = imageUrl;
+		if(dto.linkGrafik==null){ // ggf. schon oben aus RSS gelsesen
+			String imageUrl = res.getImageUrl();
+			if (imageUrl != null && !"".equals(imageUrl) && !imageUrl.contains("leer.") && !imageUrl.contains("empty.")) {
+				dto.linkGrafik = imageUrl;
+			}
 		}
 
 		if (text != null) {

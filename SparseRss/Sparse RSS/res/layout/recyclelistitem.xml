@@ -20,6 +20,7 @@
         <RelativeLayout
         android:paddingLeft="5dp"
         android:paddingTop="3dp"
+	        android:paddingBottom="3dp"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
 
