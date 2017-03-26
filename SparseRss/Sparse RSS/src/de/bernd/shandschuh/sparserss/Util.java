@@ -310,6 +310,16 @@ public class Util {
 					return url;
 				}
 			}
+			// src auch ohne "
+			pos = strHtml.indexOf("src=");
+			if(pos>0){
+				pos+=4;
+				int posEnd=strHtml.indexOf(" ", pos);
+				if(posEnd>-1){
+					String url=strHtml.substring(pos,posEnd);
+					return url;
+				}
+			}
 		}
 		return null;
 	}

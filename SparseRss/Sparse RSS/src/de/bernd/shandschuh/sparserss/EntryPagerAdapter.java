@@ -634,9 +634,16 @@ public class EntryPagerAdapter extends PagerAdapter {
 		// String title = res.getTitle();
 
 		if(dto.linkGrafik==null){ // ggf. schon oben aus RSS gelsesen
-			String imageUrl = res.getImageUrl();
-			if (imageUrl != null && !"".equals(imageUrl) && !imageUrl.contains("leer.") && !imageUrl.contains("empty.")) {
-				dto.linkGrafik = imageUrl;
+
+			// nochmal RSS bevorzugen
+			if (dto.text!=null && dto.text.startsWith("<")){
+				dto.linkGrafik = Util.takeFirstSrc(dto.text);
+			}
+			if(dto.linkGrafik==null){
+				String imageUrl = res.getImageUrl();
+				if (imageUrl != null && !"".equals(imageUrl) && !imageUrl.contains("leer.") && !imageUrl.contains("empty.")) {
+					dto.linkGrafik = imageUrl;
+				}
 			}
 		}
 
