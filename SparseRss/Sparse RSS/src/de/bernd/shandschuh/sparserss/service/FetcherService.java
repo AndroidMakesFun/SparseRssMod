@@ -222,7 +222,8 @@ public class FetcherService extends IntentService {
 		File[] files = Util.getImageFolderFile(getBaseContext()).listFiles();
 		if(files!=null){
 			Date today = new Date();
-			long lastWeek = today.getTime() - 604800000l; // 1000* 60*60*24*7 = 7 Tage
+//			long lastWeek = today.getTime() - 604800000l; // 1000* 60*60*24*7 = 7 Tage
+			long lastWeek = today.getTime() - 259200000l; // 1000* 60*60*24*3 = 3 Tage
 			for (int i = 0; i < files.length; i++) {
 				File f=files[i];
 				if(f.lastModified() < lastWeek){
