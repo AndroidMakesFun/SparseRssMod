@@ -262,7 +262,9 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 			if (!mContext.showPics) {
 				// webview Block Images scheint nicht zu ziehen...
-				dto.text = dto.text.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
+				if(dto.text!=null){
+					dto.text = dto.text.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
+				}
 			}
 			dto.text += "<br><br>"; // Verschieben zur Anzeige !!
 
