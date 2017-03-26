@@ -108,8 +108,17 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	protected int buttonSize;
 	protected int densityDpi;
 	
-	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout, int iFeedFilter) {
-		super(context, layout, createManagedCursor(context, uri, true, iFeedFilter), autoreload);
+	/**
+	 * @param context EntriesListActivity / RecycleListActivity
+	 * @param uri irgentwas mit entries
+	 * @param showFeedInfo	per EXTRA_SHOWFEEDINFO
+	 * @param autoreload per EXTRA_AUTORELOAD
+	 * @param layout R.layout.entrylistitem oder R.layout.recyclelistitem
+	 * @param iFeedFilter per EXTRA_SHOWFEEDFILTER
+	 * @param bResetSearchFilter true im cons für createManagedCursor()
+	 */
+	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout, int iFeedFilter, boolean bResetSearchFilter) {
+		super(context, layout, createManagedCursor(context, uri, true, iFeedFilter, bResetSearchFilter), autoreload);
 
 		showRead = true;
 		this.uri = uri;
@@ -244,10 +253,28 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		}
 	}
 
+	private static String mSearchFilter=null;
+
+	/**
+	 * SearchFilter, umsetzung ähnlich showRead(boolean)
+	 */
+	public void filter(String filter) {
+		if(filter==null || "".equals(filter)){
+			mSearchFilter=null;
+		}else{
+			mSearchFilter=filter.toLowerCase();
+//			mSearchFilter=EntryColumns.TITLE + " REGEXP '.*" + filter.toLowerCase() + ".*' COLLATE NOCASE";  // +COLLATE NOCASE
+			mSearchFilter=EntryColumns.TITLE + " REGEXP '(?i).*" + filter + ".*'";
+		}
+//		notifyDataSetChanged();
+		mActivity.stopManagingCursor(getCursor());
+		changeCursor(createManagedCursor(mActivity, uri, showRead, mFeedFilter, false));
+	}
+	
 	public void showRead(boolean showRead) {
 		if (showRead != this.showRead) {
 			mActivity.stopManagingCursor(getCursor());
-			changeCursor(createManagedCursor(mActivity, uri, showRead, mFeedFilter));
+			changeCursor(createManagedCursor(mActivity, uri, showRead, mFeedFilter, false));
 			this.showRead = showRead;
 		}
 	}
@@ -265,7 +292,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		return mSelectionFilter;
 	}
 	
-	private static Cursor createManagedCursor(Activity context, Uri uri, boolean showRead, int iFeedFilter) {
+	private static Cursor createManagedCursor(Activity context, Uri uri, boolean showRead, int iFeedFilter, boolean bResetSearchFilter) {
 		String str=new StringBuilder(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_PRIORITIZE, false) ? SQLREAD : Strings.EMPTY).append(FeedData.EntryColumns.DATE).append(Strings.DB_DESC).toString();
 		mActivity = context;
 
@@ -281,6 +308,16 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 				selection=EntryColumns.FEED_ID + " in (" + ret + ")";
 			}else{
 				selection += " AND _id in (" + ret + ")";
+			}
+		}
+		if(bResetSearchFilter){
+			mSearchFilter=null;
+		}
+		if(mSearchFilter!=null){
+			if(selection == null){
+				selection=mSearchFilter;
+			}else{
+				selection= selection + " AND " + mSearchFilter;
 			}
 		}
 		mSelectionFilter=selection;
@@ -354,4 +391,6 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		}
 		return 0;
 	}
+	
+
 }

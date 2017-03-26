@@ -35,7 +35,7 @@ public class EntriesListActivity extends ParentActivity {
 		boolean bShowFeedInfo = getIntent().getBooleanExtra(EXTRA_SHOWFEEDINFO, false);
 		boolean bAutoreload = getIntent().getBooleanExtra(EXTRA_AUTORELOAD, false);
 		int iFeedFilter=getIntent().getIntExtra(EntriesListActivity.EXTRA_SHOWFEEDFILTER, EntriesListActivity.EXTRA_FILTER_ALL);
-		mAdapter = new EntriesListAdapter(this, uri, bShowFeedInfo, bAutoreload, R.layout.entrylistitem, iFeedFilter);
+		mAdapter = new EntriesListAdapter(this, uri, bShowFeedInfo, bAutoreload, R.layout.entrylistitem, iFeedFilter, true);
 	}
 
 }

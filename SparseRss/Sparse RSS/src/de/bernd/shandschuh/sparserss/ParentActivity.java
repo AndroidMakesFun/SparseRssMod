@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
@@ -264,12 +265,13 @@ public class ParentActivity extends AppCompatActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
+		getMenuInflater().inflate(R.menu.entrylist, menu);
+		
 		// Menues in die Toolbar, SHOW_AS_ACTION_ALWAYS zieht nur hier
 		MenuItem markAsRead = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
 		MenuItemCompat.setShowAsAction(markAsRead, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 		markAsRead.setIcon(android.R.drawable.ic_menu_revert);
 
-		getMenuInflater().inflate(R.menu.entrylist, menu);
 		MenuItem item = menu.findItem(R.id.menu_cardview);
 		if (item != null) {
 			if (Util.getTestListPrefs(getApplicationContext())) {
@@ -294,8 +296,27 @@ public class ParentActivity extends AppCompatActivity {
 				itemOffline.setChecked(false);
 			}
 		}
+		
+		SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+		searchView.setOnQueryTextListener(mOnQueryTextListener);
+		searchView.setQueryHint(this.getString(R.string.action_bar_search));
+		
 		return true;
 	}
+
+	private final SearchView.OnQueryTextListener mOnQueryTextListener = new SearchView.OnQueryTextListener() {
+		@Override
+		public boolean onQueryTextChange(String newText) {
+			mAdapter.filter(newText);
+			return true;
+		}
+
+		@Override
+		public boolean onQueryTextSubmit(String query) {
+			mAdapter.filter(query);
+			return true;
+		}
+	};
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {

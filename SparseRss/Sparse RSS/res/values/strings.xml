@@ -187,6 +187,9 @@
     <string name="message_exportedto">Exported into %s.</string>
     <string name="dialog_licenseagreement">License</string>
     <string name="dialog_hint">Hint</string>
+    
+    <string name="action_bar_search">Search</string>
+    
 
     <string-array name="settings_intervals">
         <item>1 minute</item>

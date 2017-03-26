@@ -26,7 +26,6 @@
 package de.bernd.shandschuh.sparserss;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 
@@ -57,7 +56,7 @@ public class RecycleListAdapter extends EntriesListAdapter {
 	
 	
 	public RecycleListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout, int iFeedFilter) {
-		super(context, uri,showFeedInfo, autoreload,layout, iFeedFilter);
+		super(context, uri,showFeedInfo, autoreload,layout, iFeedFilter, true);
 	}
 
 	@Override
