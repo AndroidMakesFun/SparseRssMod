@@ -155,8 +155,8 @@
     <string name="select_feeds">Select feeds</string>
     <string name="all_feeds">All feeds (incl. future)</string>
     <string name="all">All</string>
-    <string name="topfeeds">Top Feeds</string>
-    <string name="offline">Offline Feeds</string>
+    <string name="topfeeds">Top Feed</string>
+    <string name="offline">Offline Feed</string>
     <string name="overview">Overview</string>
     <string name="kb">kb</string>
     <string name="error_feederror">The Feed URL could not accessed.</string>
