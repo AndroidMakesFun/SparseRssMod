@@ -257,7 +257,11 @@ public class EntryPagerAdapter extends PagerAdapter {
 					dto.isFulltext = true;
 				}
 			} else {
-				dto.text = abstractText;
+				if(abstractText==null){
+					dto.text = "";
+				}else{
+					dto.text = abstractText;
+				}
 			}
 
 			if (!mContext.showPics) {
