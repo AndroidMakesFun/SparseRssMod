@@ -2,10 +2,9 @@ Changelog - Sparse RSS Mod
 ==========================
 
 2.30
-* Change to 
-  targetSdkVersion 27 Oreo
-  Android Support Lib 27.0.2
-  Android Studio
+* targetSdkVersion 27 Oreo
+* Android Support Lib 27.0.2
+* Android Studio
 
 2.25
 * Share Entry e.g. as eMail
