@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <group android:id="@+id/menu_group_0" >
+        <item
+            android:id="@+id/menu_addfeed"
+            android:icon="@android:drawable/ic_menu_add"
+            android:showAsAction="always"
+            android:title="@string/menu_addfeed"
+            android:visible="false"/>
+        <item
+            android:id="@+id/menu_refresh"
+            android:icon="@android:drawable/ic_menu_rotate"
+            android:showAsAction="always"
+            android:title="@string/menu_refresh"
+            android:visible="false"/>
+    </group>
+
+    <item
+        android:id="@+id/menu_markasread"
+        android:icon="@android:drawable/ic_menu_revert"
+        android:showAsAction="ifRoom"
+        android:title="@string/contextmenu_markasread"/>
+    <item
+        android:id="@+id/menu_alle_top_feeds"
+        android:title="@string/topfeeds"/>
+    <item
+        android:id="@+id/menu_alle_offline"
+        android:title="@string/offline"/>
+    
+</menu>
