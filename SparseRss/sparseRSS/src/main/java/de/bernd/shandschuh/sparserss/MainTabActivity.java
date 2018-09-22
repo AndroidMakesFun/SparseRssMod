@@ -57,6 +57,9 @@ import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
 
+/**
+ * DEAD Code - to Delete !
+ */
 public class MainTabActivity extends TabActivity {
 	private static final int DIALOG_LICENSEAGREEMENT = 0;
 	

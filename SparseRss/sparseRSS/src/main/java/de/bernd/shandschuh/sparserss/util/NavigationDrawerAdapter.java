@@ -47,7 +47,11 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 		
 		Drawable drawable;
 		String titel;
-		drawable = context.getResources().getDrawable( R.drawable.ic_arrow_back_grey600_36dp);
+		if(Util.isLightTheme(context)){
+			drawable = context.getResources().getDrawable( R.drawable.ic_arrow_left_light);
+		}else{
+			drawable = context.getResources().getDrawable( R.drawable.ic_arrow_left_dark);
+		}
 		titel = "Sparse rss Mod";
 		mListeNavDrawerEntries.add(new NavDrawerLineEntry(drawable, titel, R.id.menu_overview)); //  R.id.cancel_action));
 		

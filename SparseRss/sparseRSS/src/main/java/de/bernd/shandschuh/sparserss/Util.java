@@ -324,4 +324,30 @@ public class Util {
 		return null;
 	}
 
+
+	public static final String PREFERENCE_BROWSER_PACKAGE= "PREFERENCE_BROWSER_PACKAGE";
+
+	/**
+	 * @param wert as package from browser
+	 */
+	public static void setBrowserPackagePrefs(Context context, String wert) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putString(PREFERENCE_BROWSER_PACKAGE, wert);
+		editor.commit();
+	}
+
+	/**
+	 * Letzte auswahl aus popup_menu_browser
+	 * @param context
+	 * @return
+	 * 0 default/system browser null
+	 * 1 chrome "com.android.chrome"
+	 * 2 edge "com.microsoft.emmx"
+	 * 3 firefox klar "org.mozilla.klar"
+	 */
+	public static String getBrowserPackagePrefs(Context context) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		return prefs.getString(PREFERENCE_BROWSER_PACKAGE,null);
+	}
 }

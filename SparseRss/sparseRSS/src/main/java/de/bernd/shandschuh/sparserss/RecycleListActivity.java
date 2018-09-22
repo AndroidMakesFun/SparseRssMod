@@ -1,10 +1,16 @@
 package de.bernd.shandschuh.sparserss;
 
+/**
+ * Card View
+ */
 public class RecycleListActivity extends ParentActivity {
 
 
 	public void mySetContentView() {
 		setContentView(R.layout.activity_recycle_list);
+		if (!Util.isLightTheme(this)) {
+
+		}
 	}
 	protected void createAdapter(){
 		

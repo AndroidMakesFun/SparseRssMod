@@ -93,6 +93,8 @@ public class ParentActivity extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		int col=0xFF737373;
+		toolbar.setTitleTextColor(col);
 
 		mLongFeedId = intent.getLongExtra(FeedData.FeedColumns._ID, 0);
 

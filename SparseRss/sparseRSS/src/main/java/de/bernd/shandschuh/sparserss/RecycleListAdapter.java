@@ -25,14 +25,6 @@
 
 package de.bernd.shandschuh.sparserss;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Date;
-
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
-
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -43,10 +35,20 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.support.v7.widget.CardView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Date;
+
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.jetwick.snacktory.ArticleTextExtractor;
 import de.jetwick.snacktory.JResult;
@@ -64,6 +66,9 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
 		if (Util.isLightTheme(context)) {
 			textView.setTextColor(Color.BLACK);
+		}else{
+			// CardView cardView=view.findViewById(R.id.card_view);
+			//cardView.setCardBackgroundColor(Color.BLACK);
 		}
 
 		String strTitle=cursor.getString(titleColumnPosition);
@@ -177,17 +182,23 @@ public class RecycleListAdapter extends EntriesListAdapter {
 			textView.setText(cursor.getString(titleColumnPosition));
 			dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)));
 		}
-		
+
+		//int colDarkGrey=0xFF737373;
+		int colGrey=0xFF999999;
 		if (forcedState == STATE_ALLUNREAD && !markedAsRead.contains(id) || (forcedState != STATE_ALLREAD && cursor.isNull(readDateColumn) && !markedAsRead.contains(id)) || markedAsUnread.contains(id)) {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
 			dateTextView.setEnabled(true);
+			dateTextView.setTextColor(colGrey);
+			//textView.setTextColor(colGrey);
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
 			dateTextView.setEnabled(false);
+			//dateTextView.setTextColor(colDarkGrey);
+			//textView.setTextColor(colDarkGrey);
 		}
-		
+
 		final ImageView coverView = (ImageView) view.findViewById(R.id.coverimage);
 		String mImageFolder = Util.getImageFolderFile(context).toString();
 		String pathToImage = mImageFolder + "/" + id + "_cover.jpg";

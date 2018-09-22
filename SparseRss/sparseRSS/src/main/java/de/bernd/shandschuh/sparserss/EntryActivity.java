@@ -1,18 +1,18 @@
 /**
  * Sparse rss
- *
+ * <p>
  * Copyright (c) 2010-2012 Stefan Handschuh
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
  */
 
 package de.bernd.shandschuh.sparserss;
@@ -55,651 +54,732 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
 import de.bernd.shandschuh.sparserss.EntryPagerAdapter.DtoEntry;
 import de.jetwick.snacktory.OutputFormatter;
 
 public class EntryActivity extends AppCompatActivity implements android.widget.SeekBar.OnSeekBarChangeListener {
 
-	public static final int AUFRUFART_FEED = 0;
-	public static final int AUFRUFART_BROWSER = 1;
-	public static final int AUFRUFART_MOBILIZE = 2;
-	public static final int AUFRUFART_INSTAPAPER = 3;
-	public static final int AUFRUFART_READABILITY = 4;
-	public static final int AUFRUFART_AMP = 5;
-	public static final int AUFRUFART_GOOGLEWEBLIGHT = 6; // Leiche ?
-	private static final int AUFRUFART_WEBVIEW = 6; // Leiche ?
+    public static final int AUFRUFART_FEED = 0;
+    public static final int AUFRUFART_BROWSER = 1;
+    public static final int AUFRUFART_MOBILIZE = 2;
+    public static final int AUFRUFART_INSTAPAPER = 3;
+    public static final int AUFRUFART_READABILITY = 4;
+    public static final int AUFRUFART_AMP = 5;
+    public static final int AUFRUFART_GOOGLEWEBLIGHT = 6; // Leiche ?
+    private static final int AUFRUFART_WEBVIEW = 6; // Leiche ?
 
-	private int mAufrufart = 0;
-	private EntryActivity mActivity = null;
+    private int mAufrufart = 0;
+    private EntryActivity mActivity = null;
 
-	EntryPagerAdapter mEntryPagerAdapter;	
-	
-	boolean showPics; 	// Prefs Bilder laden und anzeigen -> f?r Adapter
-	boolean showCover; 	// Prefs Cover laden und anzeigen
+    EntryPagerAdapter mEntryPagerAdapter;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		if (Util.isLightTheme(this)) {
-			setTheme(R.style.MyTheme_Light);
-		}
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.entry);
-		mActivity = this;
-		
-		Uri mUri = mActivity.getIntent().getData(); // aus EntriesListActivity
-		
-		String sFeedId=mUri.getPath();
-		int pos=sFeedId.indexOf("/feeds/");
-		if (pos>-1){
-			pos+=7;
-			int ende=sFeedId.indexOf("/", pos);
-			sFeedId=sFeedId.substring(pos, ende);
-			feedId = Integer.parseInt(sFeedId);
-		}else{
-			// Aufruf vom Widget
+    boolean showPics;    // Prefs Bilder laden und anzeigen -> f?r Adapter
+    boolean showCover;    // Prefs Cover laden und anzeigen
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        if (Util.isLightTheme(this)) {
+            setTheme(R.style.MyTheme_Light);
+        }
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.entry);
+        mActivity = this;
+
+        Uri mUri = mActivity.getIntent().getData(); // aus EntriesListActivity
+
+        String sFeedId = mUri.getPath();
+        int pos = sFeedId.indexOf("/feeds/");
+        if (pos > -1) {
+            pos += 7;
+            int ende = sFeedId.indexOf("/", pos);
+            sFeedId = sFeedId.substring(pos, ende);
+            feedId = Integer.parseInt(sFeedId);
+        } else {
+            // Aufruf vom Widget
 //			_id = mUri.getLastPathSegment();
 //			feedId = getFeedIdZuEntryId(_id);
 //			sFeedId=""+feedId;
 //			mUri = FeedData.EntryColumns.FULL_CONTENT_URI(sFeedId, _id);
-			
-			feedId=0;	// Default f?r alle
-			sFeedId="0"; // Default f?r alle
-		}
+
+            feedId = 0;    // Default f?r alle
+            sFeedId = "0"; // Default f?r alle
+        }
 
 //		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
-		mAufrufart = Util.getViewerPrefs(mActivity, sFeedId);
-		int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
-		int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, -1);  // !!
+        mAufrufart = Util.getViewerPrefs(mActivity, sFeedId);
+        int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
+        int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, -1);  // !!
 
-		SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-		mIntScalePercent = prefs.getInt(PREFERENCE_SCALE, 60);
-		
-		// jetzt hier
-		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		toolbar.setTitle("");
-		setSupportActionBar(toolbar);
-		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
-		actionBar7.setDisplayHomeAsUpEnabled(true);
+        SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        mIntScalePercent = prefs.getInt(PREFERENCE_SCALE, 60);
+
+        // jetzt hier
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+        android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
+        actionBar7.setDisplayHomeAsUpEnabled(true);
 
 //		AppBarLayout appBarLayout =(AppBarLayout) findViewById(R.id.appBarLayout);
 //		appBarLayout.setExpanded(false);
-		
-		if (!Util.showBottomBar(this)){
-			View viewBottomBar = findViewById(R.id.button_layout);
-			viewBottomBar.setVisibility(View.GONE);
-		}
 
-		showPics = Util.showPics(this);
-		showCover = Util.showCover(this, ""+feedId);
+        if (!Util.showBottomBar(this)) {
+            View viewBottomBar = findViewById(R.id.button_layout);
+            viewBottomBar.setVisibility(View.GONE);
+        }
 
-		mEntryPagerAdapter = new EntryPagerAdapter(this,positionInListe, anzahlFeedeintraege);
-		
-		final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-		viewPager.setAdapter(mEntryPagerAdapter);
-		if(positionInListe<0){
-			positionInListe=mEntryPagerAdapter.getAktuellePosition();  // dort neu ermittelt
-		}
-		viewPager.setCurrentItem(positionInListe, true);
-		
-		if(Util.isLightTheme(mActivity)){
+        showPics = Util.showPics(this);
+        showCover = Util.showCover(this, "" + feedId);
+
+        mEntryPagerAdapter = new EntryPagerAdapter(this, positionInListe, anzahlFeedeintraege);
+
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(mEntryPagerAdapter);
+        if (positionInListe < 0) {
+            positionInListe = mEntryPagerAdapter.getAktuellePosition();  // dort neu ermittelt
+        }
+        viewPager.setCurrentItem(positionInListe, true);
+
+        if (Util.isLightTheme(mActivity)) {
 //			viewPager.setBackgroundColor( Color.parseColor("#f6f6f6"));  // Grau Weiss des CSS
-		}else{
-			viewPager.setBackgroundColor(Color.BLACK);
-		}
-	}
+        } else {
+            viewPager.setBackgroundColor(Color.BLACK);
+        }
+    }
 
-	private static final String TEXT_HTML = "text/html";
+    private static final String TEXT_HTML = "text/html";
 
-	private static final String UTF8 = "utf-8";
+    private static final String UTF8 = "utf-8";
 
-	private static final String OR_DATE = " or date ";
+    private static final String OR_DATE = " or date ";
 
-	private static final String DATE = "(date=";
+    private static final String DATE = "(date=";
 
-	private static final String AND_ID = " and _id";
+    private static final String AND_ID = " and _id";
 
-	private static final String ASC = "date asc, _id desc limit 1";
+    private static final String ASC = "date asc, _id desc limit 1";
 
-	private static final String DESC = "date desc, _id asc limit 1";
+    private static final String DESC = "date desc, _id asc limit 1";
 
-	// private static final String CSS = "<head><style type=\"text/css\">body
-	// {max-width: 100%}\nimg {max-width: 100%; height: auto;}\ndiv[style]
-	// {max-width: 100%;}\npre {white-space: pre-wrap;}</style></head>";
-	// aus /sparss/src/net/etuldan/sparss/view/EntryView.java
-	private static final String FONT_SANS_SERIF = "font-family: sans-serif;";
-	private static final String TEXT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#000000" : "#C0C0C0";
-	public static final String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
-	private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
-	private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6"
-			: "#383b3f";
-	private static final String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd"
-			: "solid #303030";
-	private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
-	private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
+    // private static final String CSS = "<head><style type=\"text/css\">body
+    // {max-width: 100%}\nimg {max-width: 100%; height: auto;}\ndiv[style]
+    // {max-width: 100%;}\npre {white-space: pre-wrap;}</style></head>";
+    // aus /sparss/src/net/etuldan/sparss/view/EntryView.java
+    private static final String FONT_SANS_SERIF = "font-family: sans-serif;";
+    //private static final String TEXT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#000000" : "#999999"; // "#C0C0C0";
+    private static final String TEXT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#000000" : "#737373"; // "#C0C0C0";
+    public static final String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
+    private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
+    private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6"
+            : "#383b3f";
+    private static final String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd"
+            : "solid #303030";
+    private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
+    private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
 
-	public static final String CSS = "<head><style type='text/css'> " + "body {max-width: 100%; margin: 0.3cm; "
-			+ FONT_SANS_SERIF + " color: " + TEXT_COLOR + "; background-color:" + BACKGROUND_COLOR
-			+ "; line-height: 150%} " + "* {max-width: 100%; word-break: break-word}"
-			+ "h1, h2 {font-weight: normal; line-height: 130%} " + "h1 {font-size: 140%; margin-bottom: 0.1em} "
-			+ "h2 {font-size: 120%} " + "a {color: #0099CC}" + "h1 a {color: inherit; text-decoration: none}"
-			+ "img {height: auto} " + "pre {white-space: pre-wrap;} " + "blockquote {border-left: thick solid "
-			+ QUOTE_LEFT_COLOR + "; background-color:" + QUOTE_BACKGROUND_COLOR
-			+ "; margin: 0.5em 0 0.5em 0em; padding: 0.5em} " + "p {margin: 0.8em 0 0.8em 0} " + "p.subtitle {color: "
-			+ SUBTITLE_COLOR + "; border-top:1px " + SUBTITLE_BORDER_COLOR + "; border-bottom:1px "
-			+ SUBTITLE_BORDER_COLOR + "; padding-top:2px; padding-bottom:2px; font-weight:800 } "
-			+ "ul, ol {margin: 0 0 0.8em 0.6em; padding: 0 0 0 1em} "
-			+ "ul li, ol li {margin: 0 0 0.8em 0; padding: 0} "
-			+ "div.button-section {padding: 0.4cm 0; margin: 0; text-align: center} "
-			+ ".button-section p {margin: 0.1cm 0 0.2cm 0}" + ".button-section p.marginfix {margin: 0.5cm 0 0.5cm 0}"
-			+ ".button-section input, .button-section a {font-family: sans-serif-light; font-size: 100%; color: #FFFFFF; background-color: "
-			+ BUTTON_COLOR + "; text-decoration: none; border: none; border-radius:0.2cm; padding: 0.3cm} "
-			+ "</style><meta name='viewport' content='width=device-width, initial-scale=1'/></head>";
-	
-	public static String getCSS(){
-		return CSS;
-	}
+    public static final String CSS = "<head><style type='text/css'> " + "body {max-width: 100%; margin: 0.3cm; "
+            + FONT_SANS_SERIF + " color: " + TEXT_COLOR + "; background-color:" + BACKGROUND_COLOR
+            + "; line-height: 150%} " + "* {max-width: 100%; word-break: break-word}"
+            + "h1, h2 {font-weight: normal; line-height: 130%} " + "h1 {font-size: 140%; margin-bottom: 0.1em} "
+            + "h2 {font-size: 120%} " + "a {color: #0099CC}" + "h1 a {color: inherit; text-decoration: none}"
+            + "img {height: auto} " + "pre {white-space: pre-wrap;} " + "blockquote {border-left: thick solid "
+            + QUOTE_LEFT_COLOR + "; background-color:" + QUOTE_BACKGROUND_COLOR
+            + "; margin: 0.5em 0 0.5em 0em; padding: 0.5em} " + "p {margin: 0.8em 0 0.8em 0} " + "p.subtitle {color: "
+            + SUBTITLE_COLOR + "; border-top:1px " + SUBTITLE_BORDER_COLOR + "; border-bottom:1px "
+            + SUBTITLE_BORDER_COLOR + "; padding-top:2px; padding-bottom:2px; font-weight:800 } "
+            + "ul, ol {margin: 0 0 0.8em 0.6em; padding: 0 0 0 1em} "
+            + "ul li, ol li {margin: 0 0 0.8em 0; padding: 0} "
+            + "div.button-section {padding: 0.4cm 0; margin: 0; text-align: center} "
+            + ".button-section p {margin: 0.1cm 0 0.2cm 0}" + ".button-section p.marginfix {margin: 0.5cm 0 0.5cm 0}"
+            + ".button-section input, .button-section a {font-family: sans-serif-light; font-size: 100%; color: #FFFFFF; background-color: "
+            + BUTTON_COLOR + "; text-decoration: none; border: none; border-radius:0.2cm; padding: 0.3cm} "
+            + "</style><meta name='viewport' content='width=device-width, initial-scale=1'/></head>";
 
-	private static final String FONT_START = CSS + "<body link=\"#97ACE5\" text=\"#C0C0C0\">";
+    public static String getCSS() {
+        return CSS;
+    }
 
-	private static final String FONT_FONTSIZE_START = CSS + "<body link=\"#97ACE5\" text=\"#C0C0C0\"><font size=\"+";
+    private static final String FONT_START = CSS + "<body link=\"#97ACE5\" text=\"#C0C0C0\">";
 
-	private static final String FONTSIZE_START = "<font size=\"+";
+    private static final String FONT_FONTSIZE_START = CSS + "<body link=\"#97ACE5\" text=\"#C0C0C0\"><font size=\"+";
 
-	private static final String FONTSIZE_MIDDLE = "\">";
+    private static final String FONTSIZE_START = "<font size=\"+";
 
-	private static final String FONTSIZE_END = "</font>";
+    private static final String FONTSIZE_MIDDLE = "\">";
 
-	private static final String FONT_END = "</font><br/><br/><br/><br/></body>";
+    private static final String FONTSIZE_END = "</font>";
 
-	private static final String BODY_START = "<body>";
+    private static final String FONT_END = "</font><br/><br/><br/><br/></body>";
 
-	private static final String BODY_END = "<br/><br/><br/><br/></body>";
+    private static final String BODY_START = "<body>";
 
-	private static final int BUTTON_ALPHA = 180;
+    private static final String BODY_END = "<br/><br/><br/><br/></body>";
 
-	private static final String IMAGE_ENCLOSURE = "[@]image/";
+    private static final int BUTTON_ALPHA = 180;
 
-	private static final String TEXTPLAIN = "text/plain";
+    private static final String IMAGE_ENCLOSURE = "[@]image/";
 
-	private static final String BRACKET = " (";
+    private static final String TEXTPLAIN = "text/plain";
 
-	private int titlePosition;
+    private static final String BRACKET = " (";
 
-	private int datePosition;
+    private int titlePosition;
 
-	private int abstractPosition;
+    private int datePosition;
 
-	private int linkPosition;
+    private int abstractPosition;
 
-	private int feedIdPosition;
+    private int linkPosition;
 
-	private int favoritePosition;
+    private int feedIdPosition;
 
-	private int readDatePosition;
+    private int favoritePosition;
 
-	private int enclosurePosition;
+    private int readDatePosition;
 
-	private int authorPosition;
+    private int enclosurePosition;
 
-	private String _id;
+    private int authorPosition;
 
-	private String _nextId;
+    private String _id;
 
-	private String _previousId;
+    private String _nextId;
 
-	private Uri uri;
+    private String _previousId;
 
-	private Uri parentUri;
+    private Uri uri;
 
-	private int feedId;
+    private Uri parentUri;
 
-	boolean favorite;
+    private int feedId;
 
-	private boolean showRead;
+    boolean favorite;
 
-	private boolean canShowIcon;
+    private boolean showRead;
 
-	private byte[] iconBytes;
+    private boolean canShowIcon;
 
-	private WebView webView;
-	private ImageView imageView;
+    private byte[] iconBytes;
 
-	private ImageButton nextButton;
-	private ImageButton markAsReadButton;
+    private WebView webView;
+    private ImageView imageView;
 
-	private ImageButton urlButton;
+    private ImageButton nextButton;
+    private ImageButton markAsReadButton;
 
-	private ImageButton previousButton;
+    private ImageButton urlButton;
 
-	int scrollX;
+    private ImageButton previousButton;
 
-	int scrollY;
+    int scrollX;
 
-	private String link;
+    int scrollY;
 
-	private LayoutParams layoutParams;
+    private String link;
+
+    private LayoutParams layoutParams;
 
 //	private View content;
 
-	private SharedPreferences preferences;
+    private SharedPreferences preferences;
 
-	private boolean localPictures;
+    private boolean localPictures;
 
-	private TextView titleTextView;
+    private TextView titleTextView;
 
-	private long timestamp;
+    private long timestamp;
 
 
-	
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-	}
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if (RSSOverview.notificationManager != null) {
-			RSSOverview.notificationManager.cancel(0);
-		}
-	}
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (RSSOverview.notificationManager != null) {
+            RSSOverview.notificationManager.cancel(0);
+        }
+    }
 
-	public static String fixLink(String strLink) {
-		if (strLink == null)
-			return null;
-		if (strLink.endsWith("feed/atom/")) {
-			strLink = strLink.substring(0, strLink.length() - "feed/atom/".length());
-		}
-		return strLink;
-	}
+    public static String fixLink(String strLink) {
+        if (strLink == null)
+            return null;
+        if (strLink.endsWith("feed/atom/")) {
+            strLink = strLink.substring(0, strLink.length() - "feed/atom/".length());
+        }
+        return strLink;
+    }
 
-	@Override
-	protected void onNewIntent(Intent intent) {
-		super.onNewIntent(intent);
-		setIntent(intent);
-	}
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.entry, menu);
-		
-		switch (mAufrufart) {
-		case AUFRUFART_READABILITY:
-			menu.findItem(R.id.menu_readability).setChecked(true);
-			break;
-		case AUFRUFART_GOOGLEWEBLIGHT:
-			menu.findItem(R.id.menu_googleweblight).setChecked(true);
-			break;
-		case AUFRUFART_AMP:
-			menu.findItem(R.id.menu_amp).setChecked(true);
-			break;
-			
-		default:
-			menu.findItem(R.id.menu_feed).setChecked(true);
-			break;
-		}
-		
-		if(showCover){
-			menu.findItem(R.id.menu_cover).setChecked(true);
-		}
-		
-		MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
-		MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-		markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.entry, menu);
 
-		MenuItem browserItem = menu.add(0, R.id.url_button, 0, R.string.contextmenu_browser);
-		MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-		browserItem.setIcon(android.R.drawable.ic_menu_view);
-		
-		return true;
-	}
+        switch (mAufrufart) {
+            case AUFRUFART_READABILITY:
+                menu.findItem(R.id.menu_readability).setChecked(true);
+                break;
+            case AUFRUFART_GOOGLEWEBLIGHT:
+                menu.findItem(R.id.menu_googleweblight).setChecked(true);
+                break;
+            case AUFRUFART_AMP:
+                menu.findItem(R.id.menu_amp).setChecked(true);
+                break;
 
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (event.getAction() == KeyEvent.ACTION_DOWN) {
-			if (keyCode == 92 || keyCode == 94 || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-				scrollUp();
-				return true;
-			} else if (keyCode == 93 || keyCode == 95 || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-				scrollDown();
-				return true;
-			}
-		}
-		return super.onKeyDown(keyCode, event);
-	}
+            default:
+                menu.findItem(R.id.menu_feed).setChecked(true);
+                break;
+        }
 
-	private void scrollUp() {
-		if (webView != null) {
-			webView.pageUp(false);
-		}
-	}
+        if (showCover) {
+            menu.findItem(R.id.menu_cover).setChecked(true);
+        }
 
-	private void scrollDown() {
-		if (webView != null) {
-			webView.pageDown(false);
-		}
-	}
+        MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
+        MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
 
-	/**
-	 * Works around android issue 6191
-	 */
-	@Override
-	public void unregisterReceiver(BroadcastReceiver receiver) {
-		try {
-			super.unregisterReceiver(receiver);
-		} catch (Exception e) {
-			// do nothing
-		}
-	}
+        MenuItem browserItem = menu.add(0, R.id.url_button, 0, R.string.contextmenu_browser);
+        MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        browserItem.setIcon(android.R.drawable.ic_menu_view);
 
-	boolean mNavVisible = true;
+        return true;
+    }
 
-	
-	//// F?r setZoomsScale und Dlg daf?r ////
-	
-	private int mIntScalePercent = 60; // 0..100
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            if (keyCode == 92 || keyCode == 94 || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                scrollUp();
+                return true;
+            } else if (keyCode == 93 || keyCode == 95 || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                scrollDown();
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
-	SeekBar mSeekBar;
+    private void scrollUp() {
+        if (webView != null) {
+            webView.pageUp(false);
+        }
+    }
 
-	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-		// progress 1..100
-		mIntScalePercent = progress;
-	}
+    private void scrollDown() {
+        if (webView != null) {
+            webView.pageDown(false);
+        }
+    }
 
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-	}
+    /**
+     * Works around android issue 6191
+     */
+    @Override
+    public void unregisterReceiver(BroadcastReceiver receiver) {
+        try {
+            super.unregisterReceiver(receiver);
+        } catch (Exception e) {
+            // do nothing
+        }
+    }
 
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
-		setZoomsScale(null);
-	}
+    boolean mNavVisible = true;
 
-	AlertDialog.Builder mAlertDialog = null;
-	public static final String PREFERENCE_SCALE = "preference_scale_readability";
-	public final static String PREFS_NAME = "de.bernd.sparse.rss.preferences";
 
-	// Scale the Text
-	public void onClickShowSeekBarDialog(View viewD) {
-		View view = getLayoutInflater().inflate(R.layout.entry_seek_bar, null);
-		mSeekBar = (SeekBar) view.findViewById(R.id.seekBar);
-		mSeekBar.setOnSeekBarChangeListener(this);
-		mSeekBar.setProgress(mIntScalePercent);
-		mAlertDialog = new AlertDialog.Builder(this);
-		mAlertDialog.setTitle("Scale the Text");
-		mAlertDialog.setView(view);
-		mAlertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-				SharedPreferences.Editor editor = prefs.edit();
-				editor.putInt(PREFERENCE_SCALE, mIntScalePercent);
-				editor.commit();
-				Util.toastMessage(mActivity, "Scale " + (mIntScalePercent * 2) );
-			}
-		});
-		mAlertDialog.show();
-	}
+    //// F?r setZoomsScale und Dlg daf?r ////
 
-	int mAnimationDirection = android.R.anim.slide_out_right;
+    private int mIntScalePercent = 60; // 0..100
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home: {
-			finish();
-			return true;
-		}
-		case R.id.menu_markasread:
-		case R.id.menu_markasread2: {
-			finish();
-			break;
-		}
-		case R.id.url_button: {
-			onClickLoadBrowser(null);
-			break;
-		}
+    SeekBar mSeekBar;
 
-		case R.id.menu_feed: {
-			_id = null;
-			onClickReload(null);
-			// readUrl(); // TODO ???
-			break;
-		}
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        // progress 1..100
+        mIntScalePercent = progress;
+    }
 
-		case R.id.menu_mobilize: {
-			onClickLoadMobilize(null);
-			break;
-		}
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
 
-		case R.id.menu_readability: {
-			onClickReadability(null);
-			break;
-		}
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        setZoomsScale(null);
+    }
 
-		case R.id.menu_amp: {
-			onClickLoadAmp(null);
-			break;
-		}
-		case R.id.menu_googleweblight: {
-			onClickLoadGoogleweblight(null);
-			break;
-		}
+    AlertDialog.Builder mAlertDialog = null;
+    public static final String PREFERENCE_SCALE = "preference_scale_readability";
+    public final static String PREFS_NAME = "de.bernd.sparse.rss.preferences";
 
-		case R.id.menu_copytoclipboard: {
-			if (link != null) {
-				((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
-			}
-			break;
-		}
+    // Scale the Text
+    public void onClickShowSeekBarDialog(View viewD) {
+        View view = getLayoutInflater().inflate(R.layout.entry_seek_bar, null);
+        mSeekBar = (SeekBar) view.findViewById(R.id.seekBar);
+        mSeekBar.setOnSeekBarChangeListener(this);
+        mSeekBar.setProgress(mIntScalePercent);
+        mAlertDialog = new AlertDialog.Builder(this);
+        mAlertDialog.setTitle("Scale the Text");
+        mAlertDialog.setView(view);
+        mAlertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(PREFERENCE_SCALE, mIntScalePercent);
+                editor.commit();
+                Util.toastMessage(mActivity, "Scale " + (mIntScalePercent * 2));
+            }
+        });
+        mAlertDialog.show();
+    }
 
-		case R.id.menu_share: {
-			onClickShare(null);
-			break;
-		}
-		case R.id.menu_share_entry: {
-			onClickShareEntry(null);
-			break;
-		}
-		case R.id.menu_text_scale: {
-			onClickShowSeekBarDialog(null);
-		}
-			break;
-		case R.id.menu_cover:{
-			if(showCover){
-				showCover=false;
-				item.setChecked(false);
-				Util.setShowCover(this, ""+feedId, false);
-				mEntryPagerAdapter.notifyDataSetChanged();
-			}else{
-				showCover=true;
-				item.setChecked(true);
-				Util.setShowCover(this, ""+feedId, true);
-				mEntryPagerAdapter.notifyDataSetChanged();
-			}
-			break;
-		}
-			
-			
-		}//switch
-		return super.onOptionsItemSelected(item);
-	}
+    int mAnimationDirection = android.R.anim.slide_out_right;
 
-	// aus net.etuldan.sparss.utils.NetworkUtils
-	public static String getBaseUrl(String link) {
-		String baseUrl = link;
-		int index = link.indexOf('/', 8); // this also covers https://
-		if (index > -1) {
-			baseUrl = link.substring(0, index);
-		}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                finish();
+                return true;
+            }
+            case R.id.menu_markasread:
+            case R.id.menu_markasread2: {
+                finish();
+                break;
+            }
+            case R.id.url_button: {
+                onClickLoadBrowser(null);
+                break;
+            }
+            case R.id.menu_browser: {
+                onClickMenuBrowser(null);
+                break;
+            }
+            case R.id.menu_chrome: {
+                Util.setBrowserPackagePrefs(this,"com.android.chrome");
+                onClickLoadBrowser(null);
+                break;
+            }
+            case R.id.menu_default: {
+                Util.setBrowserPackagePrefs(this,null);
+                onClickLoadBrowser(null);
+                break;
+            }
+            case R.id.menu_firefox_klar: {
+                Util.setBrowserPackagePrefs(this,"org.mozilla.klar");
+                onClickLoadBrowser(null);
+                break;
+            }
+            case R.id.menu_edge: {
+                Util.setBrowserPackagePrefs(this,"com.microsoft.emmx");
+                onClickLoadBrowser(null);
+                break;
+            }
 
-		return baseUrl;
-	}
+            case R.id.menu_feed: {
+                _id = null;
+                onClickReload(null);
+                // readUrl(); // TODO ???
+                break;
+            }
 
-	public void clickMarkAsRead(View view) {
-		finish();
-	}
-	
-	public void onClickLoadBrowser(View view) {
-		// Browser ?ffnen
-		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
-		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(dtoEntry.link));
-		
-		boolean forcechrome = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("forcechrome", true);
-		if(forcechrome){
-			intent.setPackage("com.android.chrome");
-		}
-		try {
-			startActivity(intent);
-		} catch (Exception e) {
-			Intent intent2 = new Intent(Intent.ACTION_VIEW, Uri.parse(dtoEntry.link));
-			startActivity(intent2);
-		}
-	}
+            case R.id.menu_mobilize: {
+                onClickLoadMobilize(null);
+                break;
+            }
 
-	public void onClickReadability(View view) {
-		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
-		mAufrufart=AUFRUFART_READABILITY;		
-		mEntryPagerAdapter.notifyDataSetChanged();
-	}
+            case R.id.menu_readability: {
+                onClickReadability(null);
+                break;
+            }
 
-	public void onClickMenu2(View view) {
+            case R.id.menu_amp: {
+                onClickLoadAmp(null);
+                break;
+            }
+            case R.id.menu_googleweblight: {
+                onClickLoadGoogleweblight(null);
+                break;
+            }
 
-		if(view==null){
-			view=this.getCurrentFocus();
-		}
-		
-		PopupMenu popup = new PopupMenu(EntryActivity.this, view);
-		popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
-		
-		switch (mAufrufart) {
-		case AUFRUFART_READABILITY:
-			popup.getMenu().findItem(R.id.menu_readability).setChecked(true);
-			break;
-		case AUFRUFART_GOOGLEWEBLIGHT:
-			popup.getMenu().findItem(R.id.menu_googleweblight).setChecked(true);
-			break;
-		case AUFRUFART_AMP:
-			popup.getMenu().findItem(R.id.menu_amp).setChecked(true);
-			break;
-			
-		default:
-			popup.getMenu().findItem(R.id.menu_feed).setChecked(true);
-			break;
-		}
-		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            case R.id.menu_copytoclipboard: {
+                if (link != null) {
+                    ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setText(link);
+                }
+                break;
+            }
+
+            case R.id.menu_share: {
+                onClickShare(null);
+                break;
+            }
+            case R.id.menu_share_entry: {
+                onClickShareEntry(null);
+                break;
+            }
+            case R.id.menu_share_source: {
+                onClickShareSource(null);
+                break;
+            }
+            case R.id.menu_text_scale: {
+                onClickShowSeekBarDialog(null);
+                break;
+            }
+            case R.id.menu_cover: {
+                if (showCover) {
+                    showCover = false;
+                    item.setChecked(false);
+                    Util.setShowCover(this, "" + feedId, false);
+                    mEntryPagerAdapter.notifyDataSetChanged();
+                } else {
+                    showCover = true;
+                    item.setChecked(true);
+                    Util.setShowCover(this, "" + feedId, true);
+                    mEntryPagerAdapter.notifyDataSetChanged();
+                }
+                break;
+            }
+
+
+        }//switch
+        return super.onOptionsItemSelected(item);
+    }
+
+    // aus net.etuldan.sparss.utils.NetworkUtils
+    public static String getBaseUrl(String link) {
+        String baseUrl = link;
+        int index = link.indexOf('/', 8); // this also covers https://
+        if (index > -1) {
+            baseUrl = link.substring(0, index);
+        }
+
+        return baseUrl;
+    }
+
+    public void clickMarkAsRead(View view) {
+        finish();
+    }
+
+    public void onClickLoadBrowser(View view) {
+        // Browser ?ffnen
+        DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(dtoEntry.link));
+
+        String browser=Util.getBrowserPackagePrefs(this);
+        //boolean forcechrome = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("forcechrome", true);
+        if (browser!=null) {
+            intent.setPackage(browser);
+        }
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Intent intent2 = new Intent(Intent.ACTION_VIEW, Uri.parse(dtoEntry.link));
+            startActivity(intent2);
+        }
+    }
+
+    public void onClickReadability(View view) {
+        Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
+        mAufrufart = AUFRUFART_READABILITY;
+        mEntryPagerAdapter.notifyDataSetChanged();
+    }
+
+    public void onClickMenu2(View view) {
+
+        if (view == null) {
+            view = this.getCurrentFocus();
+        }
+
+        PopupMenu popup = new PopupMenu(EntryActivity.this, view);
+        popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+
+        switch (mAufrufart) {
+            case AUFRUFART_READABILITY:
+                popup.getMenu().findItem(R.id.menu_readability).setChecked(true);
+                break;
+            case AUFRUFART_GOOGLEWEBLIGHT:
+                popup.getMenu().findItem(R.id.menu_googleweblight).setChecked(true);
+                break;
+            case AUFRUFART_AMP:
+                popup.getMenu().findItem(R.id.menu_amp).setChecked(true);
+                break;
+
+            default:
+                popup.getMenu().findItem(R.id.menu_feed).setChecked(true);
+                break;
+        }
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-            	EntryActivity.this.onOptionsItemSelected( item);
+                EntryActivity.this.onOptionsItemSelected(item);
                 return true;
             }
         });
-		popup.show();
-		
-	}
+        popup.show();
+    }
 
-	public void onClickLoadAmp(View view) {
-		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_AMP);
-		mAufrufart=AUFRUFART_AMP;
-		mEntryPagerAdapter.notifyDataSetChanged();
-	}
 
-	public void onClickLoadGoogleweblight(View view) {
-		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_GOOGLEWEBLIGHT);
-		mAufrufart=AUFRUFART_GOOGLEWEBLIGHT;
-		mEntryPagerAdapter.notifyDataSetChanged();
-	}
+    /**
+     *     Popup Menue for Browser selection
+     *     copy from onClickMenu2
+     */
+    public void onClickMenuBrowser(View view) {
 
-	public void onClickReload(View view) {
-		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_FEED);
-		mAufrufart=AUFRUFART_FEED;
-		mEntryPagerAdapter.notifyDataSetChanged();
-		
-	}
+        if (view == null) {
+            //view = this.getCurrentFocus();  // aus vorherigem PopupMenu ungueltig!
+            if (Util.showBottomBar(this)) {
+                //Popup unten bei der ButtomBar
+                View viewBottomBar = findViewById(R.id.button_layout);
+                view=viewBottomBar;
+            }else{
+                // Popup oben
+                view=mEntryPagerAdapter.getAktuellenEntry().viewWeb;
+            }
+         }
 
-	
-	public void onClickShareEntry(View view) {
-		try {
-			DtoEntry dto = mEntryPagerAdapter.getAktuellenEntry();
-			OutputFormatter out = new OutputFormatter();
-			Document document = Jsoup.parse(dto.titel + dto.text);
-			String share=dto.link + "\n\n" + out.getFormattedText(document);
-			startActivity(Intent.createChooser(
-					new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_HTML_TEXT, dto.text).putExtra(Intent.EXTRA_SUBJECT, dto.link).putExtra(Intent.EXTRA_TEXT, share).setType(TEXTPLAIN),
-					getString(R.string.menu_share)));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void onClickShare(View view) {
-		DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
-		startActivity(Intent.createChooser(
-				new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, dtoEntry.link).setType(TEXTPLAIN),
-				getString(R.string.menu_share)));
-	}
-	
-	
-	public void setZoomsScale(WebView nWebView) {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			
-			try {
-				if (nWebView == null) {
-					View view = this.getCurrentFocus();
-					if (view == null || !(view instanceof WebView)) {
-						nWebView = (WebView) view;
-					} else {
-						nWebView = (WebView) this.findViewById(R.id.web_view);
-					}
-				}
-				nWebView.getSettings().setTextZoom(mIntScalePercent * 2);
-			} catch (Exception e) {
-				Util.toastMessage(this, "Select WebView");
-			}
-		}
-	}
+        PopupMenu popup = new PopupMenu(EntryActivity.this, view);
+        popup.getMenuInflater().inflate(R.menu.popup_menu_browser, popup.getMenu());
 
-	public int getmAufrufart() {
-		return mAufrufart;
-	}
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                System.out.println("onClickMenuBrowser " + item);
+                EntryActivity.this.onOptionsItemSelected(item);
+                return true;
+            }
+        });
+        popup.show();
+    }
 
-	public void onClickNext(View view) {
-		int aktuellePosition = mEntryPagerAdapter.getAktuellePosition();
-		aktuellePosition++;
-		if(aktuellePosition==mEntryPagerAdapter.getCount()){
-			return;
-		}
-		ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
-		viewPager.setCurrentItem(aktuellePosition, true);
-	}
+    public void onClickLoadAmp(View view) {
+        Util.setViewerPrefs(this, "" + feedId, AUFRUFART_AMP);
+        mAufrufart = AUFRUFART_AMP;
+        mEntryPagerAdapter.notifyDataSetChanged();
+    }
 
-	public void onClickPrevious(View view) {
-		int aktuellePosition = mEntryPagerAdapter.getAktuellePosition();
-		aktuellePosition--;
-		if(aktuellePosition<0){
-			return;
-		}
-		ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
-		viewPager.setCurrentItem(aktuellePosition, true);
-	}
-	
-	private void onClickLoadMobilize(View view) {
-		Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
-		mAufrufart=AUFRUFART_MOBILIZE;		
-		mEntryPagerAdapter.notifyDataSetChanged();
-	}
+    public void onClickLoadGoogleweblight(View view) {
+        Util.setViewerPrefs(this, "" + feedId, AUFRUFART_GOOGLEWEBLIGHT);
+        mAufrufart = AUFRUFART_GOOGLEWEBLIGHT;
+        mEntryPagerAdapter.notifyDataSetChanged();
+    }
 
-	/**
-	 * ret false wenn !showPics !showCoder !linkGrafilk
-	 */
-	public boolean shouldShowCover(DtoEntry dto){
-		if(!showCover){
-			return false;
-		}
-		if (dto.linkGrafik != null && !"".equals(dto.linkGrafik)) {
-			return true;
-		}
-		return false;
-	}
+    public void onClickReload(View view) {
+        Util.setViewerPrefs(this, "" + feedId, AUFRUFART_FEED);
+        mAufrufart = AUFRUFART_FEED;
+        mEntryPagerAdapter.notifyDataSetChanged();
+
+    }
+
+
+    public void onClickShareEntry(View view) {
+        try {
+            DtoEntry dto = mEntryPagerAdapter.getAktuellenEntry();
+            OutputFormatter out = new OutputFormatter();
+            Document document = Jsoup.parse(dto.titel + dto.text);
+            String share = dto.link + "\n\n" + out.getFormattedText(document);
+            document = Jsoup.parse(dto.titel);
+            String titel=document.text();
+            startActivity(Intent.createChooser(
+                    new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_HTML_TEXT, dto.text).putExtra(Intent.EXTRA_SUBJECT, titel).putExtra(Intent.EXTRA_TEXT, share).setType(TEXTPLAIN),
+                    getString(R.string.menu_share)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Util.toastMessage(this,e.toString());
+        }
+    }
+
+    public void onClickShare(View view) {
+        DtoEntry dtoEntry = mEntryPagerAdapter.getAktuellenEntry();
+        Document document = Jsoup.parse(dtoEntry.titel);
+        String titel=document.text();
+        startActivity(Intent.createChooser(
+                new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_TEXT, dtoEntry.link).putExtra(Intent.EXTRA_SUBJECT, titel).setType(TEXTPLAIN),
+                getString(R.string.menu_share)));
+    }
+
+    public void onClickShareSource(View view) {
+        try {
+            DtoEntry dto = mEntryPagerAdapter.getAktuellenEntry();
+            Document document = Jsoup.parse(dto.titel);
+            String titel=document.text();
+            startActivity(Intent.createChooser(
+                    new Intent(Intent.ACTION_SEND).putExtra(Intent.EXTRA_HTML_TEXT, dto.text).putExtra(Intent.EXTRA_SUBJECT, titel).putExtra(Intent.EXTRA_TEXT, dto.text).setType(TEXTPLAIN),
+                    getString(R.string.menu_share)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            Util.toastMessage(this,e.toString());
+        }
+    }
+
+
+    public void setZoomsScale(WebView nWebView) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+
+            try {
+                if (nWebView == null) {
+                    View view = this.getCurrentFocus();
+                    if (view == null || !(view instanceof WebView)) {
+                        nWebView = (WebView) view;
+                    } else {
+                        nWebView = (WebView) this.findViewById(R.id.web_view);
+                    }
+                }
+                nWebView.getSettings().setTextZoom(mIntScalePercent * 2);
+            } catch (Exception e) {
+                Util.toastMessage(this, "Select WebView");
+            }
+        }
+    }
+
+    public int getmAufrufart() {
+        return mAufrufart;
+    }
+
+    public void onClickNext(View view) {
+        int aktuellePosition = mEntryPagerAdapter.getAktuellePosition();
+        aktuellePosition++;
+        if (aktuellePosition == mEntryPagerAdapter.getCount()) {
+            return;
+        }
+        ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
+        viewPager.setCurrentItem(aktuellePosition, true);
+    }
+
+    public void onClickPrevious(View view) {
+        int aktuellePosition = mEntryPagerAdapter.getAktuellePosition();
+        aktuellePosition--;
+        if (aktuellePosition < 0) {
+            return;
+        }
+        ViewPager viewPager = (ViewPager) mActivity.findViewById(R.id.viewpager);
+        viewPager.setCurrentItem(aktuellePosition, true);
+    }
+
+    private void onClickLoadMobilize(View view) {
+        Util.setViewerPrefs(this, "" + feedId, AUFRUFART_MOBILIZE);
+        mAufrufart = AUFRUFART_MOBILIZE;
+        mEntryPagerAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * ret false wenn !showPics !showCoder !linkGrafilk
+     */
+    public boolean shouldShowCover(DtoEntry dto) {
+        if (!showCover) {
+            return false;
+        }
+        if (dto.linkGrafik != null && !"".equals(dto.linkGrafik)) {
+            return true;
+        }
+        return false;
+    }
 
 }

@@ -2,71 +2,33 @@
 
     <style name="MyTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="ic_menu_moreoverflow_normal_holo">@drawable/ic_menu_moreoverflow_normal_holo_light</item>
+        <item name="ic_arrow_right">@drawable/ic_arrow_right_light</item>
+        <item name="ic_arrow_left">@drawable/ic_arrow_left_light</item>
         <item name="android:statusBarColor">@android:color/black</item>
-        
-<!--         
-        <item name="windowActionBar">true</item>
-        <item name="windowActionBarOverlay">true</item>
-        <item name="android:windowActionBarOverlay">true</item>
- -->        <!-- TranslucentStatusBar 
-        
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        -->
-        
+
+        <item name="theme_textColorPrimary">@color/my_black</item>
+        <item name="android:textColorPrimary">?attr/theme_textColorPrimary</item>
+
+        <item name="theme_textColorSecondary">@color/my_dark_text_color</item>
+        <item name="android:textColorSecondary">?attr/theme_textColorSecondary</item>
+
+        <item name="theme_BackgroundColor">@color/my_white</item>
     </style>
 
+    <!-- Default Theme -->
     <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="ic_menu_moreoverflow_normal_holo">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
+        <item name="ic_arrow_right">@drawable/ic_arrow_right_dark</item>
+        <item name="ic_arrow_left">@drawable/ic_arrow_left_dark</item>
         <item name="android:statusBarColor">@android:color/black</item>
-        
-        <item name="android:attr/textColorSecondary">@android:color/secondary_text_dark</item>
 
-        <!--
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        -->
-    </style>
+        <item name="theme_textColorPrimary">@color/my_dark_text_color</item>
+        <item name="android:textColorPrimary">?attr/theme_textColorPrimary</item>
+        <item name="theme_textColorSecondary">@color/my_grey_text_color</item>
+        <item name="android:textColorSecondary">?attr/theme_textColorSecondary</item>
 
-    <style name="MyActionBar" parent="">
+        <item name="theme_BackgroundColor">@color/my_black</item>
 
-        <!--
-    <style name="MyActionBar" parent="">
-        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
-        <item name="android:statusBarColor">@android:color/holo_red_light</item>
-        <item name="android:background">@android:color/white</item>
-        <item name="android:windowActionBarOverlay">true</item>
-
-         	<item name="android:windowTranslucentStatus">true</item>
-        -->
-
-
-        <!-- Support library compatibility 
-        <item name="background">@android:color/holo_blue_light</item>
-        <item name="android:background">@android:color/transparent</item>
-        <item name="windowActionBarOverlay">true</item>
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="windowActionModeOverlay">true</item>
-        <item name="android:windowActionModeOverlay">true</item>
-        <item name="actionBarItemBackground">@android:color/holo_blue_light</item>
-        <item name="android:actionBarItemBackground">@android:color/transparent</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="actionModeBackground">@android:color/holo_green_light</item>
-        <item name="android:actionModeBackground">@android:color/holo_green_light</item>
-        <item name="android:colorForeground">@android:color/holo_green_light</item>
-        <item name="android:colorForegroundInverse">@android:color/holo_blue_light</item>
-        <item name="colorBackgroundFloating">@android:color/holo_orange_light</item>
-        <item name="android:colorBackgroundFloating">@android:color/holo_orange_light</item>
-        <item name="colorControlNormal">@android:color/black</item>
-        <item name="android:colorControlNormal">@android:color/black</item>
-        <item name="backgroundSplit">@android:color/holo_green_light</item>
-        <item name="backgroundStacked">@android:color/holo_green_light</item>
-        <item name="android:backgroundStacked">@android:color/holo_green_light</item>
--->
-        <!-- aus Vererbung/ (Base.) Widget.AppCompat.ActionBar -->
     </style>
 
     <style name="CustomActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">

@@ -408,21 +408,25 @@ public class HtmlFetcher {
         Proxy proxy = getProxy();
         HttpURLConnection hConn = (HttpURLConnection) url.openConnection(proxy);
         hConn.setRequestProperty("User-Agent", userAgent);
-        hConn.setRequestProperty("Accept", accept);
+        hConn.addRequestProperty("Accept", accept);
 
         if (includeSomeGooseOptions) {
-            hConn.setRequestProperty("Accept-Language", language);
-            hConn.setRequestProperty("content-charset", charset);
+            hConn.addRequestProperty("Accept-Language", language);
+            hConn.addRequestProperty("content-charset", charset);
             hConn.addRequestProperty("Referer", referrer);
             // avoid the cache for testing purposes only?
-            hConn.setRequestProperty("Cache-Control", cacheControl);
+            hConn.addRequestProperty("Cache-Control", cacheControl);
         }
 
         // suggest respond to be gzipped or deflated (which is just another compression)
         // http://stackoverflow.com/q/3932117
-        hConn.setRequestProperty("Accept-Encoding", "gzip, deflate");
+        hConn.addRequestProperty("Accept-Encoding", "gzip, deflate");
         hConn.setConnectTimeout(timeout);
         hConn.setReadTimeout(timeout);
+
+        if(urlAsStr.startsWith("https://derstandard.at")){
+            hConn.addRequestProperty("Cookie", "DSGVO_ZUSAGE_V1=true; MGUID=GUID=d7a70143-6871-4ac2-bfa6-5da0ae78add2&Timestamp=2018-09-14T08:11:49&DetectedVersion=Web&Version=&Hash=E04A0D0F7DB9EEA8F3C4D116D9BC2719;");
+        }
         return hConn;
     }
 

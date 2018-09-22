@@ -94,7 +94,7 @@ public class ArticleTextExtractor {
     }
 
     /**
-     * @param html extracts article text from given html string. wasn't tested
+     * param html extracts article text from given html string. wasn't tested
      * with improper HTML, although jSoup should be able to handle minor stuff.
      * @returns extracted article, all HTML tags stripped
      */
@@ -479,6 +479,9 @@ public class ArticleTextExtractor {
                     noFollow = rel.contains("nofollow");
                     weight -= 40;
                 }
+            }
+            if(sourceUrl.contains("f.ix.de")) {
+                weight=weight-45;
             }
 
             weight = (int) (weight * score);

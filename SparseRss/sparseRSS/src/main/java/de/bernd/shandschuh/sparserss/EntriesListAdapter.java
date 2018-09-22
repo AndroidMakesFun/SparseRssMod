@@ -156,9 +156,9 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
-		if (Util.isLightTheme(context)) {
-			textView.setTextColor(Color.BLACK);
-		}
+		//if (Util.isLightTheme(context)) {
+		//	textView.setTextColor(Color.BLACK);
+		//}
 
 		textView.setText(cursor.getString(titleColumnPosition));
 		float fsize=15.0f;
@@ -241,15 +241,20 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			textView.setText(cursor.getString(titleColumnPosition));
 			dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)));
 		}
-		
+
+		//int colDarkGrey=0xFF737373;
+		int colGrey=0xFF999999;
 		if (forcedState == STATE_ALLUNREAD && !markedAsRead.contains(id) || (forcedState != STATE_ALLREAD && cursor.isNull(readDateColumn) && !markedAsRead.contains(id)) || markedAsUnread.contains(id)) {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
 			dateTextView.setEnabled(true);
+			dateTextView.setTextColor(colGrey);
+		//	textView.setTextColor(colGrey);
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
-			dateTextView.setEnabled(false);
+		//	dateTextView.setTextColor(colDarkGrey);
+		//	textView.setTextColor(colDarkGrey);
 		}
 	}
 

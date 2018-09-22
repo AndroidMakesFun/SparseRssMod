@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_chrome"
+        android:title="Chrome" />
+
+    <item
+        android:id="@+id/menu_edge"
+        android:title="Edge" />
+
+    <item
+        android:id="@+id/menu_firefox_klar"
+        android:title="Firefox Klar" />
+
+
+    <item
+        android:id="@+id/menu_default"
+        android:title="Default" />
+
+    <!-- Other - later -->
+
+</menu>

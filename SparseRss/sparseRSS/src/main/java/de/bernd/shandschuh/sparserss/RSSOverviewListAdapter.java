@@ -116,11 +116,12 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 		TextView textView = ((TextView) view.findViewById(android.R.id.text1));
-		if (Util.isLightTheme(context)) {
-			textView.setTextColor(Color.BLACK);
-		}else{
-			textView.setTextColor(Color.GRAY);
-		}
+		TextView updateTextView = ((TextView) view.findViewById(android.R.id.text2));;
+		//int colDarkGrey=0xFF737373;
+		//int colGrey=0xFF999999;
+		//if (Util.isLightTheme(context)) {
+		//	textView.setTextColor(Color.BLACK);
+		//}
 		
 		textView.setSingleLine();
 		
@@ -138,9 +139,7 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 		countCursor.close();
 		
 		long timestamp = cursor.getLong(lastUpdateColumn);
-		
-		TextView updateTextView = ((TextView) view.findViewById(android.R.id.text2));;
-		
+
 		if (cursor.isNull(errorPosition)) {
 			Date date = new Date(timestamp);
 			
@@ -153,11 +152,20 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 		if (unreadCount > 0) {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
+			//textView.setTextColor(colDarkGrey);
 			updateTextView.setEnabled(true);
+			//updateTextView.setTextColor(colGrey);
+			//if(Util.isLightTheme(context)){
+			//	updateTextView.setTextColor(Color.BLACK);
+			//}
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
+			//textView.setTextColor(colGrey);
 			updateTextView.setEnabled(false);
+			//if (!Util.isLightTheme(context)) {
+			//	updateTextView.setTextColor(colGrey);
+			//}
 		}
 
 		String link = cursor.getString(linkPosition);

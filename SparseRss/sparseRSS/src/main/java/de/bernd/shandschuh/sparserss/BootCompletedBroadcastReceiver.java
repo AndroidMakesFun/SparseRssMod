@@ -25,23 +25,61 @@
 
 package de.bernd.shandschuh.sparserss;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
-import de.bernd.shandschuh.sparserss.service.RefreshService;
+import android.util.Log;
+
+import de.bernd.shandschuh.sparserss.service.RssJobService;
 
 public class BootCompletedBroadcastReceiver extends BroadcastReceiver {
+
+	private static final String TAG = BootCompletedBroadcastReceiver.class.getSimpleName();
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		try {
+			Log.d(TAG, "onReceive: BootCompletedBroadcastReceiver");
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context.createPackageContext(Strings.PACKAGE, 0));
 			
 			preferences.edit().putLong(Strings.PREFERENCE_LASTSCHEDULEDREFRESH, 0).commit();
 			if (preferences.getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
-				context.startService(new Intent(context, RefreshService.class));
+
+				//context.startService(new Intent(context, RefreshService.class));
+				// ersetzt durch folgende Zeilen:
+
+				Log.d(TAG, "Scheduling job in BootCompletedBroadcastReceiver");
+				ComponentName mServiceComponent = new ComponentName(context, RssJobService.class);
+				JobInfo.Builder jobBuilder = new JobInfo.Builder(1, mServiceComponent);
+				//	builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);  // nur wlan
+				jobBuilder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+
+				final String SIXTYMINUTES = "3600000";
+				int time = 3600000;
+				try {
+					time = Math.max(60000, Integer.parseInt(preferences.getString(Strings.SETTINGS_REFRESHINTERVAL, SIXTYMINUTES)));
+				} catch (Exception exception) {
+
+				}
+				jobBuilder.setMinimumLatency(time);  //2 * 1000); // wait at least 2 Sek
+
+				jobBuilder.setOverrideDeadline(3 * 1000); // maximum delay
+
+				PersistableBundle extras = new PersistableBundle();
+				//extras.putString(Strings.FEEDID, id);
+				jobBuilder.setExtras(extras);
+				JobScheduler tm = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+				tm.schedule(jobBuilder.build());
+
+				//test
+				context.sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS));
 			}
 			context.sendBroadcast(new Intent(Strings.ACTION_UPDATEWIDGET));
 		} catch (NameNotFoundException e) {

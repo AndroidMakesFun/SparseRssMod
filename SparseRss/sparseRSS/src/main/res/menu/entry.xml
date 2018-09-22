@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <group android:checkableBehavior="single" >
         <item
             android:id="@+id/menu_feed"
             android:icon="@drawable/ic_action_crop"
-            android:showAsAction="ifRoom"
+            app:showAsAction="ifRoom"
             android:title="Feed"/>
         <item
             android:id="@+id/menu_amp"
             android:icon="@android:drawable/ic_menu_gallery"
-            android:showAsAction="ifRoom"
+            app:showAsAction="ifRoom"
             android:title="AMP"/>
         <item
             android:id="@+id/menu_readability"
             android:icon="@drawable/readability_400"
-            android:showAsAction="ifRoom"
+            app:showAsAction="ifRoom"
             android:title="Readability"/>
         <item
             android:id="@+id/menu_googleweblight"
-            android:showAsAction="ifRoom"
+            app:showAsAction="ifRoom"
             android:title="Google Weblight"/>
     </group>
 
@@ -42,9 +43,17 @@
         android:icon="@android:drawable/ic_menu_share"
         android:title="Share Entry"/>
     <item
+        android:id="@+id/menu_share_source"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="Share Source"/>
+    <item
         android:id="@+id/menu_text_scale"
         android:icon="@android:drawable/ic_menu_sort_alphabetically"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:title="Text Scale"/>
+
+    <item android:id="@+id/menu_browser"
+        android:title="Choose Browser"
+        />
 
 </menu>

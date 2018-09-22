@@ -28,10 +28,14 @@ package de.bernd.shandschuh.sparserss;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.NotificationManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,6 +49,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -55,6 +60,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -78,9 +85,13 @@ import android.widget.Toast;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.OPML;
 import de.bernd.shandschuh.sparserss.service.RefreshService;
+import de.bernd.shandschuh.sparserss.service.RssJobService;
 import de.bernd.shandschuh.sparserss.util.NavigationDrawerAdapter;
 import de.bernd.shandschuh.sparserss.util.NavigationDrawerAdapter.NavDrawerLineEntry;
 
+/**
+ * Main Class
+ */
 public class RSSOverview extends AppCompatActivity {
 	private static final int DIALOG_ERROR_FEEDIMPORT = 3;
 
@@ -123,6 +134,9 @@ public class RSSOverview extends AppCompatActivity {
 
 	public static RSSOverview INSTANCE;
 
+	private static final String TAG = RSSOverview.class.getSimpleName();
+
+	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		if (Util.isLightTheme(this)) {
@@ -142,11 +156,15 @@ public class RSSOverview extends AppCompatActivity {
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu_grey600_36dp);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		int col=0xFF737373;
+		toolbar.setTitleTextColor(col);
 
 		setupDrawerContent();
 
 		// setHomeButtonActive();
 		progressBar = (ProgressBar) findViewById(R.id.progress_spinner);
+
+		mServiceComponent = new ComponentName(this, RssJobService.class);
 
 		listview = (ListView) findViewById(android.R.id.list);
 		listAdapter = new RSSOverviewListAdapter(this);
@@ -288,22 +306,23 @@ public class RSSOverview extends AppCompatActivity {
 
 		});
 
-		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
-			startService(new Intent(this, RefreshService.class)); // starts the
-																	// service
-																	// independent
-																	// to this
-																	// activity
-		} else {
-			stopService(new Intent(this, RefreshService.class));
-		}
+		//if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
+		//	startService(new Intent(this, RefreshService.class)); // starts the
+		//															// service
+		//															// independent
+		//															// to this
+		//															// activity
+		//} else {
+		//	stopService(new Intent(this, RefreshService.class));
+		//}
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHONPENENABLED,
 				false)) {
-			new Thread() {
-				public void run() {
-					sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS));
-				}
-			}.start();
+			refreshAllFeeds();
+			//new Thread() {
+			//	public void run() {
+			//		sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS));
+			//	}
+			//}.start();
 		}
 
 		// //ab api21!
@@ -325,6 +344,13 @@ public class RSSOverview extends AppCompatActivity {
 		// if (RSSOverview.notificationManager != null) {
 		// notificationManager.cancel(0);
 		// }
+	}
+
+	@Override
+	protected void onPause()
+	{
+		unregisterReceiver(refreshReceiver);
+		super.onPause();
 	}
 
 	@Override
@@ -363,6 +389,9 @@ public class RSSOverview extends AppCompatActivity {
 		return onOptionsItemSelected(item);
 	}
 
+	private int mJobId = 1;
+	private ComponentName mServiceComponent;
+
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		
@@ -379,13 +408,8 @@ public class RSSOverview extends AppCompatActivity {
 			break;
 		}
 		case R.id.menu_refresh: {
-			new Thread() {
-				public void run() {
-					sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS).putExtra(Strings.SETTINGS_OVERRIDEWIFIONLY,
-							PreferenceManager.getDefaultSharedPreferences(RSSOverview.this)
-									.getBoolean(Strings.SETTINGS_OVERRIDEWIFIONLY, false)));
-				}
-			}.start();
+
+			refreshAllFeeds();
 			break;
 		}
 		case CONTEXTMENU_EDIT_ID: {
@@ -394,6 +418,9 @@ public class RSSOverview extends AppCompatActivity {
 			break;
 		}
 		case CONTEXTMENU_REFRESH_ID: {
+
+			// TODO WLAN an/aus auswerten/berücksichtigen
+
 			final String id = Long.toString(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id);
 
 			ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(
@@ -401,64 +428,27 @@ public class RSSOverview extends AppCompatActivity {
 
 			final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-			if (networkInfo != null && networkInfo.getState() == NetworkInfo.State.CONNECTED) { // since
-																								// we
-																								// have
-																								// acquired
-																								// the
-																								// networkInfo,
-																								// we
-																								// use
-																								// it
-																								// for
-																								// basic
-																								// checks
-				final Intent intent = new Intent(Strings.ACTION_REFRESHFEEDS).putExtra(Strings.FEEDID, id);
+			if (networkInfo != null && networkInfo.getState() == NetworkInfo.State.CONNECTED) {
 
-				final Thread thread = new Thread() {
-					public void run() {
-						sendBroadcast(intent);
-					}
-				};
+				JobInfo.Builder jobBuilder = new JobInfo.Builder(mJobId, mServiceComponent);
 
-				if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI
-						|| PreferenceManager.getDefaultSharedPreferences(RSSOverview.this)
-								.getBoolean(Strings.SETTINGS_OVERRIDEWIFIONLY, false)) {
-					intent.putExtra(Strings.SETTINGS_OVERRIDEWIFIONLY, true);
-					thread.start();
-				} else {
-					Cursor cursor = getContentResolver().query(FeedData.FeedColumns.CONTENT_URI(id),
-							new String[] { FeedData.FeedColumns.WIFIONLY }, null, null, null);
+				//boolean requiresUnmetered = mWiFiConnectivityRadioButton.isChecked();
+				//boolean requiresAnyConnectivity = mAnyConnectivityRadioButton.isChecked();
+				//if (requiresUnmetered) {
+				//	builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
+				//} else if (requiresAnyConnectivity) {
+				jobBuilder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+				//}
 
-					cursor.moveToFirst();
+				PersistableBundle extras = new PersistableBundle();
+				extras.putString(Strings.FEEDID, id);
 
-					if (cursor.isNull(0) || cursor.getInt(0) == 0) {
-						thread.start();
-					} else {
-						Builder builder = new AlertDialog.Builder(RSSOverview.this);
+				jobBuilder.setExtras(extras);
 
-						builder.setIcon(android.R.drawable.ic_dialog_alert);
-						builder.setTitle(R.string.dialog_hint);
-						builder.setMessage(R.string.question_refreshwowifi);
-						builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								intent.putExtra(Strings.SETTINGS_OVERRIDEWIFIONLY, true);
-								thread.start();
-							}
-						});
-						builder.setNeutralButton(R.string.button_alwaysokforall, new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int which) {
-								PreferenceManager.getDefaultSharedPreferences(RSSOverview.this).edit()
-										.putBoolean(Strings.SETTINGS_OVERRIDEWIFIONLY, true).commit();
-								intent.putExtra(Strings.SETTINGS_OVERRIDEWIFIONLY, true);
-								thread.start();
-							}
-						});
-						builder.setNegativeButton(android.R.string.no, null);
-						builder.show();
-					}
-					cursor.close();
-				}
+				// Schedule job
+				Log.d(TAG, "Scheduling job");
+				JobScheduler tm = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+				tm.schedule(jobBuilder.build());
 
 			}
 			break;
@@ -669,6 +659,27 @@ public class RSSOverview extends AppCompatActivity {
 		return true;
 	}
 
+	private void refreshAllFeeds() {
+		JobInfo.Builder jobBuilder = new JobInfo.Builder(mJobId, mServiceComponent);
+		jobBuilder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+		PersistableBundle extras = new PersistableBundle();
+		//extras.putString(Strings.FEEDID, id);
+		jobBuilder.setExtras(extras);
+
+		// Schedule job
+		Log.d(TAG, "Scheduling job");
+		JobScheduler tm = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+		tm.schedule(jobBuilder.build());
+
+		//new Thread() {
+		//	public void run() {
+		//		sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS).putExtra(Strings.SETTINGS_OVERRIDEWIFIONLY,
+		//				PreferenceManager.getDefaultSharedPreferences(RSSOverview.this)
+		//						.getBoolean(Strings.SETTINGS_OVERRIDEWIFIONLY, false)));
+		//	}
+		//}.start();
+	}
+
 
 	public static final ContentValues getReadContentValues() {
 		ContentValues values = new ContentValues();
@@ -800,8 +811,10 @@ public class RSSOverview extends AppCompatActivity {
 	public void zeigeProgressBar(boolean zeigen) {
 		if (zeigen) {
 			progressBar.setVisibility(View.VISIBLE);
+			Log.d(TAG, "zeigeProgressBar: true");
 		} else {
 			progressBar.setVisibility(View.INVISIBLE);
+			Log.d(TAG, "zeigeProgressBar: false");
 		}
 	}
 

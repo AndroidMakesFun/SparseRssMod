@@ -3,8 +3,8 @@
     package="de.bernd.shandschuh.sparserss"
     android:installLocation="auto"
     
-    android:versionCode="230"
-    android:versionName="2.30" >
+    android:versionCode="232"
+    android:versionName="2.32" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -34,8 +34,14 @@
         android:label="@string/app_name"
         android:testOnly="false"
         android:theme="@style/MyTheme" >
+        <!--
         <service android:name=".service.RefreshService" />
         <service android:name=".service.FetcherService" />
+        -->
+        <service
+            android:name=".service.RssJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
 
         <provider
             android:name=".provider.FeedDataContentProvider"
@@ -46,6 +52,7 @@
         <activity
             android:name=".RSSOverview"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/MyTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -57,27 +64,27 @@
         
         <activity
             android:name=".EntriesListActivity"
-            android:launchMode="singleTask" 
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/MyTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="vnd.android.cursor.dir/vnd.feeddata.entry" />
+                <data android:scheme="content"
+                    android:mimeType="vnd.android.cursor.dir/vnd.feeddata.entry" />
             </intent-filter>
         </activity>
         
         <activity
             android:name=".EntryActivity"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/MyTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="vnd.android.cursor.item/vnd.feeddata.entry" />
+                <data android:scheme="content"
+                    android:mimeType="vnd.android.cursor.item/vnd.feeddata.entry" />
             </intent-filter>
         </activity>
         <activity android:name=".ApplicationPreferencesActivity" />
@@ -132,6 +139,7 @@
         </activity>
         <activity
             android:name="de.bernd.shandschuh.sparserss.RecycleListActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_recycle_list" >
         </activity>
     </application>

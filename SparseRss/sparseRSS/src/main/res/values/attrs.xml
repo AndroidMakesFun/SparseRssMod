@@ -2,6 +2,13 @@
 	
     <declare-styleable name="mein_menu">
         <attr name="ic_menu_moreoverflow_normal_holo" format="reference"/>
+        <attr name="ic_arrow_left" format="reference"/>
+        <attr name="ic_arrow_right" format="reference"/>
+
+        <attr name="theme_textColorPrimary" format="reference"/>
+        <attr name="theme_textColorSecondary" format="reference"/>
+
+        <attr name="theme_BackgroundColor" format="reference"/>
     </declare-styleable>
 
     		
