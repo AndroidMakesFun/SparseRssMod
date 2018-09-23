@@ -242,7 +242,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)));
 		}
 
-		//int colDarkGrey=0xFF737373;
+		int colDarkGrey=0xFF737373;
 		int colGrey=0xFF999999;
 		if (forcedState == STATE_ALLUNREAD && !markedAsRead.contains(id) || (forcedState != STATE_ALLREAD && cursor.isNull(readDateColumn) && !markedAsRead.contains(id)) || markedAsUnread.contains(id)) {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
@@ -253,7 +253,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
-		//	dateTextView.setTextColor(colDarkGrey);
+			dateTextView.setTextColor(colDarkGrey);
 		//	textView.setTextColor(colDarkGrey);
 		}
 	}
