@@ -54,9 +54,18 @@ public class OutputFormatter {
         Elements gravityItems = topNode.select("*[gravityScore]");
         for (Element item : gravityItems) {
             int score = Integer.parseInt(item.attr("gravityScore"));
-            if (score < 0 || item.text().length() < minParagraphText) // !!
-//           	if (score <= 0 ) // !! bah
-                item.remove();
+//       	if (score <= 0 ) // !! bah nur noch <0 raus
+            if (score < 0 ) {
+                if(item.text().length() < minParagraphText) {
+                    // kurze raus, ausser h1,..
+                    String tag=item.tagName();
+                    if(!tag.startsWith("h")) {
+                        item.remove();
+                    }
+                }else {
+                    item.remove();
+                }
+            }
         }
     }
 

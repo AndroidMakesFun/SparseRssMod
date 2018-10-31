@@ -172,7 +172,7 @@ public class ArticleTextExtractor {
             	text = bestMatchElement.toString();
             }
             
-            text = removeTitleFromText(text, res.getTitle());
+            text = removeTitleFromText(text, res.getTitle()) + ".";
             // this fails for short facebook post and probably tweets: text.length() > res.getDescription().length()
             if (text.length() > res.getTitle().length()) {
                 res.setText(text);
@@ -508,7 +508,7 @@ public class ArticleTextExtractor {
      * of function
      */
     protected void prepareDocument(Document doc) {
-//        stripUnlikelyCandidates(doc);
+        stripUnlikelyCandidates(doc);
         removeScriptsAndStyles(doc);
     }
 
@@ -555,7 +555,7 @@ public class ArticleTextExtractor {
     }
 
     private void print(String add, Element child) {
-        print(add, child, "");
+        print(add, child, "" + getScore(child) );
     }
 
     private void print(String add1, Element child, String add2) {
