@@ -1,6 +1,15 @@
 Changelog - Sparse RSS Mod
 ==========================
 
+2.33
+* Schedule for Oreo fixed
+* Readabilty improved
+* Dark theme improved
+* Hint for empty OPML Folder
+* Choose Browser for Chrome, Firefox Focus, Edge
+* Android Support Lib 27.1.1
+* Android Studio 3.2.1
+
 2.30
 * targetSdkVersion 27 Oreo
 * Android Support Lib 27.0.2

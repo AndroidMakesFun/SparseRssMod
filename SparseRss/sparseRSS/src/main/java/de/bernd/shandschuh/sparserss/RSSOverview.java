@@ -119,7 +119,7 @@ public class RSSOverview extends AppCompatActivity {
 
 	private static final int ACTIVITY_APPLICATIONPREFERENCES_ID = 1;
 
-	private static final Uri CANGELOG_URI = Uri.parse("https://github.com/AndroidMakesFun/SparseRssMod/blob/master/SparseRss/doc/changelog.md");
+	private static final Uri CANGELOG_URI = Uri.parse("https://github.com/AndroidMakesFun/SparseRssMod/blob/master/SparseRss/README.md");
 
 	public static NotificationManager notificationManager; // package scope
 

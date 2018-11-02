@@ -3,8 +3,8 @@
     package="de.bernd.shandschuh.sparserss"
     android:installLocation="auto"
     
-    android:versionCode="232"
-    android:versionName="2.32" >
+    android:versionCode="233"
+    android:versionName="2.33" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
