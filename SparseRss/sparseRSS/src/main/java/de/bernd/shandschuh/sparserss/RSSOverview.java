@@ -566,8 +566,8 @@ public class RSSOverview extends AppCompatActivity {
 		case R.id.menu_import: {
 			final AlertDialog.Builder builder = new AlertDialog.Builder(RSSOverview.this);
 
-			// builder.setTitle(R.string.select_file);
-			builder.setTitle("From " + this.getExternalFilesDir("rss"));
+			String title=""+this.getExternalFilesDir("rss");
+			builder.setTitle(title); //"From " + this.getExternalFilesDir("rss"));
 
 			try {
 				final String[] fileNames = this.getExternalFilesDir("rss").list(new FilenameFilter() {
@@ -589,7 +589,11 @@ public class RSSOverview extends AppCompatActivity {
 						}
 					}
 				});
-				builder.show();
+				if(fileNames.length==0){
+					Util.msgBox(RSSOverview.this, "Empty:\n" + title);
+				}else{
+					builder.show();
+				}
 			} catch (Exception e) {
 				showDialog(DIALOG_ERROR_FEEDIMPORT);
 			}
