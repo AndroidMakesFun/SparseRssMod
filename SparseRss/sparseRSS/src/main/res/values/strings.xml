@@ -23,7 +23,9 @@
  
  Note for translators: only include the strings that differ from the 
  English version. Translations will only be included in the Sparse RSS 
- program, if they are licensed under the MIT license.
+ program, if they are licensed under the MIT license.
+
+
 -->
 <resources>
 
@@ -81,7 +83,8 @@
         AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-        THE SOFTWARE.</string>
+        THE SOFTWARE.
+</string>
     <string name="contributors_list">Additional contributors (other translations and code):\n\n - a very nice person that wants to be unnamed (French and Turkish translations)\n
         - another nice unnamed person (Japanese translation)\n
         - Joel Low (several patches [refresh spinner, UI adjustments and more]); see commit log for details</string>
@@ -192,8 +195,6 @@
     
 
     <string-array name="settings_intervals">
-        <item>1 minute</item>
-        <item>5 minutes</item>
         <item>15 minutes</item>
         <item>30 minutes</item>
         <item>1 hour</item>
@@ -240,7 +241,8 @@
     <string name="failed_to_get_log_message">"Failed to get the log from the system."</string>
     <string name="main_dialog_text">"This application will attempt to collect the device log.
 The collected log will be sent using an application of your choice.
-You also will have an opportunity to see and modify the data being sent."</string>
+You also will have an opportunity to see and modify the data being sent."
+</string>
     <string name="title_activity_recycle_list">RecycleListActivity</string>
 
     <!-- Navigation Drawer -->

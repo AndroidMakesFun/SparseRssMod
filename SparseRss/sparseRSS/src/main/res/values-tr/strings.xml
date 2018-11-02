@@ -130,8 +130,6 @@
     <string name="dialog_hint">İpucu</string>
 
     <string-array name="settings_intervals">
-        <item>1 dakika</item>
-        <item>5 dakika</item>
         <item>15 dakika</item>
         <item>30 dakika</item>
         <item>1 saat</item>

@@ -25,7 +25,6 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
-import android.provider.SyncStateContract;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
@@ -37,6 +36,8 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
@@ -374,6 +375,7 @@ public class Util {
 		return prefs.getString(PREFERENCE_BROWSER_PACKAGE,null);
 	}
 
+	private static final String SIXTYMINUTES = "3600000";
 
 	public static void scheduleJob(Context context, final boolean doShedule) {
 
@@ -389,10 +391,10 @@ public class Util {
 		jobBuilder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		final String SIXTYMINUTES = "3600000";
+
 		int time = 3600000;
 		try {
-		    // 900000  = 15 min
+		    // 900000  = 1000ms * 60s * 15m = 15 min
 			time = Math.max(900000, Integer.parseInt(prefs.getString(Strings.SETTINGS_REFRESHINTERVAL, SIXTYMINUTES)));
 		} catch (Exception exception) {
 			Log.d(TAG, "EXP2 " + exception.toString());
@@ -424,7 +426,17 @@ public class Util {
 	public static void jobInfos(Context context) {
 		JobScheduler tm = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 		int size=tm.getAllPendingJobs().size();
-		Util.msgBox(context,"Pendings Jobs: " + size);
-
+		String text="Pendings Jobs: " + size;
+		SharedPreferences prefs=PreferenceManager.getDefaultSharedPreferences(context);
+		long lastRun=prefs.getLong(Strings.PREFERENCE_LASTSCHEDULEDREFRESH, 0);
+		if(lastRun>0){
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String currentDateTime = dateFormat.format(new Date(lastRun));
+			text+="\nLastRun " + currentDateTime;
+		}
+		int delta = Math.max(900000, Integer.parseInt(prefs.getString(Strings.SETTINGS_REFRESHINTERVAL, SIXTYMINUTES)));
+		int min=delta/60000;
+		text+="\nSchedule " + min + " minutes";
+		Util.msgBox(context,text);
 	}
 }

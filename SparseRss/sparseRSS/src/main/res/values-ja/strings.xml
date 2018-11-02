@@ -132,8 +132,6 @@
 
     <string name="dialog_licenseagreement">認可</string>
     <string-array name="settings_intervals">
-        <item>１分</item>
-        <item>５分</item>
         <item>１５分</item>
         <item>３０分</item>
         <item>１時間</item>

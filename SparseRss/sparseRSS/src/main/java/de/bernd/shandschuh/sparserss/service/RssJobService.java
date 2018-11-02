@@ -110,6 +110,8 @@ public class RssJobService extends JobService {
         if (PreferenceManager.getDefaultSharedPreferences(serviceContext).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
             Util.scheduleJob(getApplicationContext(), true); // reschedule the job
         }
+        long lDate = new Date().getTime();
+        PreferenceManager.getDefaultSharedPreferences(serviceContext).edit().putLong(Strings.PREFERENCE_LASTSCHEDULEDREFRESH, lDate).apply();
         // Return true as there's more work to be done with this job. - also false ends here?!
         return true; // mit true zieht jobFinished( )
     }
