@@ -34,6 +34,7 @@ import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import de.bernd.shandschuh.sparserss.R;
@@ -91,7 +92,8 @@ public class WidgetConfigActivity extends PreferenceActivity {
 			
 			findViewById(R.id.save_button).setOnClickListener(new OnClickListener() {
 				public void onClick(View view) {
-					SharedPreferences.Editor preferences = getSharedPreferences(SparseRSSAppWidgetProvider.class.getName(), 0).edit();
+					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(WidgetConfigActivity.this);
+					SharedPreferences.Editor preferences = prefs.edit();
 					
 					boolean hideRead = false;//((CheckBoxPreference) getPreferenceManager().findPreference("widget.hideread")).isChecked();
 					

@@ -25,11 +25,7 @@
 
 package de.bernd.shandschuh.sparserss;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.job.JobInfo;
@@ -41,13 +37,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
@@ -60,7 +56,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -82,9 +77,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FilenameFilter;
+
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.OPML;
-import de.bernd.shandschuh.sparserss.service.RefreshService;
 import de.bernd.shandschuh.sparserss.service.RssJobService;
 import de.bernd.shandschuh.sparserss.util.NavigationDrawerAdapter;
 import de.bernd.shandschuh.sparserss.util.NavigationDrawerAdapter.NavDrawerLineEntry;
@@ -315,15 +313,12 @@ public class RSSOverview extends AppCompatActivity {
 		//} else {
 		//	stopService(new Intent(this, RefreshService.class));
 		//}
-		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHONPENENABLED,
-				false)) {
-			refreshAllFeeds();
-			//new Thread() {
-			//	public void run() {
-			//		sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS));
-			//	}
-			//}.start();
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHONPENENABLED, false)) {
+			Util.scheduleJob(this, false);
+		}else if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)){
+			Util.scheduleJob(this, true);
 		}
+
 
 		// //ab api21!
 		// listview.setNestedScrollingEnabled(true);
@@ -660,6 +655,12 @@ public class RSSOverview extends AppCompatActivity {
 	}
 
 	private void refreshAllFeeds() {
+
+		//boolean reShed=PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHENABLED, false);
+		//Util.scheduleJob(this, reShed);
+
+		Util.scheduleJob(this, false);
+        /**
 		JobInfo.Builder jobBuilder = new JobInfo.Builder(mJobId, mServiceComponent);
 		jobBuilder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
 		PersistableBundle extras = new PersistableBundle();
@@ -667,9 +668,17 @@ public class RSSOverview extends AppCompatActivity {
 		jobBuilder.setExtras(extras);
 
 		// Schedule job
-		Log.d(TAG, "Scheduling job");
+		Log.d(TAG, "refreshAllFeeds Scheduling job");
 		JobScheduler tm = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
 		tm.schedule(jobBuilder.build());
+
+		// Sched wieder anwerfen
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(RSSOverview.this);
+		Log.d(TAG, "refreshAllFeeds Scheduling job BOOL " + prefs.getBoolean(Strings.SETTINGS_REFRESHENABLED, false));
+		if (prefs.getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
+			Util.scheduleJob(this);
+		}
+         */
 
 		//new Thread() {
 		//	public void run() {
@@ -970,6 +979,11 @@ public class RSSOverview extends AppCompatActivity {
 		return super.onKeyUp(keyCode, event);
 	}
 
+	// menu / feedoverview.xml android:onClick="clickJobs"
+	public void clickJobs(MenuItem menu) {
+		Log.d(TAG, "clickJobs");
+		Util.jobInfos(this);
+	}
 	
 //	// f?r Hamburger Home Icon
 //	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)

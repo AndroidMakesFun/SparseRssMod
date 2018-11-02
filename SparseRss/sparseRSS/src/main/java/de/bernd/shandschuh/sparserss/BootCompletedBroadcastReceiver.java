@@ -45,17 +45,20 @@ public class BootCompletedBroadcastReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		try {
-			Log.d(TAG, "onReceive: BootCompletedBroadcastReceiver");
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context.createPackageContext(Strings.PACKAGE, 0));
-			
-			preferences.edit().putLong(Strings.PREFERENCE_LASTSCHEDULEDREFRESH, 0).commit();
+			// Huawei: wird nie aufgerufen ?!
+			Log.d(TAG, "onReceive: BOOTCOMPLETE_BROADCASTRECEIVER");
+
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+			preferences.edit().putLong(Strings.PREFERENCE_LASTSCHEDULEDREFRESH, 0).apply();
 			if (preferences.getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
 
 				//context.startService(new Intent(context, RefreshService.class));
 				// ersetzt durch folgende Zeilen:
 
 				Log.d(TAG, "Scheduling job in BootCompletedBroadcastReceiver");
+				Util.scheduleJob(context,true);
+
+			/**
 				ComponentName mServiceComponent = new ComponentName(context, RssJobService.class);
 				JobInfo.Builder jobBuilder = new JobInfo.Builder(1, mServiceComponent);
 				//	builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);  // nur wlan
@@ -66,7 +69,7 @@ public class BootCompletedBroadcastReceiver extends BroadcastReceiver {
 				try {
 					time = Math.max(60000, Integer.parseInt(preferences.getString(Strings.SETTINGS_REFRESHINTERVAL, SIXTYMINUTES)));
 				} catch (Exception exception) {
-
+                    Log.d(TAG, "EXP " + exception.toString());
 				}
 				jobBuilder.setMinimumLatency(time);  //2 * 1000); // wait at least 2 Sek
 
@@ -77,13 +80,12 @@ public class BootCompletedBroadcastReceiver extends BroadcastReceiver {
 				jobBuilder.setExtras(extras);
 				JobScheduler tm = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 				tm.schedule(jobBuilder.build());
+			 */
 
 				//test
-				context.sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS));
+				// context.sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS));
 			}
-			context.sendBroadcast(new Intent(Strings.ACTION_UPDATEWIDGET));
-		} catch (NameNotFoundException e) {
-		}
+			// context.sendBroadcast(new Intent(Strings.ACTION_UPDATEWIDGET));
 	}
 
 }

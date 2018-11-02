@@ -58,7 +58,7 @@ public class RssJobService extends JobService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "Service created");
+        Log.i(TAG, "RssJobService Service created");
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if(RSSOverview.INSTANCE!=null){
             RSSOverview.INSTANCE.zeigeProgressBar(true);
@@ -77,7 +77,11 @@ public class RssJobService extends JobService {
     @Override
     public boolean onStartJob(final JobParameters params) {
 
-        Log.i(TAG, "on start job: " + params.getJobId());
+        // Huawei: wird nicht aufgerufen
+        Log.i(TAG, "RssJobService . ONSTARTJOB ! " + params.getJobId());
+        //Util.msgBox(RSSOverview.INSTANCE,"RssJobService . onStartJob ! " + params.getJobId());
+
+        final Context serviceContext=this;
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -89,13 +93,23 @@ public class RssJobService extends JobService {
                     @Override
                     public void run() {
                         doTheWork(params);
-                        jobFinished(params, false);
+                        Log.i(TAG, "RssJobService . ONSTARTJOB DONE ! " + params.getJobId());
+                        //if (PreferenceManager.getDefaultSharedPreferences(serviceContext).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
+                        //if (params.getJobId()==1){
+                        //    jobFinished(params, true);  // reshed !!
+                        //}else{  // 2 nur 1*
+                            jobFinished(params, false); // fertig
+                        //}
                     }
                 };
                 new Thread(run).start();
             }
         }, 0);
 
+        //if (params.getJobId()==1){
+        if (PreferenceManager.getDefaultSharedPreferences(serviceContext).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
+            Util.scheduleJob(getApplicationContext(), true); // reschedule the job
+        }
         // Return true as there's more work to be done with this job. - also false ends here?!
         return true; // mit true zieht jobFinished( )
     }
@@ -103,7 +117,7 @@ public class RssJobService extends JobService {
     @Override
     public boolean onStopJob(JobParameters params) {
 
-        Log.i(TAG, "on stop job: " + params.getJobId());
+        Log.i(TAG, "RssJobService . onStopJob ! " + params.getJobId());
 
         // Return false to drop the job.
         return false;

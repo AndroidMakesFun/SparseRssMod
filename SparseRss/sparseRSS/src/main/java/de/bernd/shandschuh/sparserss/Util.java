@@ -1,15 +1,14 @@
 package de.bernd.shandschuh.sparserss;
 
-import java.io.File;
-
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
-
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.AlertDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -24,15 +23,29 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
+import android.provider.SyncStateContract;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
+
+import java.io.File;
+
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
+import de.bernd.shandschuh.sparserss.service.RssJobService;
 
 public class Util {
+
+	private static final String TAG = Util.class.getSimpleName();
+
 
 	public static void toastMessage(Activity activityIn, final String Text) {
 		if (activityIn == null) {
@@ -66,7 +79,17 @@ public class Util {
 		});
 	}
 
-	////////////////////////////////////////////////////////
+    public static void msgBox(Context contect, final String text) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(contect);
+        alert.setMessage(text);
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
+        });
+        alert.show();
+    }
+
+    ////////////////////////////////////////////////////////
 	// aus MainTabActivity ////////////////////////////
 	////////////////////////////////////////////////////////
 
@@ -349,5 +372,59 @@ public class Util {
 	public static String getBrowserPackagePrefs(Context context) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		return prefs.getString(PREFERENCE_BROWSER_PACKAGE,null);
+	}
+
+
+	public static void scheduleJob(Context context, final boolean doShedule) {
+
+		// aus // "Scheduling job in BootCompletedBroadcastReceiver");
+		Log.d("Util", "Util . SCHEDULEJOB " + doShedule);
+		ComponentName mServiceComponent = new ComponentName(context, RssJobService.class);
+		int jobid=1;
+		if(!doShedule){
+            jobid=2;
+        }
+		JobInfo.Builder jobBuilder = new JobInfo.Builder(jobid, mServiceComponent);
+		//	builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);  // nur wlan
+		jobBuilder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		final String SIXTYMINUTES = "3600000";
+		int time = 3600000;
+		try {
+		    // 900000  = 15 min
+			time = Math.max(900000, Integer.parseInt(prefs.getString(Strings.SETTINGS_REFRESHINTERVAL, SIXTYMINUTES)));
+		} catch (Exception exception) {
+			Log.d(TAG, "EXP2 " + exception.toString());
+		}
+		Log.d("Util", "Util . SCHEDULEJOB " + time);
+		// jobBuilder.setPeriodic(900000);
+
+        if(doShedule){
+            jobBuilder.setMinimumLatency(time); //2 * 1000); // wait at least 2 Sek
+
+            jobBuilder.setOverrideDeadline(time*2); // 30 * 1000); // maximum delay
+        }
+
+		PersistableBundle extras = new PersistableBundle();
+		//extras.putString(Strings.FEEDID, id);
+		jobBuilder.setExtras(extras);
+		JobScheduler tm = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+		tm.schedule(jobBuilder.build());
+
+		for (int i = 0; i < tm.getAllPendingJobs().size(); i++) {
+			JobInfo jobInfo=tm.getAllPendingJobs().get(i);
+			Log.d("Util", "Util . SCHEDULEJOB jobInfo " + jobInfo.getId());
+		}
+
+		//context.sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS));
+		//context.sendBroadcast(new Intent(Strings.ACTION_UPDATEWIDGET));
+	}
+
+	public static void jobInfos(Context context) {
+		JobScheduler tm = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+		int size=tm.getAllPendingJobs().size();
+		Util.msgBox(context,"Pendings Jobs: " + size);
+
 	}
 }

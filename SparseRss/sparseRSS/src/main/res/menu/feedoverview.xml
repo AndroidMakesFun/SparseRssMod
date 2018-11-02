@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <group android:id="@+id/menu_group_0" >
         
@@ -32,9 +33,16 @@
             android:title="@string/contextmenu_deleteallentries"/>
         <item
             android:id="@+id/menu_log"
-            android:showAsAction="never"
+            app:showAsAction="never"
             android:title="@string/action_log"/>
-        
+
+        <item
+            android:id="@+id/menu_jobs"
+            app:showAsAction="never"
+            android:title="Jobs"
+            android:onClick="clickJobs"
+            />
+
     </group>
     <group android:id="@+id/menu_group_1" >
         <item

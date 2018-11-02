@@ -35,8 +35,10 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.RemoteViews;
+
 import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.RSSOverview;
 import de.bernd.shandschuh.sparserss.Strings;
@@ -59,7 +61,7 @@ public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 	}
 	
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		SharedPreferences preferences = context.getSharedPreferences(SparseRSSAppWidgetProvider.class.getName(), 0);
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		
 		for (int n = 0, i = appWidgetIds.length; n < i; n++) {
 			updateAppWidget(context, appWidgetManager, appWidgetIds[n], preferences.getBoolean(appWidgetIds[n]+".hideread", false), preferences.getString(appWidgetIds[n]+".entrycount", "10"), preferences.getString(appWidgetIds[n]+".feeds", Strings.EMPTY), preferences.getInt(appWidgetIds[n]+".background", STANDARD_BACKGROUND));

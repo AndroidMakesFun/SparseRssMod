@@ -111,7 +111,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
         int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, -1);  // !!
 
-        SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
+
         mIntScalePercent = prefs.getInt(PREFERENCE_SCALE, 60);
 
         // jetzt hier
@@ -431,7 +432,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         mAlertDialog.setView(view);
         mAlertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                SharedPreferences prefs = mActivity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putInt(PREFERENCE_SCALE, mIntScalePercent);
                 editor.commit();
