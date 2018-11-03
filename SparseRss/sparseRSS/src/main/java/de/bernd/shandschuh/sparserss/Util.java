@@ -47,6 +47,15 @@ public class Util {
 
 	private static final String TAG = Util.class.getSimpleName();
 
+	/**
+	 * grey for new
+	 */
+	public static final int colGrey=0xFF999999;
+	/**
+	 * darkGrey for not new
+	 */
+	public static final int colDarkGrey=0xFF737373;
+
 
 	public static void toastMessage(Activity activityIn, final String Text) {
 		if (activityIn == null) {

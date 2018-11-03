@@ -1,7 +1,10 @@
 Changelog - Sparse RSS Mod
 ==========================
+2.34
+* Lighter Dark theme
 
 2.33
+* Scrolling for Oreo fixed
 * Schedule for Oreo fixed
 * Readabilty improved
 * Dark theme improved

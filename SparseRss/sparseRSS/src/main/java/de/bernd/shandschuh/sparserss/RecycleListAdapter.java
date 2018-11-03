@@ -64,12 +64,7 @@ public class RecycleListAdapter extends EntriesListAdapter {
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
-		if (Util.isLightTheme(context)) {
-			textView.setTextColor(Color.BLACK);
-		}else{
-			// CardView cardView=view.findViewById(R.id.card_view);
-			//cardView.setCardBackgroundColor(Color.BLACK);
-		}
+		boolean isDarkTheme=!Util.isLightTheme(context);
 
 		String strTitle=cursor.getString(titleColumnPosition);
 		textView.setText(strTitle);
@@ -183,20 +178,22 @@ public class RecycleListAdapter extends EntriesListAdapter {
 			dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)));
 		}
 
-		int colDarkGrey=0xFF737373;
-		int colGrey=0xFF999999;
 		if (forcedState == STATE_ALLUNREAD && !markedAsRead.contains(id) || (forcedState != STATE_ALLREAD && cursor.isNull(readDateColumn) && !markedAsRead.contains(id)) || markedAsUnread.contains(id)) {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
 			dateTextView.setEnabled(true);
-			dateTextView.setTextColor(colGrey);
-			//textView.setTextColor(colGrey);
+			if(isDarkTheme){
+				textView.setTextColor(Util.colGrey);
+				dateTextView.setTextColor(Util.colGrey);
+			}
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
 			dateTextView.setEnabled(false);
-			dateTextView.setTextColor(colDarkGrey);
-			//textView.setTextColor(colDarkGrey);
+			if(isDarkTheme){
+				textView.setTextColor(Util.colDarkGrey);
+				dateTextView.setTextColor(Util.colDarkGrey);
+			}
 		}
 
 		final ImageView coverView = (ImageView) view.findViewById(R.id.coverimage);

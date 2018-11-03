@@ -15,6 +15,7 @@
         <item name="theme_BackgroundColor">@color/my_white</item>
     </style>
 
+
     <!-- Default Theme -->
     <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="ic_menu_moreoverflow_normal_holo">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
@@ -22,14 +23,14 @@
         <item name="ic_arrow_left">@drawable/ic_arrow_left_dark</item>
         <item name="android:statusBarColor">@android:color/black</item>
 
-        <item name="theme_textColorPrimary">@color/my_dark_text_color</item>
+        <item name="theme_textColorPrimary">@color/my_grey_text_color</item>
         <item name="android:textColorPrimary">?attr/theme_textColorPrimary</item>
         <item name="theme_textColorSecondary">@color/my_grey_text_color</item>
         <item name="android:textColorSecondary">?attr/theme_textColorSecondary</item>
 
         <item name="theme_BackgroundColor">@color/my_black</item>
-
     </style>
+
 
     <style name="CustomActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:windowActionBarOverlay">true</item>

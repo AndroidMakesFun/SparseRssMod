@@ -117,6 +117,7 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {
 		TextView textView = ((TextView) view.findViewById(android.R.id.text1));
 		TextView updateTextView = ((TextView) view.findViewById(android.R.id.text2));;
+		boolean isDarkTheme=!Util.isLightTheme(context);
 		//int colDarkGrey=0xFF737373;
 		//int colGrey=0xFF999999;
 		//if (Util.isLightTheme(context)) {
@@ -156,16 +157,19 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 			updateTextView.setEnabled(true);
 			//updateTextView.setTextColor(colGrey);
 			//if(Util.isLightTheme(context)){
-			//	updateTextView.setTextColor(Color.BLACK);
-			//}
+			if(isDarkTheme){
+				textView.setTextColor(Util.colGrey);
+				updateTextView.setTextColor(Util.colGrey);
+			}
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
 			//textView.setTextColor(colGrey);
 			updateTextView.setEnabled(false);
-			//if (!Util.isLightTheme(context)) {
-			//	updateTextView.setTextColor(colGrey);
-			//}
+			if(isDarkTheme){
+				textView.setTextColor(Util.colDarkGrey);
+				updateTextView.setTextColor(Util.colDarkGrey);
+			}
 		}
 
 		String link = cursor.getString(linkPosition);

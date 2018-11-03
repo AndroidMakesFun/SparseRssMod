@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -25,6 +26,8 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 	private LayoutInflater mInflater;
 	private static ArrayList<NavDrawerLineEntry> mListeNavDrawerEntries = null;
 
+	private static int iTextColor= Color.BLACK;
+
 	public class NavDrawerLineEntry {
 		public Drawable res ;
 		public String titel = "";
@@ -38,6 +41,12 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 	}
 
 	public NavigationDrawerAdapter(Context context) {
+
+		if(Util.isLightTheme(context)){
+			iTextColor=Color.BLACK;
+		}else{
+			iTextColor=Util.colGrey;
+		}
 
 		mInflater = LayoutInflater.from(context);
 		mListeNavDrawerEntries = new ArrayList<NavDrawerLineEntry>();
@@ -156,6 +165,7 @@ public class NavigationDrawerAdapter extends BaseAdapter {
 
 			holder = new ViewHolder();
 			holder.text = (TextView) convertView.findViewById(R.id.text43);
+			holder.text.setTextColor(iTextColor);
 			holder.icon = (ImageView) convertView.findViewById(R.id.icon43);
 			
 			convertView.setTag(holder);
