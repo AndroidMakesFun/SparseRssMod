@@ -20,6 +20,7 @@ Thanks
 
 Older Versions
 --------------
+* [2.29](https://apkplz.net/download-app/de.bernd.shandschuh.sparserss) Last Version for Android 5 (2017)
 * [2.21](https://apkplz.com/android-apps/sparse-rss-mod/sparse-rss-mod-2-21) Last Version for Android 4
 * [1.96](https://apkplz.com/android-apps/sparse-rss-mod/sparse-rss-mod-1-96) Old Version without Support Libs and Cover
 
