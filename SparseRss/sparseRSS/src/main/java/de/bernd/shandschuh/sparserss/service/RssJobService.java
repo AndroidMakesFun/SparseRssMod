@@ -1,6 +1,7 @@
 package de.bernd.shandschuh.sparserss.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.job.JobParameters;
@@ -11,14 +12,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.AudioAttributes;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.util.Xml;
+import android.view.View;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -59,7 +68,13 @@ public class RssJobService extends JobService {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "RssJobService Service created");
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (preferences.getBoolean(Strings.SETTINGS_NOTIFICATIONSENABLED, false)) {
+            mNotificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+        }
+
         if(RSSOverview.INSTANCE!=null){
             RSSOverview.INSTANCE.zeigeProgressBar(true);
         }
@@ -133,17 +148,19 @@ public class RssJobService extends JobService {
     private static Proxy proxy;
     private static final String ZERO = "0";
     private static final String COUNT = "COUNT(*)";
-
-    private NotificationManager notificationManager;
     private String mImageFolder=null;
+
+
+    //private NotificationManager notificationManager;
+    public static NotificationManagerCompat mNotificationManagerCompat=null;
+    private static NotificationCompat.Builder sGlobalNotificationCompatBuilder = null;
+    private static final String CHANNEL_ID = "4242N";
+    public static final int NOTIFICATION_ID = 8282;
+
 
     private void doTheWork(JobParameters params){
 
         Log.i(TAG, "doTheWork");
-
-        if (preferences == null) {
-            preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        }
 
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -160,47 +177,84 @@ public class RssJobService extends JobService {
                 proxy = null;
             }
 
-            //TODO korrekt ermitteln!
             String feedid=params.getExtras().getString(Strings.FEEDID);
-            Boolean boOverreideWifiOnly=true;  // params.getExtras().getBoolean(Strings.SETTINGS_OVERRIDEWIFIONLY, false);  // API 22
+            Boolean boOverreideWifiOnly=preferences.getBoolean(Strings.SETTINGS_OVERRIDEWIFIONLY, false);
 
             int newCount = RssJobService.refreshFeedsStatic(this, feedid, networkInfo, boOverreideWifiOnly);
+            // new, not unread
 
             if (newCount > 0) {
+
                 if (preferences.getBoolean(Strings.SETTINGS_NOTIFICATIONSENABLED, false)) {
-                    Cursor cursor = getContentResolver().query(FeedData.EntryColumns.CONTENT_URI, new String[] {COUNT}, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null, null);
+                    // oder mNotificationManagerCompat !=null
 
-                    cursor.moveToFirst();
-                    newCount = cursor.getInt(0);
-                    cursor.close();
+                    boolean areNotificationsEnabled = mNotificationManagerCompat.areNotificationsEnabled();
+                    if (!areNotificationsEnabled) {
+                        // Because the user took an action to create a notification, we create a prompt to let
+                        // the user re-enable notifications for this application again.
+                        Util.toastMessageLong(RSSOverview.INSTANCE, "You need to enable notifications for this app");
+                    }else{
 
-                    String text = new StringBuilder().append(newCount).append(' ').append(getString(de.bernd.shandschuh.sparserss.R.string.newentries)).toString();
+                        Cursor cursor = getContentResolver().query(FeedData.EntryColumns.CONTENT_URI, new String[] {COUNT}, new StringBuilder(FeedData.EntryColumns.READDATE).append(Strings.DB_ISNULL).toString(), null, null);
 
-                    Intent notificationIntent = new Intent(this, RSSOverview.class);
+                        cursor.moveToFirst();
+                        newCount = cursor.getInt(0);  // unread...
+                        cursor.close();
 
-                    PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        String text = new StringBuilder().append(newCount).append(' ').append(getString(de.bernd.shandschuh.sparserss.R.string.newentries)).toString();
 
-                    Notification.Builder builder = new Notification.Builder(this);
-                    builder.setContentTitle(getString(R.string.rss_feeds));
-                    builder.setContentText(text);
-                    builder.setContentIntent(contentIntent);
-                    builder.setSmallIcon(R.drawable.icon);
+                        Intent notificationIntent = new Intent(this, RSSOverview.class);
 
-                    String ringtone = preferences.getString(Strings.SETTINGS_NOTIFICATIONSRINGTONE, null);
+                        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                    if (ringtone != null && ringtone.length() > 0) {
-                        builder.setSound(Uri.parse(ringtone));
+                        if(sGlobalNotificationCompatBuilder==null){
+                            String channelId=createNotificationChannel(this);
+                            sGlobalNotificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), channelId);
+                        }
+                        // 2. Build the INBOX_STYLE.
+                        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle()
+                                // This title is slightly different than regular title, since I know INBOX_STYLE is
+                                // available.
+                                .setBigContentTitle(getString(R.string.rss_feeds))
+                                .setSummaryText(text);
+
+                        sGlobalNotificationCompatBuilder.setStyle(inboxStyle)
+                                // Title for API <16 (4.0 and below) devices and API 16+ (4.1 and after) when the
+                                // notification is collapsed.
+                                .setContentTitle(getString(R.string.rss_feeds))
+                                // Content for API <24 (7.0 and below) devices and API 16+ (4.1 and after) when the
+                                // notification is collapsed.
+                                .setContentText(text)
+                                //.setColor(Util.colGrey)
+                                .setSmallIcon(R.drawable.feed)
+                                .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.icon))
+
+                                //.setDefaults(NotificationCompat.DEFAULT_ALL)  // Sound, Vib,...
+
+                                // Sets large number at the right-hand side of the notification for API <24 devices.
+                                .setSubText(""+newCount)
+                                .setContentIntent(contentIntent)
+                                // Sets lock-screen visibility for 25 and below. For 26 and above, lock screen
+                                // visibility is set in the NotificationChannel.
+                                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+                        String ringtone = preferences.getString(Strings.SETTINGS_NOTIFICATIONSRINGTONE, null);
+                        if (ringtone != null && ringtone.length() > 0) {
+                            sGlobalNotificationCompatBuilder.setSound(Uri.parse(ringtone));
+                        }
+                        boolean bVibrate= preferences.getBoolean(Strings.SETTINGS_NOTIFICATIONSVIBRATE, false);
+                        if(bVibrate){
+                            long[] pattern = {0, 1000, 500, 1000};
+                            sGlobalNotificationCompatBuilder.setVibrate(pattern);
+                        }
+                        Notification notification = sGlobalNotificationCompatBuilder.build();
+
+                        mNotificationManagerCompat.notify(NOTIFICATION_ID, notification);
                     }
-
-                    Notification notification = builder.build();
-
-                    notificationManager.notify(0, notification);
-                } else {
-                    notificationManager.cancel(0);
                 }
             }//newCount
 
-            System.out.println("****** LADE IM BACKEND  ****");
+            Log.d(TAG, "****** LADE IM BACKEND  ****");
             mImageFolder = Util.getImageFolderFile(this).toString();
 
             String[] SYNC_PROJECTION = { BaseColumns._ID, FeedData.FeedColumns.SYNC };
@@ -210,7 +264,7 @@ public class RssJobService extends JobService {
                 String id = cursor.getString(0);
                 int iSysnc = cursor.getInt(1);
                 if(iSysnc!=0){
-                    System.out.println("Sync Feed " + id);
+                    Log.d(TAG, "Sync Feed " + id);
                     myFetchFullHtml(Integer.parseInt(id));
                 }
 
@@ -223,8 +277,6 @@ public class RssJobService extends JobService {
         File[] files = Util.getImageFolderFile(getBaseContext()).listFiles();
         if(files!=null){
             Date today = new Date();
-//			long lastWeek = today.getTime() - 604800000l; // 1000* 60*60*24*7 = 7 Tage
-//            long lastWeek = today.getTime() - 259200000l; // 1000* 60*60*24*3 = 3 Tage
             long lastWeek = today.getTime() - 432000000l; // 1000* 60*60*24*5 = 5 Tage
             for (int i = 0; i < files.length; i++) {
                 File f=files[i];
@@ -248,8 +300,7 @@ public class RssJobService extends JobService {
 
         cursor = this.getContentResolver().query(parentUri, ENTRY_UPDATE_PROJECTION, FULLTEXTISNULL, null, sortOrder);
         cursor.moveToFirst();
-        System.out.println("FetchFullHtml for " + cursor.getCount());
-
+        Log.d(TAG, "FetchFullHtml for " + cursor.getCount());
         HtmlFetcher fetcher2 = new HtmlFetcher();
         fetcher2.setMaxTextLength(50000);
 
@@ -662,6 +713,53 @@ public class RssJobService extends JobService {
             return new GZIPInputStream(inputStream);
         } else {
             return inputStream;
+        }
+    }
+
+    public static String createNotificationChannel(Context context) {
+
+        // NotificationChannels are required for Notifications on O (API 26) and above.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            // The id of the channel.
+            String channelId = CHANNEL_ID;
+
+            // The user-visible name of the channel.
+            CharSequence channelName = "Sparse RSS";
+            // The user-visible description of the channel.
+            String channelDescription = "Sparse RSS Description";
+            int channelImportance = NotificationManager.IMPORTANCE_DEFAULT;
+            int channelLockscreenVisibility =NotificationCompat.VISIBILITY_PUBLIC;
+
+            // Initializes NotificationChannel.
+            NotificationChannel notificationChannel =
+                    new NotificationChannel(channelId, channelName, channelImportance);
+            notificationChannel.setDescription(channelDescription);
+            boolean bVibrate= preferences.getBoolean(Strings.SETTINGS_NOTIFICATIONSVIBRATE, false);
+            notificationChannel.enableVibration(bVibrate);
+            notificationChannel.setLockscreenVisibility(channelLockscreenVisibility);
+            String ringtone = preferences.getString(Strings.SETTINGS_NOTIFICATIONSRINGTONE, null);
+            if (ringtone != null && ringtone.length() > 0) {
+                AudioAttributes att = new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build();
+                notificationChannel.setSound(Uri.parse(ringtone),att);
+            }
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.BLUE);
+
+            // Adds NotificationChannel to system. Attempting to create an existing notification
+            // channel with its original values performs no operation, so it's safe to perform the
+            // below sequence.
+            NotificationManager notificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(notificationChannel);
+
+            return channelId;
+        } else {
+            // Returns null for pre-O (26) devices.
+            return null;
         }
     }
 

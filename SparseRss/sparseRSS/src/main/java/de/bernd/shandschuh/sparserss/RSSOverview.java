@@ -27,7 +27,6 @@ package de.bernd.shandschuh.sparserss;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.app.NotificationManager;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
@@ -37,7 +36,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -55,6 +53,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AlertDialog.Builder;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -121,8 +121,6 @@ public class RSSOverview extends AppCompatActivity {
 
 	private static final Uri CANGELOG_URI = Uri.parse("https://github.com/AndroidMakesFun/SparseRssMod/blob/master/SparseRss/README.md");
 
-	public static NotificationManager notificationManager; // package scope
-
 	boolean feedSort;
 
 	private RSSOverviewListAdapter listAdapter;
@@ -144,9 +142,6 @@ public class RSSOverview extends AppCompatActivity {
 		}
 		super.onCreate(savedInstanceState);
 
-		if (notificationManager == null) {
-			notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		}
 		setContentView(R.layout.main);
 		INSTANCE = this;
 
@@ -295,37 +290,16 @@ public class RSSOverview extends AppCompatActivity {
 					intent.setData(FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
 					intent.putExtra(FeedData.FeedColumns._ID, id);
 					startActivity(intent);
-					
-//					Intent intent = new Intent(Intent.ACTION_VIEW,FeedData.EntryColumns.CONTENT_URI(Long.toString(id)));
-//					intent.putExtra(FeedData.FeedColumns._ID, id);
-//					startActivity(intent);
 				}
 			}
 
 		});
 
-		//if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
-		//	startService(new Intent(this, RefreshService.class)); // starts the
-		//															// service
-		//															// independent
-		//															// to this
-		//															// activity
-		//} else {
-		//	stopService(new Intent(this, RefreshService.class));
-		//}
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHONPENENABLED, false)) {
 			Util.scheduleJob(this, false);
 		}else if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)){
 			Util.scheduleJob(this, true);
 		}
-
-
-		// //ab api21!
-		// listview.setNestedScrollingEnabled(true);
-
-		// setHomeButtonActive();
-		// myActionBar().setDisplayShowTitleEnabled(false);
-		// myActionBar().setNavigationMode(android.support.v7.app.ActionBar.NAVIGATION_MODE_LIST);
 
 	} // onCreate
 
@@ -336,9 +310,9 @@ public class RSSOverview extends AppCompatActivity {
 		zeigeProgressBar(Util.isCurrentlyRefreshing(this));
 		registerReceiver(refreshReceiver, new IntentFilter("de.bernd.shandschuh.sparserss.REFRESH"));
 
-		// if (RSSOverview.notificationManager != null) {
-		// notificationManager.cancel(0);
-		// }
+		if(RssJobService.mNotificationManagerCompat!=null){
+			RssJobService.mNotificationManagerCompat.cancelAll();
+		}
 	}
 
 	@Override

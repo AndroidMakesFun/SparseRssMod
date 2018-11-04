@@ -144,12 +144,6 @@
         android:title="@string/settings_category_network">
 
         <CheckBoxPreference
-            android:title="Force chrome"
-            android:defaultValue="true"
-            android:summary="Option is gone. Use Choose Browser in WebView Menu!"
-            android:key="forcechrome" />
-        
-        <CheckBoxPreference
             android:title="@string/settings_standarduseragent"
             android:defaultValue="false"
             android:summary="@string/settings_standarduseragent_description"

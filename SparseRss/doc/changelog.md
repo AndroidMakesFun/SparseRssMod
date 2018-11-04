@@ -1,5 +1,8 @@
 Changelog - Sparse RSS Mod
 ==========================
+2.35
+* Notification fixed
+
 2.34
 * Lighter Dark theme
 

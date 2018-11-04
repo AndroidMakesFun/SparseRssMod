@@ -29,8 +29,13 @@
         <item name="android:textColorSecondary">?attr/theme_textColorSecondary</item>
 
         <item name="theme_BackgroundColor">@color/my_black</item>
+
     </style>
 
+    <style name="MeinPopupWindow" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:itemBackground">@android:color/holo_red_light</item>
+    </style>
 
     <style name="CustomActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:windowActionBarOverlay">true</item>
