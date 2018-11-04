@@ -300,9 +300,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     @Override
     protected void onResume() {
         super.onResume();
-        if (RSSOverview.notificationManager != null) {
-            RSSOverview.notificationManager.cancel(0);
-        }
     }
 
     public static String fixLink(String strLink) {

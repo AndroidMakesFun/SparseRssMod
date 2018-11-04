@@ -155,9 +155,6 @@ public class ParentActivity extends AppCompatActivity {
 		if (title != null) {
 			setTitle(title);
 		}
-		if (RSSOverview.notificationManager != null) {
-			RSSOverview.notificationManager.cancel(0);
-		}
 
 	} // onCreate
 
