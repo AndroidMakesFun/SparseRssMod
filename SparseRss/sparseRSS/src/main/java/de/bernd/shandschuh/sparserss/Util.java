@@ -134,7 +134,6 @@ public class Util {
                 LIGHTER_DARK_MODE = PreferenceManager.getDefaultSharedPreferences(context)
                         .getBoolean(Strings.SETTINGS_LIGHTER_DARK_MODE, true);
             }
-			Log.d(TAG, "GET isLighterDarkMode " + LIGHTER_DARK_MODE);
             return LIGHTER_DARK_MODE;
         }
         return true;

@@ -364,14 +364,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
         MenuItem item=menu.findItem(R.id.menu_lighter_darkmode);
         if(Util.isLightTheme(this)){
-            Log.d(TAG, "isLighterDarkMode visible false");
             item.setVisible(false);
         }else{
             if(Util.isLighterDarkMode(this)){
-                Log.d(TAG, "isLighterDarkMode checked true");
                 item.setChecked(true);
             }else{
-                Log.d(TAG, "isLighterDarkMode checked false");
                 item.setChecked(false);
             }
         }
