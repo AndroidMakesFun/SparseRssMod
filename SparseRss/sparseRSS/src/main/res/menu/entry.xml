@@ -56,4 +56,10 @@
         android:title="Choose Browser"
         />
 
+    <group android:checkableBehavior="all" >
+        <item android:id="@+id/menu_lighter_darkmode"
+            android:title="Lighter DarkMode"
+            />
+    </group>
+
 </menu>

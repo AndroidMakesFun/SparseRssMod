@@ -6,20 +6,21 @@
     >
     
     <PreferenceCategory android:title="@string/settings_category_contentpresentation">
-<!--         
-        <CheckBoxPreference
-            android:title="@string/settings_showtabs"
-            android:defaultValue="false"
-            android:summary="@string/settings_showtabs_description"
-            android:key="tabs.show" />
- -->
          <CheckBoxPreference
             android:title="@string/settings_lighttheme"
             android:defaultValue="true"
             android:summary="@string/settings_lighttheme_description"
             android:key="lighttheme"
-            android:disableDependentsState="false"/>
-             
+            android:disableDependentsState="true"/>
+
+        <CheckBoxPreference
+            android:title="Lighter DarkTheme"
+            android:summary="Use it for more contrast."
+            android:defaultValue="true"
+            android:key="lighterDarkMode"
+            android:dependency="lighttheme"
+            />
+
         <CheckBoxPreference
             android:title="@string/settings_prioritize"
             android:defaultValue="false"
@@ -48,41 +49,6 @@
             android:summary="Shows buttons at the bottom of the Entry Viewer"
             android:key="SETTINGS_SHOW_BOTTOM_BAR"
             />
-        
-<!--         
-        <CheckBoxPreference
-            android:title="@string/settings_fetchpictures"
-            android:defaultValue="false"
-            android:summary="@string/settings_fetchpictures_description"
-            android:key="pictures.fetch"
-            android:dependency="pictures.disable"/>
- -->            
-<!--         
-        <CheckBoxPreference
-            android:title="@string/settings_blacktextwhite"
-            android:defaultValue="false"
-            android:summary="@string/settings_blacktextwhite_description"
-            android:key="blacktextonwhite"
-            android:dependency="lighttheme"/>
- -->            
-<!--         
-        <ListPreference
-            android:name="@string/settings_fontsize"
-            android:title="@string/settings_fontsize"
-            android:summary="@string/settings_fontsize_description"
-            android:key="fontsize"
-            android:defaultValue="0"
-            android:inputType="number"
-            android:entries="@array/settings_fontsizes"
-            android:entryValues="@array/settings_fontsizevalues"/>
- -->            
-<!--         
-        <CheckBoxPreference
-            android:title="@string/settings_gestures"
-            android:defaultValue="true"
-            android:summary="@string/settings_gestures_description"
-            android:key="gestures.enabled"/>
- -->            
     </PreferenceCategory>
     
     

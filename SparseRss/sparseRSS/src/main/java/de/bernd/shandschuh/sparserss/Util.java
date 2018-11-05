@@ -126,7 +126,31 @@ public class Util {
 		return true;
 	}
 
-	public static final String PREFERENCE_TEST_LIST_PREFS = "PREFERENCE_TEST_LIST_PREFS";
+    private static Boolean LIGHTER_DARK_MODE;
+
+    public static boolean isLighterDarkMode(Context context) {
+        if (context != null) {
+            if (LIGHTER_DARK_MODE == null) {
+                LIGHTER_DARK_MODE = PreferenceManager.getDefaultSharedPreferences(context)
+                        .getBoolean(Strings.SETTINGS_LIGHTER_DARK_MODE, true);
+            }
+			Log.d(TAG, "GET isLighterDarkMode " + LIGHTER_DARK_MODE);
+            return LIGHTER_DARK_MODE;
+        }
+        return true;
+    }
+	public static void setLighterDarkMode(Context context, boolean wert) {
+		Log.d(TAG, "SET isLighterDarkMode " + wert);
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(Strings.SETTINGS_LIGHTER_DARK_MODE, wert);
+		editor.commit();
+		LIGHTER_DARK_MODE=wert;
+	}
+
+
+    public static final String PREFERENCE_TEST_LIST_PREFS = "PREFERENCE_TEST_LIST_PREFS";
 
 	public static void setTestListPrefs(Context context, boolean wert) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

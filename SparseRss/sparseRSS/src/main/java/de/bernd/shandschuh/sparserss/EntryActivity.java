@@ -24,12 +24,8 @@
 
 package de.bernd.shandschuh.sparserss;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,6 +40,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,10 +52,15 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import de.bernd.shandschuh.sparserss.EntryPagerAdapter.DtoEntry;
 import de.jetwick.snacktory.OutputFormatter;
 
 public class EntryActivity extends AppCompatActivity implements android.widget.SeekBar.OnSeekBarChangeListener {
+
+    private static final String TAG = EntryActivity.class.getSimpleName();
 
     public static final int AUFRUFART_FEED = 0;
     public static final int AUFRUFART_BROWSER = 1;
@@ -168,8 +170,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     // {max-width: 100%;}\npre {white-space: pre-wrap;}</style></head>";
     // aus /sparss/src/net/etuldan/sparss/view/EntryView.java
     private static final String FONT_SANS_SERIF = "font-family: sans-serif;";
-    //private static final String TEXT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#000000" : "#999999"; // "#C0C0C0";
-    private static final String TEXT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#000000" : "#737373"; // "#C0C0C0";
     public static final String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
     private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
     private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6"
@@ -179,26 +179,39 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
     private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
 
-    public static final String CSS = "<head><style type='text/css'> " + "body {max-width: 100%; margin: 0.3cm; "
-            + FONT_SANS_SERIF + " color: " + TEXT_COLOR + "; background-color:" + BACKGROUND_COLOR
-            + "; line-height: 150%} " + "* {max-width: 100%; word-break: break-word}"
-            + "h1, h2 {font-weight: normal; line-height: 130%} " + "h1 {font-size: 140%; margin-bottom: 0.1em} "
-            + "h2 {font-size: 120%} " + "a {color: #0099CC}" + "h1 a {color: inherit; text-decoration: none}"
-            + "img {height: auto} " + "pre {white-space: pre-wrap;} " + "blockquote {border-left: thick solid "
-            + QUOTE_LEFT_COLOR + "; background-color:" + QUOTE_BACKGROUND_COLOR
-            + "; margin: 0.5em 0 0.5em 0em; padding: 0.5em} " + "p {margin: 0.8em 0 0.8em 0} " + "p.subtitle {color: "
-            + SUBTITLE_COLOR + "; border-top:1px " + SUBTITLE_BORDER_COLOR + "; border-bottom:1px "
-            + SUBTITLE_BORDER_COLOR + "; padding-top:2px; padding-bottom:2px; font-weight:800 } "
-            + "ul, ol {margin: 0 0 0.8em 0.6em; padding: 0 0 0 1em} "
-            + "ul li, ol li {margin: 0 0 0.8em 0; padding: 0} "
-            + "div.button-section {padding: 0.4cm 0; margin: 0; text-align: center} "
-            + ".button-section p {margin: 0.1cm 0 0.2cm 0}" + ".button-section p.marginfix {margin: 0.5cm 0 0.5cm 0}"
-            + ".button-section input, .button-section a {font-family: sans-serif-light; font-size: 100%; color: #FFFFFF; background-color: "
-            + BUTTON_COLOR + "; text-decoration: none; border: none; border-radius:0.2cm; padding: 0.3cm} "
-            + "</style><meta name='viewport' content='width=device-width, initial-scale=1'/></head>";
+    private static String CSS = null;
 
     public static String getCSS() {
+        if(CSS==null){
+            CSS="<head><style type='text/css'> " + "body {max-width: 100%; margin: 0.3cm; "
+                    + FONT_SANS_SERIF + " color: " + getTextColor() + "; background-color:" + BACKGROUND_COLOR
+                    + "; line-height: 150%} " + "* {max-width: 100%; word-break: break-word}"
+                    + "h1, h2 {font-weight: normal; line-height: 130%} " + "h1 {font-size: 140%; margin-bottom: 0.1em} "
+                    + "h2 {font-size: 120%} " + "a {color: #0099CC}" + "h1 a {color: inherit; text-decoration: none}"
+                    + "img {height: auto} " + "pre {white-space: pre-wrap;} " + "blockquote {border-left: thick solid "
+                    + QUOTE_LEFT_COLOR + "; background-color:" + QUOTE_BACKGROUND_COLOR
+                    + "; margin: 0.5em 0 0.5em 0em; padding: 0.5em} " + "p {margin: 0.8em 0 0.8em 0} " + "p.subtitle {color: "
+                    + SUBTITLE_COLOR + "; border-top:1px " + SUBTITLE_BORDER_COLOR + "; border-bottom:1px "
+                    + SUBTITLE_BORDER_COLOR + "; padding-top:2px; padding-bottom:2px; font-weight:800 } "
+                    + "ul, ol {margin: 0 0 0.8em 0.6em; padding: 0 0 0 1em} "
+                    + "ul li, ol li {margin: 0 0 0.8em 0; padding: 0} "
+                    + "div.button-section {padding: 0.4cm 0; margin: 0; text-align: center} "
+                    + ".button-section p {margin: 0.1cm 0 0.2cm 0}" + ".button-section p.marginfix {margin: 0.5cm 0 0.5cm 0}"
+                    + ".button-section input, .button-section a {font-family: sans-serif-light; font-size: 100%; color: #FFFFFF; background-color: "
+                    + BUTTON_COLOR + "; text-decoration: none; border: none; border-radius:0.2cm; padding: 0.3cm} "
+                    + "</style><meta name='viewport' content='width=device-width, initial-scale=1'/></head>";
+        }
         return CSS;
+    }
+
+    public static String getTextColor() {
+        if(Util.isLightTheme(RSSOverview.INSTANCE)){
+            return "#000000";
+        }
+        if(Util.isLighterDarkMode(RSSOverview.INSTANCE)){
+            return "#999999"; // colGrey
+        }
+        return "#737373"; // colDarkGrey
     }
 
     private static final String FONT_START = CSS + "<body link=\"#97ACE5\" text=\"#C0C0C0\">";
@@ -349,6 +362,19 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         browserItem.setIcon(android.R.drawable.ic_menu_view);
 
+        MenuItem item=menu.findItem(R.id.menu_lighter_darkmode);
+        if(Util.isLightTheme(this)){
+            Log.d(TAG, "isLighterDarkMode visible false");
+            item.setVisible(false);
+        }else{
+            if(Util.isLighterDarkMode(this)){
+                Log.d(TAG, "isLighterDarkMode checked true");
+                item.setChecked(true);
+            }else{
+                Log.d(TAG, "isLighterDarkMode checked false");
+                item.setChecked(false);
+            }
+        }
         return true;
     }
 
@@ -543,6 +569,21 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                     Util.setShowCover(this, "" + feedId, true);
                     mEntryPagerAdapter.notifyDataSetChanged();
                 }
+                break;
+            }
+            case R.id.menu_lighter_darkmode:{
+                if(item.isChecked()){
+                //if(Util.isLighterDarkMode(this)){
+                    Log.d(TAG, "isLighterDarkMode to FALSE");
+                    Util.setLighterDarkMode(this, false);
+                    item.setChecked(false);
+                }else{
+                    Log.d(TAG, "isLighterDarkMode to TRUE");
+                    Util.setLighterDarkMode(this, true);
+                    item.setChecked(true);
+                }
+                CSS=null;
+                this.finish();
                 break;
             }
 
