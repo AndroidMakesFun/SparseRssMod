@@ -6,7 +6,7 @@
 
     <item android:id="@+id/action_search"
           android:icon="@android:drawable/ic_menu_search"
-          app:actionViewClass="android.support.v7.widget.SearchView" 
+          app:actionViewClass="androidx.appcompat.widget.SearchView"
           android:title="@string/action_bar_search"
           app:showAsAction="always" />
           />
@@ -30,9 +30,11 @@
             android:title="@string/contextmenu_deleteallentries"/>
     </group>
     
-    <group android:checkableBehavior="all" >
+    <group  android:id="@+id/menu_group_2" android:checkableBehavior="all" >
         <item android:id="@+id/menu_cardview"
             android:title="Card View"/>
+        <item android:id="@+id/menu_teaser"
+            android:title="Teaser"/>
         <item android:id="@+id/menu_topfeed"
             android:title="@string/topfeeds"/>
         <item android:id="@+id/menu_offline"

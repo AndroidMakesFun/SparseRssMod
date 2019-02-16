@@ -25,8 +25,8 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -164,6 +164,25 @@ public class Util {
 	public static boolean getTestListPrefs(Context context) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		return prefs.getBoolean(PREFERENCE_TEST_LIST_PREFS, true);
+	}
+
+
+
+	public static final String PREFERENCE_TEASER = "PREFERENCE_TEASER";
+
+	public static void setTeaserPrefs(Context context, boolean wert) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(PREFERENCE_TEASER, wert);
+		editor.commit();
+	}
+
+	/**
+	 * True means Textlist, not CardView !
+	 */
+	public static boolean getTeaserPrefs(Context context) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		return prefs.getBoolean(PREFERENCE_TEASER, true);
 	}
 
 	private static File imageFolder = null;

@@ -36,6 +36,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -43,19 +44,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AlertDialog.Builder;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ContextThemeWrapper;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -78,9 +69,21 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.io.File;
 import java.io.FilenameFilter;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog.Builder;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.OPML;
 import de.bernd.shandschuh.sparserss.service.RssJobService;
@@ -90,7 +93,7 @@ import de.bernd.shandschuh.sparserss.util.NavigationDrawerAdapter.NavDrawerLineE
 /**
  * Main Class
  */
-public class RSSOverview extends AppCompatActivity {
+public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
 	private static final int DIALOG_ERROR_FEEDIMPORT = 3;
 
 	private static final int DIALOG_ERROR_FEEDEXPORT = 4;
@@ -540,34 +543,42 @@ public class RSSOverview extends AppCompatActivity {
 		case R.id.menu_import: {
 			final AlertDialog.Builder builder = new AlertDialog.Builder(RSSOverview.this);
 
-			String title=""+this.getExternalFilesDir("rss");
-			builder.setTitle(title); //"From " + this.getExternalFilesDir("rss"));
-
 			try {
-				final String[] fileNames = this.getExternalFilesDir("rss").list(new FilenameFilter() {
-					public boolean accept(File dir, String filename) {
-						return new File(dir, filename).isFile();
-					}
-				});
 
-				final RSSOverview rssOverview = this;
-				builder.setItems(fileNames, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						try {
-							OPML.importFromFile(
-									new StringBuilder(rssOverview.getExternalFilesDir("rss").toString())
-											.append(File.separator).append(fileNames[which]).toString(),
-									RSSOverview.this);
-						} catch (Exception e) {
-							showDialog(DIALOG_ERROR_FEEDIMPORT);
+				if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+
+					String title="Download Folder";  //+this.getExternalFilesDir("rss");
+					builder.setTitle(title);
+
+					final String[] fileNames = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).list(new FilenameFilter() {
+						public boolean accept(File dir, String filename) {
+							return new File(dir, filename).isFile();
 						}
+					});
+
+					final RSSOverview rssOverview = this;
+					builder.setItems(fileNames, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							try {
+								OPML.importFromFile(
+										new StringBuilder(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString())
+												.append(File.separator).append(fileNames[which]).toString(),
+										RSSOverview.this);
+							} catch (Exception e) {
+								showDialog(DIALOG_ERROR_FEEDIMPORT);
+							}
+						}
+					});
+					if(fileNames.length==0){
+						Util.msgBox(RSSOverview.this, "Empty:\n" + title);
+					}else{
+						builder.show();
 					}
-				});
-				if(fileNames.length==0){
-					Util.msgBox(RSSOverview.this, "Empty:\n" + title);
+
 				}else{
-					builder.show();
+					requestPermission();
 				}
+
 			} catch (Exception e) {
 				showDialog(DIALOG_ERROR_FEEDIMPORT);
 			}
@@ -575,13 +586,18 @@ public class RSSOverview extends AppCompatActivity {
 		}
 		case R.id.menu_export: {
 			try {
-				String folder = this.getExternalFilesDir("rss").toString();
-				String filename = new StringBuilder(folder).append("/sparse_rss_").append(System.currentTimeMillis())
-						.append(".opml").toString();
 
-				OPML.exportToFile(filename, this);
-				Toast.makeText(this, String.format(getString(R.string.message_exportedto), filename), Toast.LENGTH_LONG)
-						.show();
+				if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+					String folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+					String filename = new StringBuilder(folder).append("/sparse_rss_").append(System.currentTimeMillis())
+							.append(".opml").toString();
+
+					OPML.exportToFile(filename, this);
+					Util.msgBox(this,String.format(getString(R.string.message_exportedto), filename));
+				}else{
+					requestPermission();
+				}
+
 			} catch (Exception e) {
 				showDialog(DIALOG_ERROR_FEEDEXPORT);
 			}
@@ -631,6 +647,57 @@ public class RSSOverview extends AppCompatActivity {
 		}
 		return true;
 	}
+
+	private static final int PERMISSION_REQUEST = 0;
+
+	private void requestPermission() {
+
+//		ActivityCompat.requestPermissions(this,
+//				new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//				PERMISSION_REQUEST);
+
+		// Permission has not been granted and must be requested.
+		if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+				android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+			// Provide an additional rationale to the user if the permission was not granted
+			// and the user would benefit from additional context for the use of the permission.
+			// Display a SnackBar with cda button to request the missing permission.
+			Snackbar.make(listview, R.string.message_permission_download_folder,
+					Snackbar.LENGTH_INDEFINITE).setAction("ok", new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					// Request the permission
+					ActivityCompat.requestPermissions(RSSOverview.INSTANCE,
+							new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+							PERMISSION_REQUEST);
+				}
+			}).show();
+
+		} else {
+			Snackbar.make(listview, R.string.message_permission_download_folder, Snackbar.LENGTH_SHORT).show();
+			// Request the permission. The result will be received in onRequestPermissionResult().
+			ActivityCompat.requestPermissions(RSSOverview.INSTANCE,
+					new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+		}
+
+	}
+	/**
+	// access Downloads
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		switch (requestCode) {
+			case Manifest.:
+				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					//Granted.
+
+
+				} else {
+					//Denied.
+				}
+				break;
+		}
+	}
+	**/
 
 	private void refreshAllFeeds() {
 
@@ -782,7 +849,7 @@ public class RSSOverview extends AppCompatActivity {
 	}
 
 	public void setHomeButtonActive() {
-		android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
+		ActionBar actionBar7 = getSupportActionBar();
 		actionBar7.setHomeButtonEnabled(true);
 		// durchsichtige Actionbar
 		// actionBar7.setBackgroundDrawable(new
@@ -887,10 +954,10 @@ public class RSSOverview extends AppCompatActivity {
 			return;
 		}
 		switch (navDrawerLineEntry.ID) {
-		case R.id.cancel_action:
-			// do nothing
-			break;
-			
+//		case R.id.cancel_action:
+//			// do nothing
+//			break;
+
 		case R.id.menu_overview:{
 			// do nothing
 			break;

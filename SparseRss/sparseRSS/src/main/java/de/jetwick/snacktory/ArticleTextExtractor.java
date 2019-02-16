@@ -172,7 +172,7 @@ public class ArticleTextExtractor {
             	text = bestMatchElement.toString();
             }
             
-            text = removeTitleFromText(text, res.getTitle()) + ".";
+            text = removeTitleFromText(text, res.getTitle());
             // this fails for short facebook post and probably tweets: text.length() > res.getDescription().length()
             if (text.length() > res.getTitle().length()) {
                 res.setText(text);

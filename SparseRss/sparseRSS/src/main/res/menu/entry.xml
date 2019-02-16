@@ -19,6 +19,10 @@
             app:showAsAction="ifRoom"
             android:title="Readability"/>
         <item
+            android:id="@+id/menu_readability4j"
+            app:showAsAction="ifRoom"
+            android:title="Readability4J"/>
+        <item
             android:id="@+id/menu_googleweblight"
             app:showAsAction="ifRoom"
             android:title="Google Weblight"/>

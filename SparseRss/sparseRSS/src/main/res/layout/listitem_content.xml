@@ -1,9 +1,9 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
     <TextView
+        android:id="@android:id/text1"
         android:gravity="top"
         android:layout_marginLeft="6dip"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@android:id/text1"
         android:textColor="?attr/theme_textColorPrimary"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -20,9 +20,24 @@
         android:layout_height="wrap_content"
         />
     <ImageView
+        android:id="@android:id/icon"
         android:layout_alignBottom="@android:id/text2"
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@android:id/icon"/>
+        />
+
+    <TextView
+        android:id="@+id/text3"
+        android:textColor="?attr/theme_textColorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@android:id/icon"
+        android:padding="5dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:visibility="gone"
+        />
+
+
 </merge>

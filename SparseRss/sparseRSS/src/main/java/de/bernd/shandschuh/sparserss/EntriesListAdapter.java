@@ -51,6 +51,8 @@ import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedData.EntryColumns;
 import de.bernd.shandschuh.sparserss.provider.FeedData.FeedColumns;
+import de.jetwick.snacktory.ArticleTextExtractor;
+import de.jetwick.snacktory.JResult;
 
 public class EntriesListAdapter extends ResourceCursorAdapter {
 	protected static final int STATE_NEUTRAL = 0;
@@ -107,7 +109,10 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	
 	protected int buttonSize;
 	protected int densityDpi;
-	
+
+	public Date today= new Date();
+
+
 	/**
 	 * @param context EntriesListActivity / RecycleListActivity
 	 * @param uri irgentwas mit entries
@@ -119,6 +124,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	 */
 	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout, int iFeedFilter, boolean bResetSearchFilter) {
 		super(context, layout, createManagedCursor(context, uri, true, iFeedFilter, bResetSearchFilter), autoreload);
+		today.setHours(0);
+		today.setMinutes(0);
 
 		showRead = true;
 		this.uri = uri;
@@ -158,14 +165,24 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
         boolean isDarkTheme=!Util.isLightTheme(context);
 
-		textView.setText(cursor.getString(titleColumnPosition));
+		String strTitle=cursor.getString(titleColumnPosition);
+		textView.setText(strTitle);
 		float fsize=15.0f;
-		textView.setTextSize(fsize); // etwas gr??er
+		textView.setTextSize(fsize); // etwas kleiner!
 
 		TextView dateTextView = (TextView) view.findViewById(android.R.id.text2);
 		
 		final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
-		
+
+		Struktur struktur = getTeaser(cursor, strTitle);
+
+		if (Util.getTeaserPrefs(context)) {
+			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
+			feedTextView.setTextSize(fsize);
+			feedTextView.setText(struktur.text); // strAbstract);
+			feedTextView.setVisibility(View.VISIBLE);
+		}
+
 		final long id = cursor.getLong(idColumn);
 		
 		String link=cursor.getString(linkColumn);
@@ -211,7 +228,11 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
 					
 					if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
-						dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
+						if(date.after(today)){
+							dateTextView.setText(new StringBuilder().append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
+						}else{
+							dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
+						}
 						bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
 						bitmap = Util.getRoundedBitmap(bitmap);
 						BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
@@ -237,7 +258,11 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		} else {
 			// alles 1 feed - kein icon
 			textView.setText(cursor.getString(titleColumnPosition));
-			dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)));
+			if(date.after(today)){
+				dateTextView.setText(new StringBuilder(timeFormat.format(date)));
+			}else{
+				dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)));
+			}
 		}
 
 		if (forcedState == STATE_ALLUNREAD && !markedAsRead.contains(id) || (forcedState != STATE_ALLREAD && cursor.isNull(readDateColumn) && !markedAsRead.contains(id)) || markedAsUnread.contains(id)) {
@@ -396,6 +421,48 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		}
 		return 0;
 	}
-	
 
+	class Struktur {
+		String linkGrafik;
+		String text;
+	}
+
+	protected Struktur getTeaser(Cursor cursor, String strTitle){
+		String strAbstract=cursor.getString(abstractColumnPosition);
+		String linkGrafik=null;
+		int cut=200;
+		if(strAbstract==null){
+			strAbstract=cursor.getString(fulltextColumnPosition);
+		}
+		if(strAbstract!=null){
+			if(strAbstract.startsWith("<")){
+				try {
+					JResult result = new ArticleTextExtractor().extractContent(strAbstract, true);
+					linkGrafik=result.getImageUrl();
+					if(linkGrafik==null || "".equals(linkGrafik)){
+						linkGrafik=Util.takeFirstSrc(strAbstract);
+					}
+					strAbstract=result.getText();
+				} catch (Exception e) {
+					System.err.println("Err Extracting " + strTitle + " " + e);
+				}
+			}
+			if(!"".equals(strAbstract) && strAbstract.length()>cut){
+				// next '.'
+				int point=strAbstract.indexOf('.',cut);  // -1 || 200..
+				if(point<0 || point > cut+100){
+					// next ' '
+					point=strAbstract.indexOf(' ',cut);
+					if(point<0 || point > cut+100){
+						point=cut;
+					}
+				}
+				strAbstract=strAbstract.substring(0, point);
+			}
+		}
+		Struktur struktur = new Struktur();
+		struktur.text=strAbstract;
+		struktur.linkGrafik=linkGrafik;
+		return struktur;
+	}
 }

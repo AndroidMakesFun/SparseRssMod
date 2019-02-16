@@ -35,10 +35,12 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.support.v7.widget.CardView;
+import androidx.cardview.widget.CardView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -47,6 +49,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 
 import de.bernd.shandschuh.sparserss.provider.FeedData;
@@ -55,8 +58,6 @@ import de.jetwick.snacktory.JResult;
 
 public class RecycleListAdapter extends EntriesListAdapter {
 
-	
-	
 	public RecycleListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout, int iFeedFilter) {
 		super(context, uri,showFeedInfo, autoreload,layout, iFeedFilter, true);
 	}
@@ -69,14 +70,25 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		String strTitle=cursor.getString(titleColumnPosition);
 		textView.setText(strTitle);
 		float fsize=15.0f;
-		textView.setTextSize(fsize); // etwas gr??er
+		textView.setTextSize(fsize); // etwas kleiner!
 
 		TextView dateTextView = (TextView) view.findViewById(android.R.id.text2);
-		
+
 		final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
-		
-		
-		TextView feedTextView = (TextView) view.findViewById(R.id.text3);
+
+
+		//String strAbstract = getTeaser(cursor, strTitle);
+		Struktur struktur = getTeaser(cursor, strTitle);
+		String linkGrafik=struktur.linkGrafik;
+
+		if (Util.getTeaserPrefs(context)) {
+			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
+			feedTextView.setTextSize(fsize);
+			feedTextView.setText(struktur.text); // strAbstract);
+			feedTextView.setVisibility(View.VISIBLE);
+		}
+
+		/**
 		String strAbstract=cursor.getString(abstractColumnPosition);
 		int cut=200;
 		String linkGrafik=null;
@@ -96,14 +108,24 @@ public class RecycleListAdapter extends EntriesListAdapter {
 					System.err.println("Err Extracting " + strTitle + " " + e);
 				}
 			}
-			if(strAbstract.length()>cut){
-				strAbstract=strAbstract.substring(0, cut);
+			if(!"".equals(strAbstract) && strAbstract.length()>cut){
+				// next '.'
+				int point=strAbstract.indexOf('.',cut);  // -1 || 200..
+				if(point<0 || point > cut+100){
+					// next ' '
+					point=strAbstract.indexOf(' ',cut);
+					if(point<0 || point > cut+100){
+						point=cut;
+					}
+				}
+				strAbstract=strAbstract.substring(0, point);
 			}
 			feedTextView.setText(strAbstract);
 			
-			feedTextView.setVisibility(View.GONE);
+			//feedTextView.setVisibility(View.GONE);
 		}
-		
+		 **/
+
 		final long id = cursor.getLong(idColumn);
 		
 		String link=cursor.getString(linkColumn);
@@ -149,7 +171,11 @@ public class RecycleListAdapter extends EntriesListAdapter {
 					Bitmap bitmap = BitmapFactory.decodeByteArray(iconBytes, 0, iconBytes.length);
 					
 					if (bitmap != null && bitmap.getHeight() > 0 && bitmap.getWidth() > 0) {
-						dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
+						if(date.after(today)){
+							dateTextView.setText(new StringBuilder().append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
+						}else{
+							dateTextView.setText(new StringBuilder().append(' ').append(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(feedName)); // bad style
+						}
 						bitmap = Bitmap.createScaledBitmap(bitmap, buttonSize, buttonSize, false);
 						bitmap = Util.getRoundedBitmap(bitmap);
 						BitmapDrawable bitmapDrawable = new BitmapDrawable(bitmap);
@@ -175,7 +201,11 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		} else {
 			// alles 1 feed - kein icon
 			textView.setText(cursor.getString(titleColumnPosition));
-			dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)));
+			if(date.after(today)){
+				dateTextView.setText(new StringBuilder(timeFormat.format(date)));
+			}else{
+				dateTextView.setText(new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)));
+			}
 		}
 
 		if (forcedState == STATE_ALLUNREAD && !markedAsRead.contains(id) || (forcedState != STATE_ALLREAD && cursor.isNull(readDateColumn) && !markedAsRead.contains(id)) || markedAsUnread.contains(id)) {
@@ -201,10 +231,10 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		String pathToImage = mImageFolder + "/" + id + "_cover.jpg";
 //		Drawable d = Drawable.createFromPath(pathToImage);
 		File imageFile = new File(pathToImage);
+		boolean hasImmage=true;
 		if(imageFile.exists()){
 			BitmapImageViewTarget roundedImageTarget = Util.getRoundedImageTarget(context, coverView, 30.0f);
 			Glide.with(context).load(imageFile).asBitmap().centerCrop().into(roundedImageTarget);
-//			Glide.with(context).load(imageFile).centerCrop().into(coverView);
 		}else {
 			if (linkGrafik==null){
 				linkGrafik=cursor.getString(grafikLinkColumn);				
@@ -215,9 +245,16 @@ public class RecycleListAdapter extends EntriesListAdapter {
 					BitmapImageViewTarget roundedImageTarget = Util.getRoundedImageTarget(context, coverView, 30.0f);
 					Glide.with(context).load(url).asBitmap().centerCrop().into(roundedImageTarget);
 				} catch (Exception e) {
-					System.err.println("Err Loading dierect " + linkGrafik);
+					System.err.println("Err Loading direct " + linkGrafik);
+					hasImmage=false;
 				}
+			}else{
+				hasImmage=false;
 			}
+		}
+		if(!hasImmage){
+			//int pixel=Util.getButtonSizeInPixel(context)* 2 ;
+			//coverView.setLayoutParams(new RelativeLayout.LayoutParams(pixel, pixel));
 		}
 	}
 	

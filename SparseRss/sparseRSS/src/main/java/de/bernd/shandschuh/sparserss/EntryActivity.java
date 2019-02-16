@@ -34,11 +34,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -70,6 +70,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     public static final int AUFRUFART_AMP = 5;
     public static final int AUFRUFART_GOOGLEWEBLIGHT = 6; // Leiche ?
     private static final int AUFRUFART_WEBVIEW = 6; // Leiche ?
+    public static final int AUFRUFART_READABILITY4J = 7;
 
     private int mAufrufart = 0;
     private EntryActivity mActivity = null;
@@ -121,7 +122,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
-        android.support.v7.app.ActionBar actionBar7 = getSupportActionBar();
+        androidx.appcompat.app.ActionBar actionBar7 = getSupportActionBar();
         actionBar7.setDisplayHomeAsUpEnabled(true);
 
 //		AppBarLayout appBarLayout =(AppBarLayout) findViewById(R.id.appBarLayout);
@@ -335,6 +336,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         getMenuInflater().inflate(R.menu.entry, menu);
 
         switch (mAufrufart) {
+            case AUFRUFART_READABILITY4J:
+                menu.findItem(R.id.menu_readability4j).setChecked(true);
+                break;
             case AUFRUFART_READABILITY:
                 menu.findItem(R.id.menu_readability).setChecked(true);
                 break;
@@ -521,6 +525,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                 onClickReadability(null);
                 break;
             }
+            case R.id.menu_readability4j: {
+                onClickReadability4J(null);
+                break;
+            }
 
             case R.id.menu_amp: {
                 onClickLoadAmp(null);
@@ -628,6 +636,14 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         mEntryPagerAdapter.notifyDataSetChanged();
     }
 
+    private void onClickReadability4J(View view) {
+        Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY4J);
+        mAufrufart = AUFRUFART_READABILITY4J;
+        mEntryPagerAdapter.notifyDataSetChanged();
+    }
+
+
+    // PopupMenu aus ButtomBar
     public void onClickMenu2(View view) {
 
         if (view == null) {
@@ -638,6 +654,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
 
         switch (mAufrufart) {
+            case AUFRUFART_READABILITY4J:
+                popup.getMenu().findItem(R.id.menu_readability4j).setChecked(true);
+                break;
             case AUFRUFART_READABILITY:
                 popup.getMenu().findItem(R.id.menu_readability).setChecked(true);
                 break;

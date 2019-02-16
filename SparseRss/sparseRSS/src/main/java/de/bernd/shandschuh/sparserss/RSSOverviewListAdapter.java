@@ -80,6 +80,8 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 	
 	private int buttonSize;
 	private int densityDpi;
+
+	public Date today= new Date();
 	
 	public RSSOverviewListAdapter(Activity activity) {
 		super(activity, R.layout.feedlistitem, activity.managedQuery(FeedData.FeedColumns.CONTENT_URI, null, null, null, null));
@@ -90,6 +92,10 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 		errorPosition = getCursor().getColumnIndex(FeedData.FeedColumns.ERROR);
 		iconPosition = getCursor().getColumnIndex(FeedData.FeedColumns.ICON);
 		COLON = activity.getString(R.string.colon);
+
+		today.setHours(0);
+		today.setMinutes(0);
+
 		handler = new Handler();
 		updateTask = new SimpleTask() {
 			@Override
@@ -143,8 +149,13 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 
 		if (cursor.isNull(errorPosition)) {
 			Date date = new Date(timestamp);
-			
-			updateTextView.setText(new StringBuilder(context.getString(R.string.update)).append(COLON).append(timestamp == 0 ? context.getString(R.string.never) : new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(unreadCount).append('/').append(count).append(' ').append(context.getString(R.string.unread))));
+			StringBuilder stringBuilder =null;
+			if(date.after(today)){
+				stringBuilder =new StringBuilder(timeFormat.format(date)).append(Strings.COMMASPACE).append(unreadCount).append('/').append(count).append(' ').append(context.getString(R.string.unread));
+			}else{
+				stringBuilder =new StringBuilder(dateFormat.format(date)).append(' ').append(timeFormat.format(date)).append(Strings.COMMASPACE).append(unreadCount).append('/').append(count).append(' ').append(context.getString(R.string.unread));
+			}
+			updateTextView.setText(new StringBuilder(context.getString(R.string.update)).append(COLON).append(timestamp == 0 ? context.getString(R.string.never) : stringBuilder));
 		} else {
 			updateTextView.setText(new StringBuilder(context.getString(R.string.error)).append(COLON).append(cursor.getString(errorPosition)));
 		}

@@ -15,7 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.v4.view.PagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 import android.text.format.DateFormat;
 import android.util.Xml.Encoding;
 import android.view.LayoutInflater;
@@ -30,6 +30,12 @@ import android.widget.TextView;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.bumptech.glide.Glide;
 
+import net.dankito.readability4j.Article;
+import net.dankito.readability4j.Readability4J;
+import net.dankito.readability4j.extended.Readability4JExtended;
+
+import org.jsoup.Jsoup;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,12 +44,17 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
 import de.bernd.shandschuh.sparserss.service.FetcherService;
+import de.bernd.shandschuh.sparserss.util.HtmlUtils;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class EntryPagerAdapter extends PagerAdapter {
 
@@ -138,7 +149,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 		}
 
 		Drawable drawable = getDrawableForEntry(dtoEntry);
-		android.support.v7.app.ActionBar actionBar7 = mContext.getSupportActionBar();
+		androidx.appcompat.app.ActionBar actionBar7 = mContext.getSupportActionBar();
 		actionBar7.setHomeAsUpIndicator(drawable);
 
 		refreshLayout(dtoEntry, layout);
@@ -268,7 +279,6 @@ public class EntryPagerAdapter extends PagerAdapter {
 					dto.text = dto.text.replaceAll(Strings.HTML_IMG_REGEX, Strings.EMPTY);
 				}
 			}
-			dto.text += "<br><br>"; // Verschieben zur Anzeige !!
 
 			if (entryCursor.isNull(readDatePosition)) {
 				dto.isRead = false;
@@ -316,6 +326,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 		if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_READABILITY) {
 			new AsyncVeryNewReadability().execute(dtoEntry);
+		} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_READABILITY4J) {
+			new AsyncReadability4J().execute(dtoEntry);
 		} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_AMP) {
 			new AsyncAmpRead().execute(dtoEntry);
 		} else if (mContext.getmAufrufart() == EntryActivity.AUFRUFART_MOBILIZE) {
@@ -446,7 +458,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 
 			if (dto.text != null) {
 
-				dto.text = dto.titel + dto.text;
+				dto.text = dto.titel + dto.text + "<br><br></body>";
 
 				String baseUrl = EntryActivity.getBaseUrl(dto.link);
 				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
@@ -484,7 +496,71 @@ public class EntryPagerAdapter extends PagerAdapter {
 		}
 	}
 
-	
+
+	public class AsyncReadability4J extends AsyncTask<DtoEntry, Void, Void> {
+
+		DtoEntry dto;
+
+		@Override
+		protected Void doInBackground(DtoEntry... params) {
+
+			try {
+				dto = params[0];
+
+				Request.Builder builder = new Request.Builder().url(dto.link)
+						.header("User-agent", "Mozilla/5.0 (compatible) AppleWebKit Chrome Safari") // some feeds need this to work properly
+						.addHeader("accept", "*/*");
+				if(dto.link.startsWith("https://derstandard.at")){
+					builder.addHeader("Cookie", "DSGVO_ZUSAGE_V1=true; MGUID=GUID=d7a70143-6871-4ac2-bfa6-5da0ae78add2&Timestamp=2018-09-14T08:11:49&DetectedVersion=Web&Version=&Hash=E04A0D0F7DB9EEA8F3C4D116D9BC2719;");
+				}
+				Request request = builder.build();
+
+				OkHttpClient client = new OkHttpClient().newBuilder()
+						.connectTimeout(10, TimeUnit.SECONDS)
+						.readTimeout(30, TimeUnit.SECONDS)
+						.build();
+				Response response = client.newCall(request).execute();
+
+				Readability4J readability4J = new Readability4JExtended(dto.link, Jsoup.parse(response.body().byteStream(), null, dto.link));
+
+				Article article = readability4J.parse();
+
+				//fetchHtmlSeite(dto);
+				dto.text = article.getArticleContent().html();
+
+				// TODO Clean Html
+
+				if(mContext.shouldShowCover(dto)){
+					dto.linkGrafik= HtmlUtils.getFirstImmage(dto.text);
+				}
+
+
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			checkViews(dto, null);
+
+			dto.text = mContext.getCSS() + "<body>" + "<b>" + dto.titel + "</b>" + dto.text + "<br><br></body>";
+
+			dto.viewWeb.loadDataWithBaseURL(dto.link, dto.text, "text/html", Encoding.UTF_8.toString(), null);
+
+			if (!mContext.showCover || dto.linkGrafik == null) {
+				int pixel = 1;
+				dto.viewImage.setLayoutParams(new LinearLayout.LayoutParams(1, pixel));
+			}else{
+				Glide.with(mContext).load(dto.linkGrafik).asBitmap().centerCrop().into(dto.viewImage);
+			}
+
+			dto.progressBar.setVisibility(View.INVISIBLE);
+		}
+	}
 	
 	public class AsyncAmpRead extends AsyncTask<DtoEntry, Void, Void> {
 
@@ -573,7 +649,8 @@ public class EntryPagerAdapter extends PagerAdapter {
 		// reload wird von allen, ausser Readability genutzt!
 		// d.g. kein Immage !!! -> alles raus !!
 
-		dto.text = dto.titel + dto.text;
+		dto.text = dto.titel + dto.text + "<br><br></body>";
+
 
 		checkViews(dto, null);
 		String baseUrl = EntryActivity.getBaseUrl(dto.link);

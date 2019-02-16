@@ -188,6 +188,7 @@
     <string name="button_decline">Decline</string>
     <string name="button_alwaysokforall">Always ok for all</string>
     <string name="message_exportedto">Exported into %s.</string>
+    <string name="message_permission_download_folder">Permission for Download Folder needed.</string>
     <string name="dialog_licenseagreement">License</string>
     <string name="dialog_hint">Hint</string>
     
