@@ -36,6 +36,8 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -490,4 +492,26 @@ public class Util {
 		text+="\nSchedule " + min + " minutes";
 		Util.msgBox(context,text);
 	}
+
+	public static File  loadCover(Context context, String id, String linkGrafik){
+		String mImageFolder = Util.getImageFolderFile(context).toString();
+		String pathToImage = mImageFolder + "/" + id + "_cover.jpg";
+		File imageFile = new File(pathToImage);
+		if(imageFile.exists()){
+			return imageFile;
+		}else{
+			try {
+				byte[] data = FetcherService.getBytes(new URL(linkGrafik).openStream());
+				FileOutputStream fos = new FileOutputStream(pathToImage);
+				fos.write(data);
+				fos.close();
+				imageFile = new File(pathToImage);
+				return imageFile;
+			} catch (Exception e) {
+				System.err.println("Err Run loading " + linkGrafik + " " + e);
+			}
+		}
+		return null;
+	}
 }
+

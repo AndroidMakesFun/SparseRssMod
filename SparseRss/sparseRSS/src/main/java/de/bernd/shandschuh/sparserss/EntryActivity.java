@@ -26,6 +26,8 @@ package de.bernd.shandschuh.sparserss;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -55,7 +57,11 @@ import android.widget.TextView;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.File;
+
 import de.bernd.shandschuh.sparserss.EntryPagerAdapter.DtoEntry;
+import de.bernd.shandschuh.sparserss.provider.FeedData;
+import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
 import de.jetwick.snacktory.OutputFormatter;
 
 public class EntryActivity extends AppCompatActivity implements android.widget.SeekBar.OnSeekBarChangeListener {
@@ -68,8 +74,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     public static final int AUFRUFART_INSTAPAPER = 3;
     public static final int AUFRUFART_READABILITY = 4;
     public static final int AUFRUFART_AMP = 5;
-    public static final int AUFRUFART_GOOGLEWEBLIGHT = 6; // Leiche ?
-    private static final int AUFRUFART_WEBVIEW = 6; // Leiche ?
+    public static final int AUFRUFART_GOOGLEWEBLIGHT = 6;
     public static final int AUFRUFART_READABILITY4J = 7;
 
     private int mAufrufart = 0;
@@ -632,12 +637,14 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
     public void onClickReadability(View view) {
         Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY);
+        resetFulltextForCurrentEntry();
         mAufrufart = AUFRUFART_READABILITY;
         mEntryPagerAdapter.notifyDataSetChanged();
     }
 
     private void onClickReadability4J(View view) {
         Util.setViewerPrefs(this, "" + feedId, AUFRUFART_READABILITY4J);
+        resetFulltextForCurrentEntry();
         mAufrufart = AUFRUFART_READABILITY4J;
         mEntryPagerAdapter.notifyDataSetChanged();
     }
@@ -716,12 +723,14 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
     public void onClickLoadAmp(View view) {
         Util.setViewerPrefs(this, "" + feedId, AUFRUFART_AMP);
+        resetFulltextForCurrentEntry();
         mAufrufart = AUFRUFART_AMP;
         mEntryPagerAdapter.notifyDataSetChanged();
     }
 
     public void onClickLoadGoogleweblight(View view) {
         Util.setViewerPrefs(this, "" + feedId, AUFRUFART_GOOGLEWEBLIGHT);
+        resetFulltextForCurrentEntry();
         mAufrufart = AUFRUFART_GOOGLEWEBLIGHT;
         mEntryPagerAdapter.notifyDataSetChanged();
     }
@@ -837,4 +846,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         return false;
     }
 
+    /**
+     * Fills fulltext in db with null
+     */
+    public void resetFulltextForCurrentEntry(){
+
+        Uri uri= FeedData.EntryColumns.PARENT_URI(mActivity.getIntent().getData().getPath());
+        DtoEntry dto=mEntryPagerAdapter.getAktuellenEntry();
+        ContentValues values = FeedDataContentProvider.createContentValuesForFulltext(null, null);
+        this.getContentResolver().update(ContentUris.withAppendedId(uri, Long.parseLong( dto.id)),
+                values, null, null);
+        dto.text=null;
+        dto.linkGrafik=null;
+        String mImageFolder = Util.getImageFolderFile(mActivity).toString();
+        String pathToImage = mImageFolder + "/" + dto.id + "_cover.jpg";
+        File imageFile = new File(pathToImage);
+        if(imageFile.exists()){
+            imageFile.delete();
+        }
+    }
 }

@@ -78,7 +78,7 @@ public class FeedConfigActivity extends Activity {
 		
 		spinner = (Spinner) findViewById(R.id.spinner1);
 		
-	    String[] mStrings = {"Feed", "Browser", "Mobilize", "Instapaper", "Readability", "AMP"};  // 0..5
+	    String[] mStrings = {"Feed", "Browser", "Mobilize", "Instapaper", "Readability", "AMP", "GoogleWeblight", "Readability4J"};  // 0..7
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, mStrings);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

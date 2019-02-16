@@ -29,6 +29,12 @@ import android.util.Log;
 import android.util.Xml;
 import android.view.View;
 
+import net.dankito.readability4j.Article;
+import net.dankito.readability4j.Readability4J;
+import net.dankito.readability4j.extended.Readability4JExtended;
+
+import org.jsoup.Jsoup;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,9 +52,11 @@ import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import de.bernd.shandschuh.sparserss.BASE64;
+import de.bernd.shandschuh.sparserss.EntryActivity;
 import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.RSSOverview;
 import de.bernd.shandschuh.sparserss.Strings;
@@ -56,8 +64,12 @@ import de.bernd.shandschuh.sparserss.Util;
 import de.bernd.shandschuh.sparserss.handler.RSSHandler;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
+import de.bernd.shandschuh.sparserss.util.HtmlUtils;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class RssJobService extends JobService {
 
@@ -305,6 +317,7 @@ public class RssJobService extends JobService {
         fetcher2.setMaxTextLength(50000);
 
         boolean showCover = Util.showCover(this, ""+feedId);
+        int iAufrufart = Util.getViewerPrefs(this, ""+feedId);
 
         while (cursor.isAfterLast() == false) {
             String id = cursor.getString(0);
@@ -317,12 +330,44 @@ public class RssJobService extends JobService {
                 rssLen=rssText.length();
                 imageUrl = Util.takeFirstSrc(rssText);
             }
+            String text = null;
             try {
-                JResult res = fetcher2.fetchAndExtract(link, 10000, true);
-                String text = res.getText();
-                if(imageUrl==null){
-                    imageUrl = res.getImageUrl();
+                if(EntryActivity.AUFRUFART_READABILITY==iAufrufart){
+                    JResult res = fetcher2.fetchAndExtract(link, 10000, true);
+                    text = res.getText();
+                    if(imageUrl==null){
+                        imageUrl = res.getImageUrl();
+                    }
+
+                }else if (EntryActivity.AUFRUFART_READABILITY4J==iAufrufart){
+
+                    // kopiert aus AsyncReadability4J
+
+                    Request.Builder builder = new Request.Builder().url(link)
+                            .header("User-agent", "Mozilla/5.0 (compatible) AppleWebKit Chrome Safari") // some feeds need this to work properly
+                            .addHeader("accept", "*/*");
+                    if (link.startsWith("https://derstandard.at")) {
+                        builder.addHeader("Cookie", "DSGVO_ZUSAGE_V1=true; MGUID=GUID=d7a70143-6871-4ac2-bfa6-5da0ae78add2&Timestamp=2018-09-14T08:11:49&DetectedVersion=Web&Version=&Hash=E04A0D0F7DB9EEA8F3C4D116D9BC2719;");
+                    }
+                    Request request = builder.build();
+
+                    OkHttpClient client = new OkHttpClient().newBuilder()
+                            .connectTimeout(10, TimeUnit.SECONDS)
+                            .readTimeout(30, TimeUnit.SECONDS)
+                            .build();
+                    Response response = client.newCall(request).execute();
+
+                    Readability4J readability4J = new Readability4JExtended(link, Jsoup.parse(response.body().byteStream(), null, link));
+
+                    Article article = readability4J.parse();
+
+                    text = article.getArticleContent().html();
+
+                    imageUrl = HtmlUtils.getFirstImmage(text);
+
                 }
+
+
                 if(text!=null && text.length()>rssLen){
                     ContentValues values = FeedDataContentProvider.createContentValuesForFulltext(text, imageUrl);
                     Uri updateUri = ContentUris.withAppendedId(parentUri,Long.parseLong(id));
