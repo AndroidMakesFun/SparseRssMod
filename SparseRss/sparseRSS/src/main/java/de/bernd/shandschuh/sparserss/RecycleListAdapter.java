@@ -198,6 +198,7 @@ public class RecycleListAdapter extends EntriesListAdapter {
 //		Drawable d = Drawable.createFromPath(pathToImage);
 		File imageFile = new File(pathToImage);
 		boolean hasImmage=true;
+		coverView.setVisibility(View.VISIBLE);
 		if(imageFile.exists()){
 			BitmapImageViewTarget roundedImageTarget = Util.getRoundedImageTarget(context, coverView, 30.0f);
 			Glide.with(context).load(imageFile).asBitmap().centerCrop().into(roundedImageTarget);
@@ -221,6 +222,7 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		if(!hasImmage){
 			//int pixel=Util.getButtonSizeInPixel(context)* 2 ;
 			//coverView.setLayoutParams(new RelativeLayout.LayoutParams(pixel, pixel));
+			coverView.setVisibility(View.INVISIBLE);
 		}
 	}
 	
