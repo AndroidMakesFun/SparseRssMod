@@ -36,6 +36,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import androidx.cardview.widget.CardView;
+
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -72,59 +74,23 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		float fsize=15.0f;
 		textView.setTextSize(fsize); // etwas kleiner!
 
+		Struktur struktur = getTeaser(cursor, strTitle);
+		if (Util.getTeaserPrefs(context)) {
+			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
+			feedTextView.setTextSize(fsize);
+			if (!TextUtils.isEmpty(struktur.text)){
+				feedTextView.setText(struktur.text);
+				feedTextView.setVisibility(View.VISIBLE);
+			}else{
+				feedTextView.setVisibility(View.GONE);
+			}
+		}
+
 		TextView dateTextView = (TextView) view.findViewById(android.R.id.text2);
 
 		final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
 
-
-		//String strAbstract = getTeaser(cursor, strTitle);
-		Struktur struktur = getTeaser(cursor, strTitle);
 		String linkGrafik=struktur.linkGrafik;
-
-		if (Util.getTeaserPrefs(context)) {
-			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
-			feedTextView.setTextSize(fsize);
-			feedTextView.setText(struktur.text); // strAbstract);
-			feedTextView.setVisibility(View.VISIBLE);
-		}
-
-		/**
-		String strAbstract=cursor.getString(abstractColumnPosition);
-		int cut=200;
-		String linkGrafik=null;
-		if(strAbstract==null){
-			strAbstract=cursor.getString(fulltextColumnPosition);
-		}
-		if(strAbstract!=null){
-			if(strAbstract.startsWith("<")){
-				try {
-					JResult result = new ArticleTextExtractor().extractContent(strAbstract, true);
-					linkGrafik=result.getImageUrl();
-					if(linkGrafik==null || "".equals(linkGrafik)){
-						linkGrafik=Util.takeFirstSrc(strAbstract);
-					}
-					strAbstract=result.getText();
-				} catch (Exception e) {
-					System.err.println("Err Extracting " + strTitle + " " + e);
-				}
-			}
-			if(!"".equals(strAbstract) && strAbstract.length()>cut){
-				// next '.'
-				int point=strAbstract.indexOf('.',cut);  // -1 || 200..
-				if(point<0 || point > cut+100){
-					// next ' '
-					point=strAbstract.indexOf(' ',cut);
-					if(point<0 || point > cut+100){
-						point=cut;
-					}
-				}
-				strAbstract=strAbstract.substring(0, point);
-			}
-			feedTextView.setText(strAbstract);
-			
-			//feedTextView.setVisibility(View.GONE);
-		}
-		 **/
 
 		final long id = cursor.getLong(idColumn);
 		

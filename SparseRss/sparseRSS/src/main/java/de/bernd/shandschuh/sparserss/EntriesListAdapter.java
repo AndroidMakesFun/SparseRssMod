@@ -43,6 +43,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -55,6 +56,12 @@ import de.jetwick.snacktory.ArticleTextExtractor;
 import de.jetwick.snacktory.JResult;
 
 public class EntriesListAdapter extends ResourceCursorAdapter {
+
+	public class Struktur {
+		String linkGrafik;
+		String text;
+	}
+
 	protected static final int STATE_NEUTRAL = 0;
 	
 	protected static final int STATE_ALLREAD = 1;
@@ -174,13 +181,16 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		
 		final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
 
-		Struktur struktur = getTeaser(cursor, strTitle);
-
 		if (Util.getTeaserPrefs(context)) {
+			Struktur struktur = getTeaser(cursor, strTitle);
 			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
 			feedTextView.setTextSize(fsize);
-			feedTextView.setText(struktur.text); // strAbstract);
-			feedTextView.setVisibility(View.VISIBLE);
+			if (!TextUtils.isEmpty(struktur.text)){
+				feedTextView.setText(struktur.text);
+				feedTextView.setVisibility(View.VISIBLE);
+			}else{
+				feedTextView.setVisibility(View.GONE);
+			}
 		}
 
 		final long id = cursor.getLong(idColumn);
@@ -422,10 +432,6 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		return 0;
 	}
 
-	class Struktur {
-		String linkGrafik;
-		String text;
-	}
 
 	protected Struktur getTeaser(Cursor cursor, String strTitle){
 		String strAbstract=cursor.getString(abstractColumnPosition);
