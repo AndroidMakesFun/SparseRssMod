@@ -227,13 +227,13 @@ public class RssJobService extends JobService {
                         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle()
                                 // This title is slightly different than regular title, since I know INBOX_STYLE is
                                 // available.
-                                .setBigContentTitle(getString(R.string.rss_feeds))
+                                .setBigContentTitle(getString(R.string.rss_feeds) + " " + newCount + " UnRead")
                                 .setSummaryText(text);
 
                         sGlobalNotificationCompatBuilder.setStyle(inboxStyle)
                                 // Title for API <16 (4.0 and below) devices and API 16+ (4.1 and after) when the
                                 // notification is collapsed.
-                                .setContentTitle(getString(R.string.rss_feeds))
+                                .setContentTitle( getString(R.string.rss_feeds)  + " " + newCount + " UnRead")
                                 // Content for API <24 (7.0 and below) devices and API 16+ (4.1 and after) when the
                                 // notification is collapsed.
                                 .setContentText(text)
