@@ -3,8 +3,8 @@
     package="de.bernd.shandschuh.sparserss"
     android:installLocation="auto"
     
-    android:versionCode="238"
-    android:versionName="2.38" >
+    android:versionCode="239"
+    android:versionName="2.39" >
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />

@@ -238,7 +238,7 @@ public class RssJobService extends JobService {
                                 // notification is collapsed.
                                 .setContentText(text)
                                 //.setColor(Util.colGrey)
-                                .setSmallIcon(R.drawable.feed)
+                                .setSmallIcon(R.drawable.ic_statusbar_rss)
                                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.icon))
 
                                 //.setDefaults(NotificationCompat.DEFAULT_ALL)  // Sound, Vib,...

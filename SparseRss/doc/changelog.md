@@ -1,5 +1,19 @@
 Changelog - Sparse RSS Mod
 ==========================
+2.39
+* Big Notification Icon
+* Hide Empty Teaser
+* Hide Empty Cover
+
+2.38 
+* Fix for AndroidX - Mark as read 
+
+2.37 
+* optional Teaser 
+* Readability4J 
+* Andoied Pie 
+* AndroidX
+
 2.36
 * Lighter Dark theme for PageView configureable
 
