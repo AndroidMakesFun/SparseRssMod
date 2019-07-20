@@ -455,7 +455,13 @@ public class RssJobService extends JobService {
 
                 int fetchMode = cursor.getInt(fetchmodePosition);
 
-                handler.init(new Date(cursor.getLong(lastUpdatePosition)), id, cursor.getString(titlePosition), feedUrl);
+                Date jetzt=new Date();
+                Date lastUpdate = new Date(cursor.getLong(lastUpdatePosition));
+                if(lastUpdate == null || lastUpdate.getTime()>jetzt.getTime()){
+                    lastUpdate.setTime(0);
+                }
+
+                handler.init(lastUpdate, id, cursor.getString(titlePosition), feedUrl);
                 if (fetchMode == 0) {
                     if (contentType != null && contentType.startsWith(CONTENT_TYPE_TEXT_HTML)) {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(getConnectionInputStream(connection)));
