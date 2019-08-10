@@ -654,13 +654,16 @@ public class RSSHandler extends DefaultHandler {
 	}
 	
 	private static Date parsePubdateDate(String string) {
+		string = string.replace(Z, GMT);
 		for (int n = 0; n < TIMEZONES_COUNT; n++) {
 			string = string.replace(TIMEZONES[n], TIMEZONES_REPLACE[n]);
 		}
 		for (int n = 0; n < PUBDATEFORMAT_COUNT; n++) {
 			try {
 				return PUBDATE_DATEFORMATS[n].parse(string);
-			} catch (ParseException e) { } // just do nothing
+			} catch (ParseException e) {
+				System.err.println("Err Parsing " + string);
+			} // just do nothing
 		}
 		return null;
 	}
