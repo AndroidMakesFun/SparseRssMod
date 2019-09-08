@@ -9,6 +9,11 @@
             android:icon="@android:drawable/ic_menu_preferences"
             android:title="@string/menu_settings"/>
         <item
+            android:id="@+id/menu_load_last"
+            android:icon="@drawable/ic_settings_backup_restore_grey600_48dp"
+            android:title="Load Last"/>
+
+        <item
             android:id="@+id/menu_allread"
             android:icon="@android:drawable/ic_menu_revert"
             android:title="@string/menu_allread"/>

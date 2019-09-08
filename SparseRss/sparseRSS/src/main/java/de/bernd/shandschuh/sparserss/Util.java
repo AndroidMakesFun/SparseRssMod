@@ -513,5 +513,22 @@ public class Util {
 		}
 		return null;
 	}
+
+	public static final String PREFERENCE_LAST_ENTRY_ID = "PREFERENCE_LAST_ARTIKEL_ID";
+
+	public static void setLastEntryId(Context context, String entryId) {
+		//System.out.println("setLastEntryId " + entryId);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putString(PREFERENCE_LAST_ENTRY_ID, entryId);
+		editor.commit();
+	}
+
+	public static String getLastEntryId(Context context) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		return prefs.getString(PREFERENCE_LAST_ENTRY_ID, null); // 0 Feed
+	}
+
+
 }
 

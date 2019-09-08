@@ -67,7 +67,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -524,7 +523,20 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
 					ACTIVITY_APPLICATIONPREFERENCES_ID);
 			break;
 		}
-		case R.id.menu_allread: {
+			case R.id.menu_load_last: {
+				String entryid=Util.getLastEntryId(this);
+				if(entryid==null){
+					Util.toastMessage(this,"No Last Entry");
+					return true;
+				}
+				int feedId=Util.getFeedIdZuEntryId(this,entryid);
+				Uri contenUri = FeedData.EntryColumns.FULL_CONTENT_URI(""+feedId, entryid);
+				//mit content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/0/entries/134522
+				startActivity(new Intent(Intent.ACTION_VIEW, contenUri));
+				break;
+			}
+
+			case R.id.menu_allread: {
 			new Thread() {
 				public void run() {
 					if (getContentResolver().update(FeedData.EntryColumns.CONTENT_URI, getReadContentValues(),

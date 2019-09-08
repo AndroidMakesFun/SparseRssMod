@@ -95,7 +95,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         mActivity = this;
 
         Uri mUri = mActivity.getIntent().getData(); // aus EntriesListActivity
-
         String sFeedId = mUri.getPath();
         int pos = sFeedId.indexOf("/feeds/");
         if (pos > -1) {
@@ -114,7 +113,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
             sFeedId = "0"; // Default f?r alle
         }
 
-//		mAufrufart = getIntent().getIntExtra(EntriesListActivity.EXTRA_AUFRUFART, 0);
         mAufrufart = Util.getViewerPrefs(mActivity, sFeedId);
         int anzahlFeedeintraege = getIntent().getIntExtra(EntriesListActivity.EXTRA_ANZAHL, 1);
         int positionInListe = getIntent().getIntExtra(EntriesListActivity.EXTRA_POSITION, -1);  // !!
@@ -386,6 +384,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        /**
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             if (keyCode == 92 || keyCode == 94 || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
                 scrollUp();
@@ -395,6 +394,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                 return true;
             }
         }
+         **/
         return super.onKeyDown(keyCode, event);
     }
 

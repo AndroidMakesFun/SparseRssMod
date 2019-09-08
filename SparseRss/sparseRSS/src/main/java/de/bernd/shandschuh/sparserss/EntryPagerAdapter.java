@@ -103,7 +103,7 @@ public class EntryPagerAdapter extends PagerAdapter {
 
     public EntryPagerAdapter(EntryActivity context, int position, int anzahlFeedeintraege) {
         mContext = context;
-        mAnzahlFeedeintraege = anzahlFeedeintraege;
+        //mAnzahlFeedeintraege = anzahlFeedeintraege; wird in ermittleAlleIds() überschrieben
         mUri = mContext.getIntent().getData();
         // showRead =
         // mContext.getIntent().getBooleanExtra(EntriesListActivity.EXTRA_SHOWREAD,
@@ -181,9 +181,12 @@ public class EntryPagerAdapter extends PagerAdapter {
 
         String id = dto.id;
         if (!dto.isRead) {
+            //mark as read
             mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri, Long.parseLong(id)),
                     RSSOverview.getReadContentValues(), null, null);
         }
+        //save Last _id
+        Util.setLastEntryId(mContext, id);
     }
 
     /**
@@ -475,7 +478,9 @@ public class EntryPagerAdapter extends PagerAdapter {
                 }
 
                 if (aimageFile != null) {
-                    Glide.with(mContext).load(aimageFile).centerCrop().into(dto.viewImage);
+                    if(mContext!=null && !mContext.isDestroyed()){
+                        Glide.with(mContext).load(aimageFile).centerCrop().into(dto.viewImage);
+                    }
                 } else {
                     if (dto.viewImage != null) {
                         int pixel = 1;
@@ -558,7 +563,9 @@ public class EntryPagerAdapter extends PagerAdapter {
             dto.viewWeb.loadDataWithBaseURL(dto.link, dto.text, "text/html", Encoding.UTF_8.toString(), null);
 
             if (aimageFile != null) {
-                Glide.with(mContext).load(aimageFile).centerCrop().into(dto.viewImage);
+                if(mContext!=null && !mContext.isDestroyed()){
+                    Glide.with(mContext).load(aimageFile).centerCrop().into(dto.viewImage);
+                }
             } else {
                 if (dto.viewImage != null) {
                     int pixel = 1;
