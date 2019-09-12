@@ -2,6 +2,7 @@ package de.bernd.shandschuh.sparserss;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ContentUris;
@@ -35,6 +36,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.Date;
 
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedData.FeedColumns;
@@ -76,14 +79,19 @@ public class ParentActivity extends AppCompatActivity {
     protected long mDateFromFirst;
 
     protected EntriesListAdapter mAdapter;
+    protected Activity mActivity;
 
     protected long mLongFeedId = 0l;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Util.isLightTheme(this)) {
+        mActivity=this;
+        if(Util.getColorMode(this)==0){
             setTheme(R.style.MyTheme_Light);
         }
+//        if (Util.isLightTheme(this)) {
+  //          setTheme(R.style.MyTheme_Light);
+    //    }
         super.onCreate(savedInstanceState);
 
         String title = null;
@@ -99,6 +107,10 @@ public class ParentActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         int col = 0xFF737373;
         toolbar.setTitleTextColor(col);
+
+        View viewBottomBar = findViewById(R.id.button_layout);
+        viewBottomBar.setAlpha(0.4f);
+
 
         mLongFeedId = intent.getLongExtra(FeedData.FeedColumns._ID, 0);
 
@@ -271,7 +283,12 @@ public class ParentActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.entrylist, menu);
 
         // Menues in die Toolbar, SHOW_AS_ACTION_ALWAYS zieht nur hier
-        MenuItem markAsRead = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
+        MenuItem addColorMenu = menu.add(0, R.id.menu_color, 0, R.string.menu_color);
+        addColorMenu.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        addColorMenu.setIcon(R.drawable.ic_action_brightness_medium);
+
+        //MenuItem markAsRead = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
+        MenuItem markAsRead = menu.add(0, R.id.menu_markasread_up_here, 0, R.string.contextmenu_markasread);
         MenuItemCompat.setShowAsAction(markAsRead, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         markAsRead.setIcon(android.R.drawable.ic_menu_revert);
 
@@ -351,7 +368,22 @@ public class ParentActivity extends AppCompatActivity {
                 getContentResolver().update(uri, RSSOverview.getReadContentValues(), where, null);
             }
         }.start();
-        mAdapter.markAsRead();
+        finish();
+    }
+
+    public void clickMarkAsReadUpHere(View view) {
+        new Thread() { // the update process takes some time
+            public void run() {
+                if(mAdapter.getmDateFromLastShownUpHere()==0){
+                    mAdapter.setmDateFromLastShownUpHere(ParentActivity.this.mDateFromFirst);
+                }
+                String where = FeedData.EntryColumns.DATE + "<=" + ParentActivity.this.mDateFromFirst;
+                where += " AND " + mAdapter.getSelectionFilter(); //readdate is null AND _id in (1,2,3)
+                where += " AND " + FeedData.EntryColumns.DATE + ">=" + mAdapter.getmDateFromLastShownUpHere();
+                // System.out.println( "where " + where);
+                getContentResolver().update(uri, RSSOverview.getReadContentValues(), where, null);
+            }
+        }.start();
         finish();
     }
 
@@ -363,10 +395,24 @@ public class ParentActivity extends AppCompatActivity {
                 finish();
                 break;
 
+            case R.id.menu_color: {
+                Intent intent = new Intent(mActivity, mActivity.getClass());
+                intent.setData(FeedData.EntryColumns.CONTENT_URI(Long.toString(mLongFeedId)));
+                intent.putExtra(FeedData.FeedColumns._ID, mLongFeedId);
+                RSSOverview.chooseColorDialog(mActivity,intent);
+                break;
+            }
+
+            case R.id.menu_markasread_up_here: {
+                clickMarkAsReadUpHere(null);
+                break;
+            }
+
             case R.id.menu_markasread: {
                 clickMarkAsRead(null);
                 break;
             }
+
             case R.id.menu_markasunread: {
                 new Thread() { // the update process takes some time
                     public void run() {
@@ -571,4 +617,5 @@ public class ParentActivity extends AppCompatActivity {
         getContentResolver().update(FeedData.FeedColumns.CONTENT_URI(feedId),
                 values, null, null);
     }
+
 }

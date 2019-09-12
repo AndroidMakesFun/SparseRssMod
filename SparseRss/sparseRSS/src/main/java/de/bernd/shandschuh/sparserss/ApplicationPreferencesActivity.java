@@ -42,7 +42,7 @@ import de.bernd.shandschuh.sparserss.service.RefreshService;
 public class ApplicationPreferencesActivity extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		if (Util.isLightTheme(this)) {
+		if(Util.getColorMode(this)==0){
 			setTheme(R.style.Theme_Light);
 		}
 		super.onCreate(savedInstanceState);

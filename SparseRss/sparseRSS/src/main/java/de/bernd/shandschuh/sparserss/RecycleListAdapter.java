@@ -70,7 +70,10 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		boolean isDarkTheme=!Util.isLightTheme(context);
 
 		String strTitle=cursor.getString(titleColumnPosition);
+		System.out.println(" **** OLD " + textView.getText());
+
 		textView.setText(strTitle);
+		System.out.println(" ** BIND " + strTitle);
 		float fsize=15.0f;
 		textView.setTextSize(fsize); // etwas kleiner!
 
@@ -78,6 +81,9 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		if (Util.getTeaserPrefs(context)) {
 			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
 			feedTextView.setTextSize(fsize);
+			if(isDarkTheme){
+				feedTextView.setTextColor(Util.colDarkGrey);
+			}
 			if (!TextUtils.isEmpty(struktur.text)){
 				feedTextView.setText(struktur.text);
 				feedTextView.setVisibility(View.VISIBLE);
@@ -127,7 +133,9 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		});
 		
 		Date date = new Date(cursor.getLong(dateColumn));
-		String feedName = cursor.getString(feedNameColumn);		
+		mDateFromLastShownUpHere=date.getTime();
+
+		String feedName = cursor.getString(feedNameColumn);
 		if (showFeedInfo && feedIconColumn > -1 && feedNameColumn > -1) {
 			byte[] iconBytes = cursor.getBlob(feedIconColumn);
 			

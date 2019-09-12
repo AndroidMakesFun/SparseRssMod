@@ -37,6 +37,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.core.view.MenuItemCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
@@ -87,9 +88,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Util.isLightTheme(this)) {
+        if(Util.getColorMode(this)==0){
             setTheme(R.style.MyTheme_Light);
         }
+        CSS = null;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.entry);
         mActivity = this;
@@ -131,9 +133,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 //		AppBarLayout appBarLayout =(AppBarLayout) findViewById(R.id.appBarLayout);
 //		appBarLayout.setExpanded(false);
 
+        View viewBottomBar = findViewById(R.id.button_layout);
         if (!Util.showBottomBar(this)) {
-            View viewBottomBar = findViewById(R.id.button_layout);
             viewBottomBar.setVisibility(View.GONE);
+        }else{
+            viewBottomBar.setAlpha(0.4f);
         }
 
         showPics = Util.showPics(this);
@@ -148,8 +152,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         }
         viewPager.setCurrentItem(positionInListe, true);
 
-        if (Util.isLightTheme(mActivity)) {
-//			viewPager.setBackgroundColor( Color.parseColor("#f6f6f6"));  // Grau Weiss des CSS
+        if(Util.getColorMode(this)==0){
+			viewPager.setBackgroundColor( Color.parseColor("#f6f6f6"));  // Grau Weiss des CSS
         } else {
             viewPager.setBackgroundColor(Color.BLACK);
         }
@@ -174,19 +178,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     // {max-width: 100%;}\npre {white-space: pre-wrap;}</style></head>";
     // aus /sparss/src/net/etuldan/sparss/view/EntryView.java
     private static final String FONT_SANS_SERIF = "font-family: sans-serif;";
-    public static final String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
-    private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
-    private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6"
-            : "#383b3f";
-    private static final String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd"
-            : "solid #303030";
-    private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
-    private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
+    public static String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
+    //private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
+    //private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6" : "#383b3f";
+    //private static final String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd" : "solid #303030";
+    //private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
+    //private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
 
     private static String CSS = null;
 
     public static String getCSS() {
         if(CSS==null){
+            BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
+            String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
+            String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6" : "#383b3f";
+            String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd" : "solid #303030";
+            String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
+            String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
             CSS="<head><style type='text/css'> " + "body {max-width: 100%; margin: 0.3cm; "
                     + FONT_SANS_SERIF + " color: " + getTextColor() + "; background-color:" + BACKGROUND_COLOR
                     + "; line-height: 150%} " + "* {max-width: 100%; word-break: break-word}"
@@ -209,10 +217,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     }
 
     public static String getTextColor() {
-        if(Util.isLightTheme(RSSOverview.INSTANCE)){
+        if(Util.getColorMode(RSSOverview.INSTANCE)==0){
             return "#000000";
         }
-        if(Util.isLighterDarkMode(RSSOverview.INSTANCE)){
+        if(Util.getColorMode(RSSOverview.INSTANCE)==2){
             return "#999999"; // colGrey
         }
         return "#737373"; // colDarkGrey
@@ -361,6 +369,10 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
             menu.findItem(R.id.menu_cover).setChecked(true);
         }
 
+        MenuItem addColorMenu = menu.add(0, R.id.menu_color, 0, R.string.menu_color);
+        addColorMenu.setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        addColorMenu.setIcon(R.drawable.ic_action_brightness_medium);
+
         MenuItem markasreadItem = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
         MenuItemCompat.setShowAsAction(markasreadItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         markasreadItem.setIcon(android.R.drawable.ic_menu_revert);
@@ -373,7 +385,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         if(Util.isLightTheme(this)){
             item.setVisible(false);
         }else{
-            if(Util.isLighterDarkMode(this)){
+            if(Util.getColorMode(this)==2){
                 item.setChecked(true);
             }else{
                 item.setChecked(false);
@@ -394,19 +406,23 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                 return true;
             }
         }
-         **/
+        **/
         return super.onKeyDown(keyCode, event);
     }
 
     private void scrollUp() {
-        if (webView != null) {
-            webView.pageUp(false);
+        NestedScrollView view= (NestedScrollView) mEntryPagerAdapter.getCurrentView();
+        if(view!=null){
+            view.pageScroll(View.FOCUS_UP);
         }
     }
 
     private void scrollDown() {
-        if (webView != null) {
-            webView.pageDown(false);
+        //mEntryPagerAdapter.getAktuellenEntry().viewWeb.pageDown(true);
+        //mEntryPagerAdapter.setPrimaryItem(ViewGroup container, int position, Object object) {
+        NestedScrollView view= (NestedScrollView) mEntryPagerAdapter.getCurrentView();
+        if(view!=null){
+            view.pageScroll(View.FOCUS_DOWN);
         }
     }
 
@@ -485,6 +501,17 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                 finish();
                 break;
             }
+
+            case R.id.menu_color: {
+                CSS = null;//reset
+                String entryid = Util.getLastEntryId(this);
+                int feedId = Util.getFeedIdZuEntryId(this, entryid);
+                Uri contenUri = FeedData.EntryColumns.FULL_CONTENT_URI("" + feedId, entryid);
+                Intent intent = new Intent(Intent.ACTION_VIEW, contenUri);
+                RSSOverview.chooseColorDialog(mActivity,intent);
+                break;
+            }
+
             case R.id.url_button: {
                 onClickLoadBrowser(null);
                 break;

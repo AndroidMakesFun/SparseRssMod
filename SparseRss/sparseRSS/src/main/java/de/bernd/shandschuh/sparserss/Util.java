@@ -118,6 +118,8 @@ public class Util {
 	private static Boolean LIGHTTHEME;
 
 	public static boolean isLightTheme(Context context) {
+		return (Util.getColorMode(context)==0);
+		/**
 		if (context != null) {
 			if (LIGHTTHEME == null) {
 				LIGHTTHEME = PreferenceManager.getDefaultSharedPreferences(context)
@@ -126,6 +128,7 @@ public class Util {
 			return LIGHTTHEME;
 		}
 		return true;
+		 **/
 	}
 
     private static Boolean LIGHTER_DARK_MODE;
@@ -150,8 +153,27 @@ public class Util {
 		LIGHTER_DARK_MODE=wert;
 	}
 
+	public static final String SETTINGS_COLOR_MODE = "SETTINGS_COLOR_MODE";
 
-    public static final String PREFERENCE_TEST_LIST_PREFS = "PREFERENCE_TEST_LIST_PREFS";
+	/**
+	 * 0,1,2 for "Light Mode", "Dark Mode","Night Mode"
+	 */
+	public static int getColorMode(Context context) {
+		return PreferenceManager.getDefaultSharedPreferences(context).getInt(SETTINGS_COLOR_MODE, 0);
+	}
+
+	/**
+	 * 0,1,2 for "Light Mode", "Dark Mode","Night Mode"
+	 */
+	public static void setColorMode(Context context, int colorMode) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putInt(SETTINGS_COLOR_MODE, colorMode);
+		editor.commit();
+	}
+
+
+	public static final String PREFERENCE_TEST_LIST_PREFS = "PREFERENCE_TEST_LIST_PREFS";
 
 	public static void setTestListPrefs(Context context, boolean wert) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -516,6 +538,9 @@ public class Util {
 
 	public static final String PREFERENCE_LAST_ENTRY_ID = "PREFERENCE_LAST_ARTIKEL_ID";
 
+	/**
+	 * save _id from Last Entry maybe for reloading
+	 */
 	public static void setLastEntryId(Context context, String entryId) {
 		//System.out.println("setLastEntryId " + entryId);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

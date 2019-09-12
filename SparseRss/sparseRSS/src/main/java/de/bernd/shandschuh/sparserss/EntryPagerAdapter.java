@@ -1,5 +1,6 @@
 package de.bernd.shandschuh.sparserss;
 
+import android.animation.ObjectAnimator;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -16,11 +18,14 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 
+import androidx.core.widget.NestedScrollView;
 import androidx.viewpager.widget.PagerAdapter;
 
 import android.text.format.DateFormat;
 import android.util.Xml.Encoding;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -154,15 +159,70 @@ public class EntryPagerAdapter extends PagerAdapter {
         androidx.appcompat.app.ActionBar actionBar7 = mContext.getSupportActionBar();
         actionBar7.setHomeAsUpIndicator(drawable);
 
+        /** test
+        NestedScrollView nNestedScrollView = layout.findViewById(R.id.nested_scroll_view);
+        nNestedScrollView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                System.out.println("  ***** NESTED CLICK   " + event + " " + v.toString());
+                return false;
+            }
+        });
+         */
+        NestedScrollView nNestedScrollView = layout.findViewById(R.id.nested_scroll_view);
+
+        WebView wWebView = layout.findViewById(R.id.web_view);
+        //wWebView.performClick()
+
+        wWebView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(MotionEvent.ACTION_UP == event.getAction()){
+                    Display display = mContext.getWindowManager().getDefaultDisplay();
+                    Point size = new Point();
+                    display.getSize(size);
+                    if (wWebView.getHeight() < size.y) {
+                        return false;
+                    }
+                    int mitte = size.y/2;
+                    int touch= (int) event.getY();
+                    int[] arrLocation=new int[2];
+                    wWebView.getLocationOnScreen(arrLocation); //neg
+                    int y = touch + arrLocation[1];
+                    int yDirection=size.y/10*9;
+                    if( y < mitte){
+                        yDirection=-yDirection;
+                    }
+                    //System.out.println(" ** POS " + wWebView.getHeight() + " touch " + touch + " loc " + arrLocation[1] + "  NH " + nNestedScrollView.getHeight() + " " + nNestedScrollView.getScrollY() + " YD " + yDirection);
+                    //nNestedScrollView.smoothScrollBy(0, yDirection);
+                    ObjectAnimator anim = ObjectAnimator.ofInt(nNestedScrollView, "scrollY",nNestedScrollView.getScrollY(), nNestedScrollView.getScrollY()+yDirection);
+                    anim.setDuration(1000);
+                    anim.start();
+                }
+                return false;
+            }
+
+        });
+
         refreshLayout(dtoEntry, layout);
         collection.addView(layout);
         return layout;
     }
 
-    // Ermittlung der aktuell angezeigten Position
+    /**
+     * ret NestedScrollView aus setPrimaryItem(... object )
+     */
+    public Object getCurrentView() {
+        return currentView;
+    }
+    //NestedScrollView
+    private Object currentView=null;
+
+    // setzen der aktuell angezeigten Position
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
 
+        currentView=object;
         int lastPosition = getAktuellePosition();
         if (getAktuellePosition() == position && startPosition != position) {
             // && startPosition!=position wegen startPosition gleich auf gelesen
@@ -185,7 +245,6 @@ public class EntryPagerAdapter extends PagerAdapter {
             mContext.getContentResolver().update(ContentUris.withAppendedId(mParentUri, Long.parseLong(id)),
                     RSSOverview.getReadContentValues(), null, null);
         }
-        //save Last _id
         Util.setLastEntryId(mContext, id);
     }
 

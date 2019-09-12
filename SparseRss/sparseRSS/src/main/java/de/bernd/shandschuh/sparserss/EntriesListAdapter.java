@@ -164,13 +164,14 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		
 		buttonSize=Util.getButtonSizeInPixel(context);
 		densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
-
+		mDateFromLastShownUpHere=0;
 	}
 
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
-        boolean isDarkTheme=!Util.isLightTheme(context);
+        boolean isDarkTheme=Util.getColorMode(context)!=0;
+
 
 		String strTitle=cursor.getString(titleColumnPosition);
 		textView.setText(strTitle);
@@ -185,6 +186,9 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			Struktur struktur = getTeaser(cursor, strTitle);
 			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
 			feedTextView.setTextSize(fsize);
+			if(isDarkTheme){
+				feedTextView.setTextColor(Util.colDarkGrey);
+			}
 			if (!TextUtils.isEmpty(struktur.text)){
 				feedTextView.setText(struktur.text);
 				feedTextView.setVisibility(View.VISIBLE);
@@ -228,6 +232,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		});
 		
 		Date date = new Date(cursor.getLong(dateColumn));
+		mDateFromLastShownUpHere=date.getTime();
+
 		String feedName = cursor.getString(feedNameColumn);		
 		if (showFeedInfo && feedIconColumn > -1 && feedNameColumn > -1) {
 			byte[] iconBytes = cursor.getBlob(feedIconColumn);
@@ -471,4 +477,17 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		struktur.linkGrafik=linkGrafik;
 		return struktur;
 	}
+
+	/**
+	 * Marker für letzten angesehenen Entry
+	 */
+	protected long mDateFromLastShownUpHere;
+
+	public long getmDateFromLastShownUpHere() {
+		return mDateFromLastShownUpHere;
+	}
+	public void setmDateFromLastShownUpHere(long mDateFromLastShownUpHere) {
+		this.mDateFromLastShownUpHere = mDateFromLastShownUpHere;
+	}
+
 }

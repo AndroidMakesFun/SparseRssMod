@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <group android:id="@+id/menu_group_0" >
-        
+
         <item
             android:id="@+id/menu_settings"
             android:icon="@android:drawable/ic_menu_preferences"
@@ -54,5 +54,23 @@
             android:id="@+id/menu_disablefeedsort"
             android:title="@string/menu_disablefeedsort"/>
     </group>
-
+<!--
+    <group android:id="@+id/menu_group_2" >
+    <item
+        android:title="SubMenu"
+        android:id="@+id/menu_color_mode">
+        <menu>
+            <item
+                android:id="@+id/menu_light_mode"
+                android:title="Light Mode"/>
+            <item
+                android:id="@+id/menu_dark_mode"
+                android:title="Dark Mode"/>
+            <item
+                android:id="@+id/menu_night_mode"
+                android:title="Night Mode"/>
+        </menu>
+    </item>
+    </group>
+-->
 </menu>

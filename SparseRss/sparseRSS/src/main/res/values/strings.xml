@@ -31,6 +31,7 @@
 
     <string name="app_name">Sparse rss Mod</string>
     <string name="menu_addfeed">Add feed</string>
+    <string name="menu_color">Dark Mode</string>
     <string name="norssfeeds">No RSS feeds</string>
     <string name="noentries">No entries</string>
     <string name="menu_refresh">Refresh</string>
