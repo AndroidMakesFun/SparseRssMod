@@ -32,7 +32,7 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:testOnly="false"
-        android:theme="@style/MyTheme" >
+        android:theme="@style/MyThemeDark" >
         <!--
         <service android:name=".service.RefreshService" />
         <service android:name=".service.FetcherService" />
@@ -52,7 +52,7 @@
             android:name=".RSSOverview"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/MyTheme" >
+            android:theme="@style/MyThemeDark" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -65,7 +65,7 @@
             android:name=".EntriesListActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/MyTheme" >
+            android:theme="@style/MyThemeDark" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -78,7 +78,7 @@
             android:name=".EntryActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/MyTheme" >
+            android:theme="@style/MyThemeDark" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -9,33 +9,54 @@
         <item name="ic_arrow_left">@drawable/ic_arrow_left_light</item>
         <item name="android:statusBarColor">@android:color/black</item>
 
-        <item name="theme_textColorPrimary">@color/my_black</item>
+        <item name="theme_textColorPrimary">@android:color/black</item>
         <item name="android:textColorPrimary">?attr/theme_textColorPrimary</item>
 
         <item name="theme_textColorSecondary">@color/my_dark_text_color</item>
         <item name="android:textColorSecondary">?attr/theme_textColorSecondary</item>
 
-        <item name="theme_BackgroundColor">@color/my_white</item>
+        <item name="theme_BackgroundColor">@android:color/white</item>
+        <item name="android:colorBackground">?attr/theme_BackgroundColor</item>
+
+        <item name="theme_my_toolbar">@style/ThemeOverlay.AppCompat.Light</item>
+
     </style>
 
 
 
 
-    <!-- Default Theme -->
-    <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
+    <!-- Default Theme Dark-->
+    <style name="MyThemeDark" parent="Theme.AppCompat.NoActionBar">
         <item name="ic_menu_moreoverflow_normal_holo">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
         <item name="ic_arrow_right">@drawable/ic_arrow_right_dark</item>
         <item name="ic_arrow_left">@drawable/ic_arrow_left_dark</item>
         <item name="android:statusBarColor">@android:color/black</item>
 
-        <item name="theme_textColorPrimary">@color/my_grey_text_color</item>
+        <item name="theme_textColorPrimary">@color/my_grey</item>
         <item name="android:textColorPrimary">?attr/theme_textColorPrimary</item>
-        <item name="theme_textColorSecondary">@color/my_grey_text_color</item>
+        <item name="theme_textColorSecondary">@color/my_dark_grey</item>
         <item name="android:textColorSecondary">?attr/theme_textColorSecondary</item>
 
-        <item name="theme_BackgroundColor">@color/my_black</item>
+        <item name="theme_BackgroundColor">@android:color/black</item>
+        <item name="android:colorBackground">?attr/theme_BackgroundColor</item>
+
+        <item name="theme_my_toolbar">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+    </style>
+
+
+    <style name="MyThemeNight" parent="MyThemeDark">
+        <item name="theme_textColorPrimary">@color/my_dark_grey</item>
+        <item name="android:textColorPrimary">?attr/theme_textColorPrimary</item>
+        <item name="theme_textColorSecondary">@color/my_mid_light_red</item>
+        <item name="android:textColorSecondary">?attr/theme_textColorSecondary</item>
+<!--
+  Toolbar: ... und Suche verschwinden
+        <item name="theme_my_toolbar">@android:style/Theme.DeviceDefault.Light.DarkActionBar</item>
+-->
 
     </style>
+
+
 
     <style name="MeinPopupWindow" parent="Widget.AppCompat.PopupMenu">
         <item name="android:textColor">@android:color/white</item>

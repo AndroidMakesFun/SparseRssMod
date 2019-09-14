@@ -88,9 +88,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(Util.getColorMode(this)==0){
-            setTheme(R.style.MyTheme_Light);
-        }
+        Util.setTheme(this);
         CSS = null;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.entry);
@@ -151,12 +149,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
             positionInListe = mEntryPagerAdapter.getAktuellePosition();  // dort neu ermittelt
         }
         viewPager.setCurrentItem(positionInListe, true);
-
-        if(Util.getColorMode(this)==0){
-			viewPager.setBackgroundColor( Color.parseColor("#f6f6f6"));  // Grau Weiss des CSS
-        } else {
-            viewPager.setBackgroundColor(Color.BLACK);
-        }
     }
 
     private static final String TEXT_HTML = "text/html";
@@ -220,7 +212,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         if(Util.getColorMode(RSSOverview.INSTANCE)==0){
             return "#000000";
         }
-        if(Util.getColorMode(RSSOverview.INSTANCE)==2){
+        if(Util.getColorMode(RSSOverview.INSTANCE)==1){
             return "#999999"; // colGrey
         }
         return "#737373"; // colDarkGrey

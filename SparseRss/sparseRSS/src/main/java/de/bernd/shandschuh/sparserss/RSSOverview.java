@@ -140,13 +140,7 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        System.out.println("CREATE");
-        setColorMode(this);
-//        if (Util.isLightTheme(this)) {
-  //          setTheme(R.style.MyTheme_Light);
-    //    } else {
-      //      setTheme(R.style.Theme_AppCompat_NoActionBar); // @style/Theme.AppCompat.NoActionBar
-        //}
+        Util.setTheme(this);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main);
@@ -169,9 +163,6 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
         listview = (ListView) findViewById(android.R.id.list);
         listAdapter = new RSSOverviewListAdapter(this);
         listview.setAdapter(listAdapter);
-//        if (!Util.isLightTheme(this)) {
-  //          listview.setBackgroundColor(Color.BLACK);
-    //    }
 
         emptyview = (TextView) findViewById(android.R.id.empty);
         if (listAdapter.getCount() > 0) {
@@ -202,8 +193,6 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
             private LayoutParams layoutParams;
 
             private int minY = 25; // is the header size --> needs to be changed
-
-            // private ListView listView = getListView();
 
             public boolean onTouch(View v, MotionEvent event) {
                 if (feedSort) {
@@ -312,10 +301,7 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        System.out.println("RESUME");
-        System.out.println("RESUME");
-        System.out.println("RESUME");
-        setColorMode(this);
+        //setColorMode(this);
         super.onResume();
 
         zeigeProgressBar(Util.isCurrentlyRefreshing(this));
@@ -376,8 +362,6 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        // return super.onContextItemSelected(item);
-        // Popup: Bearbeiten, etc.
         return onOptionsItemSelected(item);
     }
 
@@ -1059,7 +1043,6 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
                 } else {
                     finish();
                 }
-//			mDrawerLayout.closeDrawers();
                 return true;
         }
         return super.onKeyUp(keyCode, event);
@@ -1070,16 +1053,6 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
         Log.d(TAG, "clickJobs");
         Util.jobInfos(this);
     }
-
-//	// f?r Hamburger Home Icon
-//	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-//	protected Context getActionBarThemedContextCompat() {
-//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-//			return getSupportActionBar().getThemedContext();
-//		} else {
-//			return this;
-//		}
-//	}
 
 
     public static void chooseColorDialog(final Activity activity, final Intent intent) {
@@ -1120,29 +1093,4 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
         alert.show();
     }
 
-    private void setColorMode(Activity activity){
-        switch (Util.getColorMode(activity)){
-            case 1:
-                //dark
-                setTheme(R.style.Theme_AppCompat_NoActionBar); // @style/Theme.AppCompat.NoActionBar
-                if(listview!=null){
-                    listview.setBackgroundColor(Color.BLACK);
-                }
-                break;
-            case 2:
-                //night
-                setTheme(R.style.Theme_AppCompat_NoActionBar); // @style/Theme.AppCompat.NoActionBar
-                if(listview!=null){
-                    listview.setBackgroundColor(Color.BLACK);
-                }
-                break;
-
-            default:
-                setTheme(R.style.MyTheme_Light);
-                if(listview!=null){
-                    listview.setBackgroundColor(Color.WHITE);
-                }
-                break;
-        }
-    }
 }

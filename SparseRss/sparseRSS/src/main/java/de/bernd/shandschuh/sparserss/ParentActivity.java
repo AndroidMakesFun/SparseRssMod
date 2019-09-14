@@ -86,12 +86,7 @@ public class ParentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mActivity=this;
-        if(Util.getColorMode(this)==0){
-            setTheme(R.style.MyTheme_Light);
-        }
-//        if (Util.isLightTheme(this)) {
-  //          setTheme(R.style.MyTheme_Light);
-    //    }
+        Util.setTheme(this);
         super.onCreate(savedInstanceState);
 
         String title = null;
@@ -183,9 +178,9 @@ public class ParentActivity extends AppCompatActivity {
 
     public void createListView() {
         listview = (ListView) findViewById(android.R.id.list);
-        if (!Util.isLightTheme(this)) {
-            listview.setBackgroundColor(Color.BLACK);
-        }
+        //if (!Util.isLightTheme(this)) {
+        //    listview.setBackgroundColor(Color.BLACK);
+        //}
         listview.setAdapter(mAdapter);
         listview.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
 
@@ -288,7 +283,7 @@ public class ParentActivity extends AppCompatActivity {
         addColorMenu.setIcon(R.drawable.ic_action_brightness_medium);
 
         //MenuItem markAsRead = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
-        MenuItem markAsRead = menu.add(0, R.id.menu_markasread_up_here, 0, R.string.contextmenu_markasread);
+        MenuItem markAsRead = menu.add(0, R.id.menu_markasread, 0, R.string.contextmenu_markasread);
         MenuItemCompat.setShowAsAction(markAsRead, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         markAsRead.setIcon(android.R.drawable.ic_menu_revert);
 

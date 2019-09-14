@@ -555,5 +555,16 @@ public class Util {
 	}
 
 
+	public static void setTheme(Activity activity) {
+		//0,1,2 for "Light Mode", "Dark Mode","Night Mode"
+		int colorMode = Util.getColorMode(activity);
+		if(colorMode==0){
+			activity.setTheme(R.style.MyTheme_Light);
+		}else if (colorMode==1){
+			activity.setTheme(R.style.MyThemeDark);
+		}else{
+			activity.setTheme(R.style.MyThemeNight);
+		}
+	}
 }
 

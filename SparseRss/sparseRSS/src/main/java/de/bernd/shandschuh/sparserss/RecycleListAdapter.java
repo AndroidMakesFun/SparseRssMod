@@ -67,13 +67,10 @@ public class RecycleListAdapter extends EntriesListAdapter {
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
-		boolean isDarkTheme=!Util.isLightTheme(context);
 
 		String strTitle=cursor.getString(titleColumnPosition);
-		System.out.println(" **** OLD " + textView.getText());
 
 		textView.setText(strTitle);
-		System.out.println(" ** BIND " + strTitle);
 		float fsize=15.0f;
 		textView.setTextSize(fsize); // etwas kleiner!
 
@@ -81,9 +78,6 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		if (Util.getTeaserPrefs(context)) {
 			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
 			feedTextView.setTextSize(fsize);
-			if(isDarkTheme){
-				feedTextView.setTextColor(Util.colDarkGrey);
-			}
 			if (!TextUtils.isEmpty(struktur.text)){
 				feedTextView.setText(struktur.text);
 				feedTextView.setVisibility(View.VISIBLE);
@@ -186,18 +180,10 @@ public class RecycleListAdapter extends EntriesListAdapter {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
 			dateTextView.setEnabled(true);
-			if(isDarkTheme){
-				textView.setTextColor(Util.colGrey);
-				dateTextView.setTextColor(Util.colGrey);
-			}
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
 			dateTextView.setEnabled(false);
-			if(isDarkTheme){
-				textView.setTextColor(Util.colDarkGrey);
-				dateTextView.setTextColor(Util.colDarkGrey);
-			}
 		}
 
 		final ImageView coverView = (ImageView) view.findViewById(R.id.coverimage);

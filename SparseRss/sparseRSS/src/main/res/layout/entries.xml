@@ -49,12 +49,12 @@
                     android:visibility="invisible" />
 
                 <ImageButton
-                    android:id="@+id/menu_markasread2"
+                    android:id="@+id/menu_markasread_up_here"
                     android:layout_width="80dp"
                     android:layout_height="50dp"
                     android:layout_toLeftOf="@id/dummy_button"
                     android:background="#10000000"
-                    android:onClick="clickMarkAsRead"
+                    android:onClick="clickMarkAsReadUpHere"
                     android:src="@android:drawable/ic_menu_revert" />
             </RelativeLayout>
         </RelativeLayout>

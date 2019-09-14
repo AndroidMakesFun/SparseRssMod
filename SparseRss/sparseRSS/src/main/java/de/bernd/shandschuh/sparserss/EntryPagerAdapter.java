@@ -198,10 +198,12 @@ public class EntryPagerAdapter extends PagerAdapter {
                     ObjectAnimator anim = ObjectAnimator.ofInt(nNestedScrollView, "scrollY",nNestedScrollView.getScrollY(), nNestedScrollView.getScrollY()+yDirection);
                     anim.setDuration(1000);
                     anim.start();
+                    //v.performClick();
+                    v.setPressed(false);
+                    //return true;
                 }
                 return false;
             }
-
         });
 
         refreshLayout(dtoEntry, layout);

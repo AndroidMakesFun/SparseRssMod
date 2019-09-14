@@ -123,13 +123,7 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 	public void bindView(View view, Context context, Cursor cursor) {
 		TextView textView = ((TextView) view.findViewById(android.R.id.text1));
 		TextView updateTextView = ((TextView) view.findViewById(android.R.id.text2));;
-		boolean isDarkTheme=!Util.isLightTheme(context);
-		//int colDarkGrey=0xFF737373;
-		//int colGrey=0xFF999999;
-		//if (Util.isLightTheme(context)) {
-		//	textView.setTextColor(Color.BLACK);
-		//}
-		
+
 		textView.setSingleLine();
 		
 		Cursor countCursor = context.getContentResolver().query(
@@ -164,23 +158,11 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 		if (unreadCount > 0) {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
-			//textView.setTextColor(colDarkGrey);
 			updateTextView.setEnabled(true);
-			//updateTextView.setTextColor(colGrey);
-			//if(Util.isLightTheme(context)){
-			if(isDarkTheme){
-				textView.setTextColor(Util.colGrey);
-				updateTextView.setTextColor(Util.colGrey);
-			}
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
-			//textView.setTextColor(colGrey);
 			updateTextView.setEnabled(false);
-			if(isDarkTheme){
-				textView.setTextColor(Util.colDarkGrey);
-				updateTextView.setTextColor(Util.colDarkGrey);
-			}
 		}
 
 		String link = cursor.getString(linkPosition);
@@ -257,27 +239,4 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 			sortView.setVisibility(visibility);
 		}
 	}
-	
-//	@Override
-//	public View getView(int position, View convertView, ViewGroup parent) {
-//		System.out.println("" + position + " " + convertView + " " + parent);
-//		return super.getView(position, convertView, parent);
-//	}
-//	
-//	@Override
-//	public int getCount() {
-//		System.out.println("getCount " + super.getCount());
-//		return super.getCount();
-//	}
-//	@Override
-//	public Object getItem(int position) {
-//		System.out.println("getItem " + super.getItem(position));
-//		return super.getItem(position);
-//	}
-//	
-//	@Override
-//	public long getItemId(int position) {
-//		System.out.println("getItemId " + super.getItemId(position));
-//		return super.getItemId(position);
-//	}
 }

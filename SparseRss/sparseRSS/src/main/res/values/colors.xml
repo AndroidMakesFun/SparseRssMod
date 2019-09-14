@@ -14,12 +14,16 @@
      limitations under the License.
 -->
 <resources>
+    <color name="my_grey">#999999</color>
+    <color name="my_dark_grey">#737373</color>
+
     <color name="my_mid_light_red">#16711680</color>
     <color name="my_mid_light_grey">#51000000</color>
     <color name="my_dark_text_color">#737373</color>
     <color name="my_grey_text_color">#999999</color>
     <color name="my_green">#00FF00</color>
     <color name="my_red">#16711680</color>
+
     <color name="my_black">#000000</color>
     <color name="my_white">#ffffff</color>
 
