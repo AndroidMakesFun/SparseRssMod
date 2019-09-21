@@ -78,6 +78,8 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     public static final int AUFRUFART_GOOGLEWEBLIGHT = 6;
     public static final int AUFRUFART_READABILITY4J = 7;
 
+    public static final float NIGHT_ALPHA_FACTOR = 0.6f;
+
     private int mAufrufart = 0;
     private EntryActivity mActivity = null;
 
@@ -128,14 +130,15 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         androidx.appcompat.app.ActionBar actionBar7 = getSupportActionBar();
         actionBar7.setDisplayHomeAsUpEnabled(true);
 
-//		AppBarLayout appBarLayout =(AppBarLayout) findViewById(R.id.appBarLayout);
-//		appBarLayout.setExpanded(false);
+        if (Util.getColorMode(this)==2){
+            toolbar.setAlpha(EntryActivity.NIGHT_ALPHA_FACTOR);
+        }
 
         View viewBottomBar = findViewById(R.id.button_layout);
         if (!Util.showBottomBar(this)) {
             viewBottomBar.setVisibility(View.GONE);
         }else{
-            viewBottomBar.setAlpha(0.4f);
+            viewBottomBar.setAlpha(0.4f);  // etwas durchsichtig
         }
 
         showPics = Util.showPics(this);

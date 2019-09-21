@@ -103,6 +103,11 @@ public class ParentActivity extends AppCompatActivity {
         int col = 0xFF737373;
         toolbar.setTitleTextColor(col);
 
+        if (Util.getColorMode(this)==2){
+            toolbar.setAlpha(EntryActivity.NIGHT_ALPHA_FACTOR);
+        }
+
+
         View viewBottomBar = findViewById(R.id.button_layout);
         viewBottomBar.setAlpha(0.4f);
 

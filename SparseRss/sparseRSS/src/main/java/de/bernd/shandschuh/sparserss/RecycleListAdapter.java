@@ -217,6 +217,10 @@ public class RecycleListAdapter extends EntriesListAdapter {
 			//int pixel=Util.getButtonSizeInPixel(context)* 2 ;
 			//coverView.setLayoutParams(new RelativeLayout.LayoutParams(pixel, pixel));
 			coverView.setVisibility(View.INVISIBLE);
+		}else{
+			if (Util.getColorMode(context)==2){
+				coverView.setAlpha(EntryActivity.NIGHT_ALPHA_FACTOR);
+			}
 		}
 	}
 	

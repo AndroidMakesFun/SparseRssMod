@@ -153,6 +153,10 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
         int col = 0xFF737373;
         toolbar.setTitleTextColor(col);
 
+        if (Util.getColorMode(this)==2){
+            toolbar.setAlpha(EntryActivity.NIGHT_ALPHA_FACTOR);
+        }
+
         setupDrawerContent();
 
         // setHomeButtonActive();

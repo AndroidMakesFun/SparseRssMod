@@ -10,8 +10,6 @@
 
         <attr name="theme_BackgroundColor" format="reference"/>
 
-        <attr name="theme_my_toolbar" format="reference"/>
-
     </declare-styleable>
 
     		

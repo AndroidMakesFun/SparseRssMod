@@ -1,8 +1,5 @@
 <resources>
 
-    <style name="MyTheme.Light_NEU" parent="Theme.AppCompat.DayNight.NoActionBar">
-    </style>
-
     <style name="MyTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="ic_menu_moreoverflow_normal_holo">@drawable/ic_menu_moreoverflow_normal_holo_light</item>
         <item name="ic_arrow_right">@drawable/ic_arrow_right_light</item>
@@ -17,13 +14,7 @@
 
         <item name="theme_BackgroundColor">@android:color/white</item>
         <item name="android:colorBackground">?attr/theme_BackgroundColor</item>
-
-        <item name="theme_my_toolbar">@style/ThemeOverlay.AppCompat.Light</item>
-
     </style>
-
-
-
 
     <!-- Default Theme Dark-->
     <style name="MyThemeDark" parent="Theme.AppCompat.NoActionBar">
@@ -39,35 +30,13 @@
 
         <item name="theme_BackgroundColor">@android:color/black</item>
         <item name="android:colorBackground">?attr/theme_BackgroundColor</item>
-
-        <item name="theme_my_toolbar">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
 
 
     <style name="MyThemeNight" parent="MyThemeDark">
         <item name="theme_textColorPrimary">@color/my_dark_grey</item>
         <item name="android:textColorPrimary">?attr/theme_textColorPrimary</item>
-        <item name="theme_textColorSecondary">@color/my_mid_light_red</item>
-        <item name="android:textColorSecondary">?attr/theme_textColorSecondary</item>
-<!--
-  Toolbar: ... und Suche verschwinden
-        <item name="theme_my_toolbar">@android:style/Theme.DeviceDefault.Light.DarkActionBar</item>
--->
-
     </style>
 
-
-
-    <style name="MeinPopupWindow" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:itemBackground">@android:color/holo_red_light</item>
-    </style>
-
-    <style name="CustomActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:windowActionBarOverlay">true</item>
-        <!-- Support library compatibility -->
-        <item name="windowActionBarOverlay">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
 
 </resources>

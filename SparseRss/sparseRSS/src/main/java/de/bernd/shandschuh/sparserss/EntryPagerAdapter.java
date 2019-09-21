@@ -548,6 +548,9 @@ public class EntryPagerAdapter extends PagerAdapter {
                         dto.viewImage.setLayoutParams(new LinearLayout.LayoutParams(1, pixel));
                     }
                 }
+                if (dto.viewImage!=null && Util.getColorMode(mContext)==2){
+                    dto.viewImage.setAlpha(EntryActivity.NIGHT_ALPHA_FACTOR);
+                }
             }
             dto.progressBar.setVisibility(View.INVISIBLE);
         }
@@ -632,6 +635,9 @@ public class EntryPagerAdapter extends PagerAdapter {
                     int pixel = 1;
                     dto.viewImage.setLayoutParams(new LinearLayout.LayoutParams(1, pixel));
                 }
+            }
+            if (dto.viewImage!=null && Util.getColorMode(mContext)==2){
+                dto.viewImage.setAlpha(EntryActivity.NIGHT_ALPHA_FACTOR);
             }
             dto.progressBar.setVisibility(View.INVISIBLE);
         }
@@ -743,7 +749,9 @@ public class EntryPagerAdapter extends PagerAdapter {
             int pixel = 1;
             dto.viewImage.setLayoutParams(new LinearLayout.LayoutParams(1, pixel));
         }
-
+        if (Util.getColorMode(mContext)==2){
+            layout.setAlpha(EntryActivity.NIGHT_ALPHA_FACTOR);
+        }
         dto.progressBar.setVisibility(View.INVISIBLE);
 
     }
