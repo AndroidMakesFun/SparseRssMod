@@ -131,27 +131,6 @@ public class Util {
 		 **/
 	}
 
-    private static Boolean LIGHTER_DARK_MODE;
-
-    public static boolean isLighterDarkMode(Context context) {
-        if (context != null) {
-            if (LIGHTER_DARK_MODE == null) {
-                LIGHTER_DARK_MODE = PreferenceManager.getDefaultSharedPreferences(context)
-                        .getBoolean(Strings.SETTINGS_LIGHTER_DARK_MODE, true);
-            }
-            return LIGHTER_DARK_MODE;
-        }
-        return true;
-    }
-	public static void setLighterDarkMode(Context context, boolean wert) {
-		Log.d(TAG, "SET isLighterDarkMode " + wert);
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putBoolean(Strings.SETTINGS_LIGHTER_DARK_MODE, wert);
-		editor.commit();
-		LIGHTER_DARK_MODE=wert;
-	}
 
 	public static final String SETTINGS_COLOR_MODE = "SETTINGS_COLOR_MODE";
 

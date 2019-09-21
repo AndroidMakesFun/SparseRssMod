@@ -64,8 +64,6 @@ public final class Strings {
 	
 	public static final String SETTINGS_LIGHTTHEME = "lighttheme";
 
-	public static final String SETTINGS_LIGHTER_DARK_MODE = "lighterDarkMode";
-
 	public static final String SETTINGS_FONTSIZE = "fontsize";
 	
 	public static final String SETTINGS_STANDARDUSERAGENT = "standarduseragent";

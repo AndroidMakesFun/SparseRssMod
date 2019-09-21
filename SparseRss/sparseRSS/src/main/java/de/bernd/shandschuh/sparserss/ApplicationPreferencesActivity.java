@@ -39,12 +39,12 @@ import android.preference.PreferenceManager;
 import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.service.RefreshService;
 
+import static de.bernd.shandschuh.sparserss.RSSOverview.chooseColorDialog;
+
 public class ApplicationPreferencesActivity extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		if(Util.getColorMode(this)==0){
-			setTheme(R.style.Theme_Light);
-		}
+		Util.setTheme(this);
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.layout.preferences);
 		
@@ -79,12 +79,16 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
 		preference = (Preference) findPreference(Strings.SETTINGS_LIGHTTHEME);
 		preference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
+				Intent intent = new Intent(ApplicationPreferencesActivity.this, ApplicationPreferencesActivity.class);
+				chooseColorDialog(ApplicationPreferencesActivity.this,intent );
+				RSSOverview.INSTANCE.finish();
+				/**
 				Editor editor = PreferenceManager.getDefaultSharedPreferences(ApplicationPreferencesActivity.this).edit();
 				
 				editor.putBoolean(Strings.SETTINGS_LIGHTTHEME, Boolean.TRUE.equals(newValue));
 				editor.commit();
 				android.os.Process.killProcess(android.os.Process.myPid());
-				
+				**/
 				// this return statement will never be reached
 				return true;
 			}

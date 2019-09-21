@@ -375,17 +375,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         MenuItem browserItem = menu.add(0, R.id.url_button, 0, R.string.contextmenu_browser);
         MenuItemCompat.setShowAsAction(browserItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         browserItem.setIcon(android.R.drawable.ic_menu_view);
-
-        MenuItem item=menu.findItem(R.id.menu_lighter_darkmode);
-        if(Util.isLightTheme(this)){
-            item.setVisible(false);
-        }else{
-            if(Util.getColorMode(this)==2){
-                item.setChecked(true);
-            }else{
-                item.setChecked(false);
-            }
-        }
         return true;
     }
 
@@ -603,22 +592,6 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                 }
                 break;
             }
-            case R.id.menu_lighter_darkmode:{
-                if(item.isChecked()){
-                //if(Util.isLighterDarkMode(this)){
-                    Log.d(TAG, "isLighterDarkMode to FALSE");
-                    Util.setLighterDarkMode(this, false);
-                    item.setChecked(false);
-                }else{
-                    Log.d(TAG, "isLighterDarkMode to TRUE");
-                    Util.setLighterDarkMode(this, true);
-                    item.setChecked(true);
-                }
-                CSS=null;
-                this.finish();
-                break;
-            }
-
 
         }//switch
         return super.onOptionsItemSelected(item);

@@ -14,14 +14,6 @@
             android:disableDependentsState="true"/>
 
         <CheckBoxPreference
-            android:title="Lighter DarkTheme"
-            android:summary="Use it for more contrast."
-            android:defaultValue="true"
-            android:key="lighterDarkMode"
-            android:dependency="lighttheme"
-            />
-
-        <CheckBoxPreference
             android:title="@string/settings_prioritize"
             android:defaultValue="false"
             android:summary="@string/settings_prioritize_description"

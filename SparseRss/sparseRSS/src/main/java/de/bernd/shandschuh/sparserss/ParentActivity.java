@@ -400,6 +400,7 @@ public class ParentActivity extends AppCompatActivity {
                 intent.setData(FeedData.EntryColumns.CONTENT_URI(Long.toString(mLongFeedId)));
                 intent.putExtra(FeedData.FeedColumns._ID, mLongFeedId);
                 RSSOverview.chooseColorDialog(mActivity,intent);
+                RSSOverview.INSTANCE.finish();
                 break;
             }
 
