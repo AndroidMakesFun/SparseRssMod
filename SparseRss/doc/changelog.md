@@ -3,6 +3,7 @@ Changelog - Sparse RSS Mod
 2.40
 Dark and Night Theme
 Scroll Page
+Load Last
 Fixed some bugs
 
 2.39
