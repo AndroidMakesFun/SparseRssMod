@@ -6,10 +6,10 @@
     >
     
     <PreferenceCategory android:title="@string/settings_category_contentpresentation">
+
          <CheckBoxPreference
             android:title="@string/settings_lighttheme"
             android:defaultValue="true"
-            android:summary="@string/settings_lighttheme_description"
             android:key="lighttheme"
             android:disableDependentsState="true"/>
 
