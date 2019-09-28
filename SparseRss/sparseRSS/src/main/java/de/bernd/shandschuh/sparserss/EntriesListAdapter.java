@@ -353,7 +353,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 				
 				selection=EntryColumns.FEED_ID + " in (" + ret + ")";
 			}else{
-				selection += " AND _id in (" + ret + ")";
+				//selection += " AND _id in (" + ret + ")";
+				selection += " AND " + EntryColumns.FEED_ID + " in (" + ret + ")";
 			}
 		}
 		if(bResetSearchFilter){
