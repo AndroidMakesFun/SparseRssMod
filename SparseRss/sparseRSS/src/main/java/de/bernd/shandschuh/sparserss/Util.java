@@ -545,5 +545,21 @@ public class Util {
 			activity.setTheme(R.style.MyThemeNight);
 		}
 	}
+
+	public static final String PREFERENCE_SCROLL_PAGE = "PREFERENCE_SCROLL_PAGE";
+
+	public static boolean scrollPage(Context context) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean ret = prefs.getBoolean(PREFERENCE_SCROLL_PAGE, true);
+		return ret;
+    }
+
+	public static void setScrollPage(Context context, boolean bScroll) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences.Editor editor = prefs.edit();
+		editor.putBoolean(PREFERENCE_SCROLL_PAGE, bScroll);
+		editor.commit();
+	}
+
 }
 

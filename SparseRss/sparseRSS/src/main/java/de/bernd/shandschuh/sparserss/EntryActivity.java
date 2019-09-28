@@ -87,6 +87,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
     boolean showPics;    // Prefs Bilder laden und anzeigen -> f?r Adapter
     boolean showCover;    // Prefs Cover laden und anzeigen
+    boolean scrollPage;    // Prefs scrollPage
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +144,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
         showPics = Util.showPics(this);
         showCover = Util.showCover(this, "" + feedId);
+        scrollPage = Util.scrollPage(this);
 
         mEntryPagerAdapter = new EntryPagerAdapter(this, positionInListe, anzahlFeedeintraege);
 
@@ -362,6 +364,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
 
         if (showCover) {
             menu.findItem(R.id.menu_cover).setChecked(true);
+        }
+        if (scrollPage) {
+            menu.findItem(R.id.menu_scroll_page).setChecked(true);
         }
 
         MenuItem addColorMenu = menu.add(0, R.id.menu_color, 0, R.string.menu_color);
@@ -589,6 +594,18 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                     item.setChecked(true);
                     Util.setShowCover(this, "" + feedId, true);
                     mEntryPagerAdapter.notifyDataSetChanged();
+                }
+                break;
+            }
+            case R.id.menu_scroll_page: {
+                if (scrollPage) {
+                    scrollPage = false;
+                    item.setChecked(false);
+                    Util.setScrollPage(this, false);
+                } else {
+                    scrollPage = true;
+                    item.setChecked(true);
+                    Util.setScrollPage(this,  true);
                 }
                 break;
             }
@@ -860,4 +877,9 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
             imageFile.delete();
         }
     }
+
+    public boolean isScrollPage() {
+        return scrollPage;
+    }
+
 }

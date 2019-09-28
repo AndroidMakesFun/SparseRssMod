@@ -1,5 +1,10 @@
 Changelog - Sparse RSS Mod
 ==========================
+2.40
+Dark and Night Theme
+Scroll Page
+Fixed some bugs
+
 2.39
 * Big Notification Icon
 * Hide Empty Teaser

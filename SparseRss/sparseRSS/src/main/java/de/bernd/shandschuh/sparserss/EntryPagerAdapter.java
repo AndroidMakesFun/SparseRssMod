@@ -178,6 +178,9 @@ public class EntryPagerAdapter extends PagerAdapter {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if(MotionEvent.ACTION_UP == event.getAction()){
+                    if(!mContext.isScrollPage()){
+                        return true;
+                    }
                     Display display = mContext.getWindowManager().getDefaultDisplay();
                     Point size = new Point();
                     display.getSize(size);
