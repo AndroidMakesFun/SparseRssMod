@@ -28,6 +28,7 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -93,6 +94,7 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     protected void onCreate(Bundle savedInstanceState) {
         Util.setTheme(this);
         CSS = null;
+        BACKGROUND_COLOR=null;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.entry);
         mActivity = this;
@@ -175,25 +177,33 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
     // {max-width: 100%;}\npre {white-space: pre-wrap;}</style></head>";
     // aus /sparss/src/net/etuldan/sparss/view/EntryView.java
     private static final String FONT_SANS_SERIF = "font-family: sans-serif;";
-    public static String BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
     //private static final String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
     //private static final String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6" : "#383b3f";
     //private static final String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd" : "solid #303030";
     //private static final String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
     //private static final String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
 
+    private static String BACKGROUND_COLOR = null; // Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
+
+    public static String getBACKGROUND_COLOR(Context context) {
+        if(BACKGROUND_COLOR==null){
+            BACKGROUND_COLOR = Util.isLightTheme(context) ? "#f6f6f6" : "#000000";
+        }
+        return BACKGROUND_COLOR;
+    }
+
     private static String CSS = null;
 
-    public static String getCSS() {
+    public static String getCSS(Context context) {
         if(CSS==null){
-            BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#f6f6f6" : "#000000";
-            String QUOTE_LEFT_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#a6a6a6" : "#686b6f";
-            String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#e6e6e6" : "#383b3f";
-            String SUBTITLE_BORDER_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "solid #ddd" : "solid #303030";
-            String SUBTITLE_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#666666" : "#8c8c8c";
-            String BUTTON_COLOR = Util.isLightTheme(RSSOverview.INSTANCE) ? "#52A7DF" : "#1A5A81";
+            BACKGROUND_COLOR = Util.isLightTheme(context) ? "#f6f6f6" : "#000000";
+            String QUOTE_LEFT_COLOR = Util.isLightTheme(context) ? "#a6a6a6" : "#686b6f";
+            String QUOTE_BACKGROUND_COLOR = Util.isLightTheme(context) ? "#e6e6e6" : "#383b3f";
+            String SUBTITLE_BORDER_COLOR = Util.isLightTheme(context) ? "solid #ddd" : "solid #303030";
+            String SUBTITLE_COLOR = Util.isLightTheme(context) ? "#666666" : "#8c8c8c";
+            String BUTTON_COLOR = Util.isLightTheme(context) ? "#52A7DF" : "#1A5A81";
             CSS="<head><style type='text/css'> " + "body {max-width: 100%; margin: 0.3cm; "
-                    + FONT_SANS_SERIF + " color: " + getTextColor() + "; background-color:" + BACKGROUND_COLOR
+                    + FONT_SANS_SERIF + " color: " + getTextColor(context) + "; background-color:" + getBACKGROUND_COLOR(context)
                     + "; line-height: 150%} " + "* {max-width: 100%; word-break: break-word}"
                     + "h1, h2 {font-weight: normal; line-height: 130%} " + "h1 {font-size: 140%; margin-bottom: 0.1em} "
                     + "h2 {font-size: 120%} " + "a {color: #0099CC}" + "h1 a {color: inherit; text-decoration: none}"
@@ -213,11 +223,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
         return CSS;
     }
 
-    public static String getTextColor() {
-        if(Util.getColorMode(RSSOverview.INSTANCE)==0){
+    public static String getTextColor(Context context) {
+        if(Util.getColorMode(context)==0){
             return "#000000";
         }
-        if(Util.getColorMode(RSSOverview.INSTANCE)==1){
+        if(Util.getColorMode(context)==1){
             return "#999999"; // colGrey
         }
         return "#737373"; // colDarkGrey

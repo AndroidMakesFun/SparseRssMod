@@ -360,7 +360,7 @@ public class EntryPagerAdapter extends PagerAdapter {
             Date date = new Date(timestamp);
             StringBuilder dateStringBuilder = new StringBuilder("");
 
-            dateStringBuilder.append(mContext.getCSS()); // immer
+            dateStringBuilder.append(mContext.getCSS(mContext)); // immer
             dateStringBuilder.append("<body>");
             dateStringBuilder.append("<b>" + txtTitel + "</b>");
 
@@ -438,7 +438,7 @@ public class EntryPagerAdapter extends PagerAdapter {
         }
         if (dtoEntry.viewImage != null) {
             // black / grey
-            dtoEntry.viewImage.setBackgroundColor(Color.parseColor(EntryActivity.BACKGROUND_COLOR));
+            dtoEntry.viewImage.setBackgroundColor(Color.parseColor(EntryActivity.getBACKGROUND_COLOR(mContext)));
         }
 
         if (dtoEntry.progressBar == null) {
@@ -625,7 +625,7 @@ public class EntryPagerAdapter extends PagerAdapter {
             super.onPostExecute(result);
             checkViews(dto, null);
 
-            dto.text = mContext.getCSS() + "<body>" + "<b>" + dto.titel + "</b>" + dto.text + "<br><br></body>";
+            dto.text = mContext.getCSS(mContext) + "<body>" + "<b>" + dto.titel + "</b>" + dto.text + "<br><br></body>";
 
             dto.viewWeb.loadDataWithBaseURL(dto.link, dto.text, "text/html", Encoding.UTF_8.toString(), null);
 
@@ -865,7 +865,7 @@ public class EntryPagerAdapter extends PagerAdapter {
                 // todo strip body: images, youtube,...?!
 
                 StringBuilder stringBuilder = new StringBuilder("");
-                stringBuilder.append(EntryActivity.getCSS()); // immer
+                stringBuilder.append(EntryActivity.getCSS(mContext)); // immer
                 stringBuilder.append(dto.titel);
                 stringBuilder.append(bahtml);
 

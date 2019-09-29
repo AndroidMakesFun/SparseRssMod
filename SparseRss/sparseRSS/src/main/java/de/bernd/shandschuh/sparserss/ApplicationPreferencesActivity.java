@@ -81,7 +81,9 @@ public class ApplicationPreferencesActivity extends PreferenceActivity {
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				Intent intent = new Intent(ApplicationPreferencesActivity.this, ApplicationPreferencesActivity.class);
 				chooseColorDialog(ApplicationPreferencesActivity.this,intent );
-				RSSOverview.INSTANCE.finish();
+				if(RSSOverview.INSTANCE!=null){
+					RSSOverview.INSTANCE.finish();
+				}
 				/**
 				Editor editor = PreferenceManager.getDefaultSharedPreferences(ApplicationPreferencesActivity.this).edit();
 				
