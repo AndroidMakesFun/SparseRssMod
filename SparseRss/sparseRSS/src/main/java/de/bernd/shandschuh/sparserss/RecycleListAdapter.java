@@ -74,9 +74,10 @@ public class RecycleListAdapter extends EntriesListAdapter {
 		float fsize=15.0f;
 		textView.setTextSize(fsize); // etwas kleiner!
 
+		TextView feedTextView = (TextView) view.findViewById(R.id.text3);
+
 		Struktur struktur = getTeaser(cursor, strTitle);
 		if (Util.getTeaserPrefs(context)) {
-			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
 			feedTextView.setTextSize(fsize);
 			if (!TextUtils.isEmpty(struktur.text)){
 				feedTextView.setText(struktur.text);
@@ -180,10 +181,14 @@ public class RecycleListAdapter extends EntriesListAdapter {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
 			dateTextView.setEnabled(true);
+			textView.setTextColor(colorPrimary);
+			feedTextView.setTextColor(colorPrimary);
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
 			dateTextView.setEnabled(false);
+			textView.setTextColor(colorSecondary);
+			feedTextView.setTextColor(colorSecondary);
 		}
 
 		final ImageView coverView = (ImageView) view.findViewById(R.id.coverimage);

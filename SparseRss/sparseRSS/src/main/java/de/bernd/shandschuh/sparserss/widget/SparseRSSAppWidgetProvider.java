@@ -36,6 +36,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -43,6 +44,7 @@ import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.RSSOverview;
 import de.bernd.shandschuh.sparserss.Strings;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
+import de.bernd.shandschuh.sparserss.service.RssJobService;
 
 public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 	private static final String LIMIT = " limit ";
@@ -52,9 +54,12 @@ public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 	private static final int[] ICON_IDS = {R.id.news_icon_1, R.id.news_icon_2, R.id.news_icon_3, R.id.news_icon_4, R.id.news_icon_5, R.id.news_icon_6, R.id.news_icon_7, R.id.news_icon_8, R.id.news_icon_9, R.id.news_icon_10};
 	
 	public static final int STANDARD_BACKGROUND = 0x7c000000;
-	
+
+	private static final String TAG = SparseRSSAppWidgetProvider.class.getSimpleName();
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		Log.d(TAG, "onReceive");
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		
 		onUpdate(context, appWidgetManager, appWidgetManager.getAppWidgetIds(new ComponentName(context, SparseRSSAppWidgetProvider.class)));
@@ -62,7 +67,8 @@ public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 	
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		
+		Log.d(TAG, "onUpdate");
+
 		for (int n = 0, i = appWidgetIds.length; n < i; n++) {
 			updateAppWidget(context, appWidgetManager, appWidgetIds[n], preferences.getBoolean(appWidgetIds[n]+".hideread", false), preferences.getString(appWidgetIds[n]+".entrycount", "10"), preferences.getString(appWidgetIds[n]+".feeds", Strings.EMPTY), preferences.getInt(appWidgetIds[n]+".background", STANDARD_BACKGROUND));
 		}
@@ -73,6 +79,7 @@ public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 	}
 	
 	private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, boolean hideRead, String entryCount, String feedIds, int backgroundColor) {
+		Log.d(TAG, "updateAppWidget");
 		StringBuilder selection = new StringBuilder();
 		
 		if (hideRead) {

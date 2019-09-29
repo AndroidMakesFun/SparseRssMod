@@ -35,6 +35,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -44,11 +45,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
+
+import androidx.annotation.ColorInt;
+
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedData.EntryColumns;
 import de.bernd.shandschuh.sparserss.provider.FeedData.FeedColumns;
@@ -119,6 +124,10 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 
 	public Date today= new Date();
 
+	@ColorInt
+	protected int colorPrimary=Color.GREEN;
+	@ColorInt
+	protected int colorSecondary=Color.RED;
 
 	/**
 	 * @param context EntriesListActivity / RecycleListActivity
@@ -165,13 +174,15 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		buttonSize=Util.getButtonSizeInPixel(context);
 		densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
 		mDateFromLastShownUpHere=0;
+
+		colorPrimary = Util.fetchPrimaryColor(context);
+		colorSecondary = Util.fetchSecondaryColor(context);
 	}
+
 
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
-        boolean isDarkTheme=Util.getColorMode(context)!=0;
-
 
 		String strTitle=cursor.getString(titleColumnPosition);
 		textView.setText(strTitle);
@@ -181,14 +192,11 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		TextView dateTextView = (TextView) view.findViewById(android.R.id.text2);
 		
 		final ImageView imageView = (ImageView) view.findViewById(android.R.id.icon);
+		TextView feedTextView = (TextView) view.findViewById(R.id.text3);
 
 		if (Util.getTeaserPrefs(context)) {
 			Struktur struktur = getTeaser(cursor, strTitle);
-			TextView feedTextView = (TextView) view.findViewById(R.id.text3);
 			feedTextView.setTextSize(fsize);
-			if(isDarkTheme){
-				feedTextView.setTextColor(Util.colDarkGrey);
-			}
 			if (!TextUtils.isEmpty(struktur.text)){
 				feedTextView.setText(struktur.text);
 				feedTextView.setVisibility(View.VISIBLE);
@@ -285,17 +293,15 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
 			dateTextView.setEnabled(true);
-            if(isDarkTheme){
-                textView.setTextColor(Util.colGrey);
-                dateTextView.setTextColor(Util.colGrey);
-            }
+			textView.setTextColor(colorPrimary);
+			feedTextView.setTextColor(colorPrimary);
+			dateTextView.setTextColor(colorPrimary);
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
-            if(isDarkTheme){
-                textView.setTextColor(Util.colDarkGrey);
-                dateTextView.setTextColor(Util.colDarkGrey);
-            }
+			textView.setTextColor(colorSecondary);
+			feedTextView.setTextColor(colorSecondary);
+			dateTextView.setTextColor(colorSecondary);
 		}
 	}
 

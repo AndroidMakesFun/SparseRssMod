@@ -45,6 +45,9 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
+
+import androidx.annotation.ColorInt;
+
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 
 public class RSSOverviewListAdapter extends ResourceCursorAdapter {
@@ -82,7 +85,13 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 	private int densityDpi;
 
 	public Date today= new Date();
-	
+
+	@ColorInt
+	protected int colorPrimary=Color.GREEN;
+	@ColorInt
+	protected int colorSecondary=Color.RED;
+
+
 	public RSSOverviewListAdapter(Activity activity) {
 		super(activity, R.layout.feedlistitem, activity.managedQuery(FeedData.FeedColumns.CONTENT_URI, null, null, null, null));
 		nameColumnPosition = getCursor().getColumnIndex(FeedData.FeedColumns.NAME);
@@ -117,6 +126,9 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 		
 		buttonSize=Util.getButtonSizeInPixel(activity);
 		densityDpi = Resources.getSystem().getDisplayMetrics().densityDpi;
+
+		colorPrimary = Util.fetchPrimaryColor(activity);
+		colorSecondary = Util.fetchSecondaryColor(activity);
 	}
 
 	@Override
@@ -159,10 +171,14 @@ public class RSSOverviewListAdapter extends ResourceCursorAdapter {
 			textView.setTypeface(Typeface.DEFAULT_BOLD);
 			textView.setEnabled(true);
 			updateTextView.setEnabled(true);
+			textView.setTextColor(colorPrimary);
+			updateTextView.setTextColor(colorPrimary);
 		} else {
 			textView.setTypeface(Typeface.DEFAULT);
 			textView.setEnabled(false);
 			updateTextView.setEnabled(false);
+			textView.setTextColor(colorSecondary);
+			updateTextView.setTextColor(colorSecondary);
 		}
 
 		String link = cursor.getString(linkPosition);

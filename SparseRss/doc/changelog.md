@@ -1,5 +1,8 @@
 Changelog - Sparse RSS Mod
 ==========================
+2.41
+More Contrast for Theme
+
 2.40
 Dark and Night Theme
 Scroll Page

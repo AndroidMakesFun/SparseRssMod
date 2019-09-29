@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -28,6 +29,7 @@ import android.preference.PreferenceManager;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -559,6 +561,28 @@ public class Util {
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(PREFERENCE_SCROLL_PAGE, bScroll);
 		editor.commit();
+	}
+
+	public static int fetchPrimaryColor(Activity context) {
+		TypedValue typedValue = new TypedValue();
+
+		TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[] { R.attr.theme_textColorPrimary});
+		int color = a.getColor(0, 0);
+
+		a.recycle();
+
+		return color;
+	}
+
+	public static int fetchSecondaryColor(Activity context) {
+		TypedValue typedValue = new TypedValue();
+
+		TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[] { R.attr.theme_textColorSecondary});
+		int color = a.getColor(0, 0);
+
+		a.recycle();
+
+		return color;
 	}
 
 }

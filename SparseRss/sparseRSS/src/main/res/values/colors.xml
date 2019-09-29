@@ -15,6 +15,7 @@
 -->
 <resources>
     <color name="my_grey">#999999</color>
+    <color name="my_mid_grey">#929292</color>
     <color name="my_dark_grey">#737373</color>
 
     <color name="my_mid_light_red">#16711680</color>

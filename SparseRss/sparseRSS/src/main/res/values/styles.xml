@@ -34,8 +34,10 @@
 
 
     <style name="MyThemeNight" parent="MyThemeDark">
-        <item name="theme_textColorPrimary">@color/my_dark_grey</item>
+        <item name="theme_textColorPrimary">@color/my_mid_grey</item>
         <item name="android:textColorPrimary">?attr/theme_textColorPrimary</item>
+        <item name="theme_textColorSecondary">@color/my_dark_grey</item>
+        <item name="android:textColorSecondary">?attr/theme_textColorSecondary</item>
     </style>
 
 
