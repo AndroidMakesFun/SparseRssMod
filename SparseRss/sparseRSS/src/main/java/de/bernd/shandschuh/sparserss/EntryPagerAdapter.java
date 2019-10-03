@@ -55,7 +55,6 @@ import java.util.concurrent.TimeUnit;
 
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
-import de.bernd.shandschuh.sparserss.service.FetcherService;
 import de.bernd.shandschuh.sparserss.util.HtmlUtils;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
@@ -752,7 +751,7 @@ public class EntryPagerAdapter extends PagerAdapter {
             int pixel = 1;
             dto.viewImage.setLayoutParams(new LinearLayout.LayoutParams(1, pixel));
         }
-        if (Util.getColorMode(mContext)==2){
+        if (Util.getColorMode(mContext)==2 && layout!=null){
             layout.setAlpha(EntryActivity.NIGHT_ALPHA_FACTOR);
         }
         dto.progressBar.setVisibility(View.INVISIBLE);
