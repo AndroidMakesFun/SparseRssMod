@@ -6,9 +6,11 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -44,7 +46,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import de.bernd.shandschuh.sparserss.provider.FeedData;
-import de.bernd.shandschuh.sparserss.service.FetcherService;
 import de.bernd.shandschuh.sparserss.service.RssJobService;
 
 public class Util {
@@ -110,7 +111,7 @@ public class Util {
 	public static boolean isCurrentlyRefreshing(Activity activity) {
 		ActivityManager manager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
 		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if (FetcherService.class.getName().equals(service.service.getClassName())) {
+			if (RssJobService.class.getName().equals(service.service.getClassName())) {
 				return true;
 			}
 		}
@@ -475,8 +476,8 @@ public class Util {
 			Log.d("Util", "Util . SCHEDULEJOB jobInfo " + jobInfo.getId());
 		}
 
-		//context.sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS));
-		//context.sendBroadcast(new Intent(Strings.ACTION_UPDATEWIDGET));
+		context.sendBroadcast(new Intent(Strings.ACTION_REFRESHFEEDS));
+		context.sendBroadcast(new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE));
 	}
 
 	public static void jobInfos(Context context) {
@@ -504,7 +505,7 @@ public class Util {
 			return imageFile;
 		}else{
 			try {
-				byte[] data = FetcherService.getBytes(new URL(linkGrafik).openStream());
+				byte[] data = RssJobService.getBytes(new URL(linkGrafik).openStream());
 				FileOutputStream fos = new FileOutputStream(pathToImage);
 				fos.write(data);
 				fos.close();

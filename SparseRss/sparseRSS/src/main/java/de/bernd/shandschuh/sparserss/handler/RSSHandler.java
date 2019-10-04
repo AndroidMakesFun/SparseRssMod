@@ -25,6 +25,16 @@
 
 package de.bernd.shandschuh.sparserss.handler;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.text.Html;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,20 +49,10 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import android.content.ContentValues;
-import android.content.Context;
-import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.text.Html;
 import de.bernd.shandschuh.sparserss.Strings;
 import de.bernd.shandschuh.sparserss.Util;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
-import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
-import de.bernd.shandschuh.sparserss.service.FetcherService;
+import de.bernd.shandschuh.sparserss.service.RssJobService;
 
 public class RSSHandler extends DefaultHandler {
 	private static final String ANDRHOMBUS = "&#";
@@ -557,7 +557,7 @@ public class RSSHandler extends DefaultHandler {
 							try {
 								String match = images.get(n);
 								
-								byte[] data = FetcherService.getBytes(new URL(images.get(n)).openStream());
+								byte[] data = RssJobService.getBytes(new URL(images.get(n)).openStream());
 								
 								FileOutputStream fos = new FileOutputStream(new StringBuilder(Util.getImageFolderFile(context).toString())
 										.append("/").append(entryId).append(Strings.IMAGEFILE_IDSEPARATOR)
@@ -681,5 +681,5 @@ public class RSSHandler extends DefaultHandler {
 	public void setEfficientFeedParsing(boolean efficientFeedParsing) {
 		this.efficientFeedParsing = efficientFeedParsing;
 	}
-	
+
 }

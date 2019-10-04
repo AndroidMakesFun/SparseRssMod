@@ -28,12 +28,17 @@ package de.bernd.shandschuh.sparserss;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import de.bernd.shandschuh.sparserss.service.FetcherService;
+import android.util.Log;
+
+import de.bernd.shandschuh.sparserss.service.RssJobService;
 
 public class RefreshBroadcastReceiver extends BroadcastReceiver {
+	private static final String TAG = RefreshBroadcastReceiver.class.getSimpleName();
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		context.startService(new Intent(context, FetcherService.class).putExtras(intent)); // a thread would mark the process as inactive
+		Log.d(TAG, "onReceive: RefreshBroadcastReceiver");
+		context.startService(new Intent(context, RssJobService.class).putExtras(intent)); // a thread would mark the process as inactive
 	}
 	
 }

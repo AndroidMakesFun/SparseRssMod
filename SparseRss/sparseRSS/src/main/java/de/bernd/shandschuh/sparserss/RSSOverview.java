@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -461,7 +462,7 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
                                         FeedData.FeedColumns.CONTENT_URI(Long
                                                 .toString(((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).id)),
                                         null, null);
-                                sendBroadcast(new Intent(Strings.ACTION_UPDATEWIDGET));
+                                sendBroadcast(new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE));
                             }
                         }.start();
                     }

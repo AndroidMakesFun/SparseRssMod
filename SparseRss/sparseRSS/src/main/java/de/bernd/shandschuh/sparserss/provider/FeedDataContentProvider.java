@@ -27,6 +27,7 @@ package de.bernd.shandschuh.sparserss.provider;
 
 import java.io.File;
 
+import android.appwidget.AppWidgetManager;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -102,7 +103,7 @@ public class FeedDataContentProvider extends ContentProvider {
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 		public DatabaseHelper(Context context, String name, int version) {
 			super(context, name, null, version);
-			context.sendBroadcast(new Intent(Strings.ACTION_UPDATEWIDGET));
+			context.sendBroadcast(new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE));
 		}
 
 		@Override

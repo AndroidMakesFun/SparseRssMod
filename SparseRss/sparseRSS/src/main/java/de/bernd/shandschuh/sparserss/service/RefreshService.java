@@ -35,10 +35,14 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
 import de.bernd.shandschuh.sparserss.Strings;
 
 public class RefreshService extends Service {
 	private static final String SIXTYMINUTES = "3600000";
+
+	private static final String TAG = RefreshService.class.getSimpleName();
 	
 	private OnSharedPreferenceChangeListener listener = new OnSharedPreferenceChangeListener() {
 		public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -75,6 +79,8 @@ public class RefreshService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Log.i(TAG, "RefreshService Service created");
+
 		try {
 			preferences = PreferenceManager.getDefaultSharedPreferences(createPackageContext(Strings.PACKAGE, 0));
 		} catch (NameNotFoundException e) {

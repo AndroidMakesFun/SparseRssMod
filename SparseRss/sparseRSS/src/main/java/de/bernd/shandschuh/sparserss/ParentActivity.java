@@ -1,7 +1,5 @@
 package de.bernd.shandschuh.sparserss;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -13,17 +11,10 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.core.view.MenuItemCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-
 import android.text.ClipboardManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -33,16 +24,22 @@ import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.Date;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
+
+import com.amulyakhare.textdrawable.TextDrawable;
 
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedData.FeedColumns;
 
 public class ParentActivity extends AppCompatActivity {
+
+    private static final String TAG = ParentActivity.class.getSimpleName();
 
     protected static final int CONTEXTMENU_MARKASREAD_ID = 6;
 
@@ -380,7 +377,6 @@ public class ParentActivity extends AppCompatActivity {
                 String where = FeedData.EntryColumns.DATE + "<=" + ParentActivity.this.mDateFromFirst;
                 where += " AND " + mAdapter.getSelectionFilter(); //readdate is null AND _id in (1,2,3)
                 where += " AND " + FeedData.EntryColumns.DATE + ">=" + mAdapter.getmDateFromLastShownUpHere();
-                // System.out.println( "where " + where);
                 getContentResolver().update(uri, RSSOverview.getReadContentValues(), where, null);
             }
         }.start();

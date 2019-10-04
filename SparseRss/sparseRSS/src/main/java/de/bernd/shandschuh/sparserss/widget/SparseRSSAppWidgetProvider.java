@@ -59,7 +59,7 @@ public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d(TAG, "onReceive");
+		Log.d(TAG, "onReceive widget");
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		
 		onUpdate(context, appWidgetManager, appWidgetManager.getAppWidgetIds(new ComponentName(context, SparseRSSAppWidgetProvider.class)));
@@ -67,7 +67,7 @@ public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 	
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		Log.d(TAG, "onUpdate");
+		Log.d(TAG, "onUpdate widget" + appWidgetIds);
 
 		for (int n = 0, i = appWidgetIds.length; n < i; n++) {
 			updateAppWidget(context, appWidgetManager, appWidgetIds[n], preferences.getBoolean(appWidgetIds[n]+".hideread", false), preferences.getString(appWidgetIds[n]+".entrycount", "10"), preferences.getString(appWidgetIds[n]+".feeds", Strings.EMPTY), preferences.getInt(appWidgetIds[n]+".background", STANDARD_BACKGROUND));
@@ -97,7 +97,6 @@ public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 		
 		RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.homescreenwidget);
 		
-//		views.setOnClickPendingIntent(R.id.feed_icon, PendingIntent.getActivity(context, 0, new Intent(context, MainTabActivity.class), 0));
 		views.setOnClickPendingIntent(R.id.feed_icon, PendingIntent.getActivity(context, 0, new Intent(context, RSSOverview.class), 0));
 		
 		int k = 0;
@@ -142,5 +141,4 @@ public class SparseRSSAppWidgetProvider extends AppWidgetProvider {
 		views.setInt(R.id.widgetlayout, "setBackgroundColor", backgroundColor);
 		appWidgetManager.updateAppWidget(appWidgetId, views);
 	}
-
 }

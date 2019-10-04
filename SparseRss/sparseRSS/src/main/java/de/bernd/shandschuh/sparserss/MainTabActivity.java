@@ -55,7 +55,7 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import de.bernd.shandschuh.sparserss.R;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
-import de.bernd.shandschuh.sparserss.service.FetcherService;
+import de.bernd.shandschuh.sparserss.service.RssJobService;
 
 /**
  * DEAD Code - to Delete !
@@ -274,7 +274,7 @@ public class MainTabActivity extends TabActivity {
 	{
 		ActivityManager manager = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
 		for (RunningServiceInfo service: manager.getRunningServices(Integer.MAX_VALUE)) {
-			if (FetcherService.class.getName().equals(service.service.getClassName())) {
+			if (RssJobService.class.getName().equals(service.service.getClassName())) {
 				return true;
 			}
 		}

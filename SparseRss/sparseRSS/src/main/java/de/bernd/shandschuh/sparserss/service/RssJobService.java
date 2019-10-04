@@ -6,6 +6,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -28,6 +30,7 @@ import androidx.core.app.NotificationManagerCompat;
 import android.util.Log;
 import android.util.Xml;
 import android.view.View;
+import android.widget.RemoteViews;
 
 import net.dankito.readability4j.Article;
 import net.dankito.readability4j.Readability4J;
@@ -65,6 +68,7 @@ import de.bernd.shandschuh.sparserss.handler.RSSHandler;
 import de.bernd.shandschuh.sparserss.provider.FeedData;
 import de.bernd.shandschuh.sparserss.provider.FeedDataContentProvider;
 import de.bernd.shandschuh.sparserss.util.HtmlUtils;
+import de.bernd.shandschuh.sparserss.widget.SparseRSSAppWidgetProvider;
 import de.jetwick.snacktory.HtmlFetcher;
 import de.jetwick.snacktory.JResult;
 import okhttp3.OkHttpClient;
@@ -100,13 +104,11 @@ public class RssJobService extends JobService {
         Log.i(TAG, "Service destroyed");
     }
 
-
     @Override
     public boolean onStartJob(final JobParameters params) {
 
         // Huawei: wird nicht aufgerufen
         Log.i(TAG, "RssJobService . ONSTARTJOB ! " + params.getJobId());
-        //Util.msgBox(RSSOverview.INSTANCE,"RssJobService . onStartJob ! " + params.getJobId());
 
         final Context serviceContext=this;
 
@@ -121,12 +123,7 @@ public class RssJobService extends JobService {
                     public void run() {
                         doTheWork(params);
                         Log.i(TAG, "RssJobService . ONSTARTJOB DONE ! " + params.getJobId());
-                        //if (PreferenceManager.getDefaultSharedPreferences(serviceContext).getBoolean(Strings.SETTINGS_REFRESHENABLED, false)) {
-                        //if (params.getJobId()==1){
-                        //    jobFinished(params, true);  // reshed !!
-                        //}else{  // 2 nur 1*
-                            jobFinished(params, false); // fertig
-                        //}
+                        jobFinished(params, false); // fertig
                     }
                 };
                 new Thread(run).start();
@@ -152,16 +149,11 @@ public class RssJobService extends JobService {
         return false;
     }
 
-
-
-    // kopiert aus FetcherService.onHandleIntent
-
     private static SharedPreferences preferences = null;
     private static Proxy proxy;
     private static final String ZERO = "0";
     private static final String COUNT = "COUNT(*)";
     private String mImageFolder=null;
-
 
     //private NotificationManager notificationManager;
     public static NotificationManagerCompat mNotificationManagerCompat=null;
@@ -298,7 +290,12 @@ public class RssJobService extends JobService {
             }
         }
 
-
+        // "manuelles" Widget update ?
+        //AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this.getApplicationContext());
+        //ComponentName thisWidget = new ComponentName(this.getApplicationContext(), SparseRSSAppWidgetProvider.class);
+        //int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+        //RemoteViews remoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),R.layout.homescreenwidget);
+        //appWidgetManager.notifyAppWidgetViewDataChanged(allWidgetIds, R.id.widgetlayout);
     }
 
     public static final String FULLTEXTISNULL = "fulltext is null";
@@ -376,7 +373,7 @@ public class RssJobService extends JobService {
                 if(showCover && imageUrl!=null && !"".equals(imageUrl) && imageUrl.toLowerCase().endsWith(".jpg")){
                     try {
                         String pathToImage=mImageFolder + "/" + id + "_cover.jpg";
-                        byte[] data = FetcherService.getBytes(new URL(imageUrl).openStream());
+                        byte[] data = RssJobService.getBytes(new URL(imageUrl).openStream());
                         FileOutputStream fos = new FileOutputStream(pathToImage);
                         fos.write(data);
                         fos.close();
@@ -680,7 +677,7 @@ public class RssJobService extends JobService {
         cursor.close();
 
         if (result > 0) {
-            context.sendBroadcast(new Intent(Strings.ACTION_UPDATEWIDGET).putExtra(Strings.COUNT, result));
+            context.sendBroadcast(new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).putExtra(Strings.COUNT, result));
         }
         return result;
     }
