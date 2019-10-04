@@ -1,5 +1,8 @@
 Changelog - Sparse RSS Mod
 ==========================
+2.42
+Widget and Nullpointer fixed
+
 2.41
 More Contrast for Theme
 
