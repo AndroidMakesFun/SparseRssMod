@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.1'
+        classpath 'com.android.tools.build:gradle:3.6.2'
     }
 }
 
@@ -20,11 +20,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.1.0'
     //implementation 'androidx.annotation:annotation:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'org.jsoup:jsoup:1.11.3'
 
     implementation 'com.github.bumptech.glide:glide:3.7.0'  // 4.8.0' //3.7.0'
@@ -39,13 +39,13 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     defaultConfig {
         applicationId "de.bernd.shandschuh.sparserss"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8

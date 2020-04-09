@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -28,12 +29,14 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
@@ -538,13 +541,19 @@ public class Util {
 
 
 	public static void setTheme(Activity activity) {
+
 		//0,1,2 for "Light Mode", "Dark Mode","Night Mode"
 		int colorMode = Util.getColorMode(activity);
 		if(colorMode==0){
+			//AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 			activity.setTheme(R.style.MyTheme_Light);
 		}else if (colorMode==1){
+			//AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+			activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.my_black));
 			activity.setTheme(R.style.MyThemeDark);
 		}else{
+			//AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+			activity.getWindow().setNavigationBarColor(activity.getResources().getColor(R.color.my_black));
 			activity.setTheme(R.style.MyThemeNight);
 		}
 	}

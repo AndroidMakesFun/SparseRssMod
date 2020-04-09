@@ -40,7 +40,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -56,7 +55,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
@@ -75,11 +73,9 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AlertDialog.Builder;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -141,11 +137,11 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        INSTANCE = this;
         Util.setTheme(this);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main);
-        INSTANCE = this;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -1059,9 +1055,15 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
         Util.jobInfos(this);
     }
 
+    static android.app.AlertDialog dlgColor=null;
 
-    public static void chooseColorDialog(final Activity activity, final Intent intent) {
+    public static void chooseColorDialog(Activity activity, Intent intent) {
 
+        if(activity.isDestroyed() || activity.isFinishing()){
+            Util.toastMessage(RSSOverview.INSTANCE,"Activity is Dead");
+            System.exit(0);
+            return;
+        }
         android.app.AlertDialog.Builder alert = new android.app.AlertDialog.Builder(activity);
         alert.setTitle("Choose color");
         String[] strAction = new String[]{"Light Mode", "Dark Mode","Night Mode"};
@@ -1086,6 +1088,7 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
                         Util.setColorMode(activity,0);
                         break;
                 }
+                dlgColor.dismiss();
                 activity.finish();
                 activity.startActivity(intent);
             }
@@ -1095,7 +1098,7 @@ public class RSSOverview<onRequestPermissionsResult> extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
             }
         });
-        alert.show();
+        dlgColor =alert.show();
     }
 
 }
