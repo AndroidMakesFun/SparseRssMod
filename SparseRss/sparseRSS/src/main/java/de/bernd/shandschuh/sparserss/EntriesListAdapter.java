@@ -191,8 +191,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		//position in view 0,...
 
 		//System.out.println(" getItemViewType:" + getViewTypeCount()); //immer 1
-		System.out.println("  XX:" + position); // in ListView/Adapter
-		System.out.println("  cc:" + parent.getChildCount()); // 0..3 dann konstant 3
+		//System.out.println("  XX:" + position); // in ListView/Adapter
+		// System.out.println("  cc:" + parent.getChildCount()); // 0..3 dann konstant 3
 		//if(xx>cc)  xx-cc-1 == gelesen zB 4-3-1==0 gelesen bei XX=4
 		mParentChildCount = parent.getChildCount();
 		//if(position > parent.getChildCount()){
@@ -221,6 +221,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	}
 
 	/**
+	 * Marks Scrolled Away Entries as Read
 	 * @param position: Current  cursor.getPosition()
 	 */
 	protected void markFreeAsRead(int position) {

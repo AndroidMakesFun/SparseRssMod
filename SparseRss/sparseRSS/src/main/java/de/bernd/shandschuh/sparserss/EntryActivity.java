@@ -529,6 +529,11 @@ public class EntryActivity extends AppCompatActivity implements android.widget.S
                 onClickLoadBrowser(null);
                 break;
             }
+            case R.id.menu_firefox: {
+                Util.setBrowserPackagePrefs(this,"org.mozilla.firefox");
+                onClickLoadBrowser(null);
+                break;
+            }
             case R.id.menu_firefox_klar: {
                 Util.setBrowserPackagePrefs(this,"org.mozilla.klar");
                 onClickLoadBrowser(null);

@@ -644,7 +644,6 @@ public class ParentActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        System.out.println("onPause");
         clickMarkAsReadUpHereForIds(null);
     }
 
