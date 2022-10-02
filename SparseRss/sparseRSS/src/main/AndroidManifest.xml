@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.bernd.shandschuh.sparserss"
     android:installLocation="auto"
     
-    android:versionCode="243"
-    android:versionName="2.43" >
+    android:versionCode="244"
+    android:versionName="2.44" >
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -52,7 +51,8 @@
             android:name=".RSSOverview"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/MyThemeDark" >
+            android:theme="@style/MyThemeDark"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -65,7 +65,8 @@
             android:name=".EntriesListActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/MyThemeDark" >
+            android:theme="@style/MyThemeDark"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -78,7 +79,8 @@
             android:name=".EntryActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/MyThemeDark" >
+            android:theme="@style/MyThemeDark"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -86,15 +88,20 @@
                     android:mimeType="vnd.android.cursor.item/vnd.feeddata.entry" />
             </intent-filter>
         </activity>
+
         <activity android:name=".ApplicationPreferencesActivity" />
-        <activity android:name=".widget.WidgetConfigActivity" >
+
+        <activity android:name=".widget.WidgetConfigActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".FeedConfigActivity"
-            android:theme="@style/Theme.Dialog" >
+            android:theme="@style/Theme.Dialog"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.EDIT" />
 
@@ -111,7 +118,8 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".widget.SparseRSSAppWidgetProvider" >
+        <receiver android:name=".widget.SparseRSSAppWidgetProvider"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -120,12 +128,14 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widgetinfo" />
         </receiver>
-        <receiver android:name=".RefreshBroadcastReceiver" >
+        <receiver android:name=".RefreshBroadcastReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="de.bernd.shandschuh.sparserss.REFRESH" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".BootCompletedBroadcastReceiver" >
+        <receiver android:name=".BootCompletedBroadcastReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

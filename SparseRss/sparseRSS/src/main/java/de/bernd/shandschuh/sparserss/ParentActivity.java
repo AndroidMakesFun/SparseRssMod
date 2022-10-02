@@ -82,7 +82,7 @@ public class ParentActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mActivity=this;
+        mActivity = this;
         Util.setTheme(this);
         super.onCreate(savedInstanceState);
 
@@ -100,7 +100,7 @@ public class ParentActivity extends AppCompatActivity {
         int col = 0xFF737373;
         toolbar.setTitleTextColor(col);
 
-        if (Util.getColorMode(this)==2){
+        if (Util.getColorMode(this) == 2) {
             toolbar.setAlpha(EntryActivity.NIGHT_ALPHA_FACTOR);
         }
 
@@ -371,7 +371,7 @@ public class ParentActivity extends AppCompatActivity {
     public void clickMarkAsReadUpHere(View view) {
         new Thread() { // the update process takes some time
             public void run() {
-                if(mAdapter.getmDateFromLastShownUpHere()==0){
+                if (mAdapter.getmDateFromLastShownUpHere() == 0) {
                     mAdapter.setmDateFromLastShownUpHere(ParentActivity.this.mDateFromFirst);
                 }
                 String where = FeedData.EntryColumns.DATE + "<=" + ParentActivity.this.mDateFromFirst;
@@ -381,6 +381,30 @@ public class ParentActivity extends AppCompatActivity {
             }
         }.start();
         finish();
+    }
+
+    public void clickMarkAsReadUpHereForIds(View view) {
+        if (!mAdapter.markedAsRead.isEmpty()) {
+            new Thread() { // the update process takes some time
+                public void run() {
+                    if (mAdapter.getmDateFromLastShownUpHere() == 0) {
+                        mAdapter.setmDateFromLastShownUpHere(ParentActivity.this.mDateFromFirst);
+                    }
+                    String where = FeedData.EntryColumns.DATE + "<=" + ParentActivity.this.mDateFromFirst;
+                    where += " AND " + mAdapter.getSelectionFilter(); //readdate is null AND _id in (1,2,3)
+                    where += " AND " + FeedData.EntryColumns.DATE + ">=" + mAdapter.getmDateFromLastShownUpHere();
+                    where += " AND " + "_id IN (";
+                    for (Long lid : mAdapter.markedAsRead) {
+                        where += lid + ",";
+                    }
+                    where = where.substring(0, where.length() - 1);
+                    where += ")";
+                    getContentResolver().update(uri, RSSOverview.getReadContentValues(), where, null);
+                    mAdapter.markedAsRead.clear();
+                }
+            }.start();
+            //finish();
+        }
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -395,8 +419,8 @@ public class ParentActivity extends AppCompatActivity {
                 Intent intent = new Intent(mActivity, mActivity.getClass());
                 intent.setData(FeedData.EntryColumns.CONTENT_URI(Long.toString(mLongFeedId)));
                 intent.putExtra(FeedData.FeedColumns._ID, mLongFeedId);
-                RSSOverview.chooseColorDialog(mActivity,intent);
-                if(RSSOverview.INSTANCE!=null){
+                RSSOverview.chooseColorDialog(mActivity, intent);
+                if (RSSOverview.INSTANCE != null) {
                     RSSOverview.INSTANCE.finish();
                 }
                 break;
@@ -530,9 +554,9 @@ public class ParentActivity extends AppCompatActivity {
                     Util.setTeaserPrefs(getApplicationContext(), true);
                 }
                 String str = this.getClass().getName();
-                Class klasse=EntriesListActivity.class;
+                Class klasse = EntriesListActivity.class;
                 if ("de.bernd.shandschuh.sparserss.RecycleListActivity".equals(str)) {
-                    klasse=RecycleListActivity.class;
+                    klasse = RecycleListActivity.class;
                 }
                 Intent intent = new Intent(getApplicationContext(), klasse);
                 intent.setData(FeedData.EntryColumns.CONTENT_URI(Long.toString(mLongFeedId)));
@@ -615,6 +639,13 @@ public class ParentActivity extends AppCompatActivity {
 
         getContentResolver().update(FeedData.FeedColumns.CONTENT_URI(feedId),
                 values, null, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        System.out.println("onPause");
+        clickMarkAsReadUpHereForIds(null);
     }
 
 }

@@ -1,51 +1,52 @@
 buildscript {
     repositories {
         mavenCentral()
-        jcenter()
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        classpath 'com.android.tools.build:gradle:7.3.0'
     }
 }
 
 apply plugin: 'com.android.application'
 
 repositories {
-    jcenter()
     google()
     maven {
         url 'https://maven.google.com'
     }
+    maven {
+        url 'https://repo1.maven.org/maven2/'
+    }
 }
 
 dependencies {
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.6.1'
     //implementation 'androidx.annotation:annotation:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'org.jsoup:jsoup:1.11.3'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'org.jsoup:jsoup:1.15.3'
 
     implementation 'com.github.bumptech.glide:glide:3.7.0'  // 4.8.0' //3.7.0'
     //annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
 
-    implementation 'net.dankito.readability4j:readability4j:1.0.2'
+    implementation 'net.dankito.readability4j:readability4j:1.0.8'
 
-    def okhttp_version = '3.12.1'
+    def okhttp_version = '5.0.0-alpha.10'
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation "com.squareup.okhttp3:okhttp-urlconnection:$okhttp_version"
 
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.2'
+    compileSdkVersion 33
+    buildToolsVersion '33.0.0'
 
     defaultConfig {
         applicationId "de.bernd.shandschuh.sparserss"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 33
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
@@ -61,5 +62,10 @@ android {
             }
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    namespace 'de.bernd.shandschuh.sparserss'
 }
 

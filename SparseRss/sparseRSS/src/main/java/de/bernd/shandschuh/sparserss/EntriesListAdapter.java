@@ -26,6 +26,7 @@
 package de.bernd.shandschuh.sparserss;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 
@@ -48,6 +49,7 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
@@ -140,12 +142,14 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	 */
 	public EntriesListAdapter(Activity context, Uri uri, boolean showFeedInfo, boolean autoreload, int layout, int iFeedFilter, boolean bResetSearchFilter) {
 		super(context, layout, createManagedCursor(context, uri, true, iFeedFilter, bResetSearchFilter), autoreload);
+
 		today.setHours(0);
 		today.setMinutes(0);
 
 		showRead = true;
 		this.uri = uri;
-		
+		ermittleAlleIDs();
+
 		Cursor cursor = getCursor();
 		System.out.println("Count: " + cursor.getCount());
 		
@@ -179,10 +183,72 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		colorSecondary = Util.fetchSecondaryColor(context);
 	}
 
+	//protected int mPosEmpty=-1;
+	protected int mParentChildCount=0;
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		//position in view 0,...
+
+		//System.out.println(" getItemViewType:" + getViewTypeCount()); //immer 1
+		System.out.println("  XX:" + position); // in ListView/Adapter
+		System.out.println("  cc:" + parent.getChildCount()); // 0..3 dann konstant 3
+		//if(xx>cc)  xx-cc-1 == gelesen zB 4-3-1==0 gelesen bei XX=4
+		mParentChildCount = parent.getChildCount();
+		//if(position > parent.getChildCount()){
+		//	mPosEmpty=position-parent.getChildCount()-1; //0..   -> id:39
+		//}else{
+		//	mPosEmpty=-1;
+		//}
+		return super.getView(position, convertView, parent);
+	}
+
+	protected ArrayList<String> mListeIdsAsString = new ArrayList<String>();
+
+	/** filled in createManagedCursor */
+	private static String mStrSortOrder="";
+
+	public void ermittleAlleIDs(){
+		mListeIdsAsString.clear();
+		Cursor cursor = mActivity.getContentResolver().query(uri, null, mSelectionFilter, null, mStrSortOrder);
+		cursor.moveToFirst();
+		while (cursor.isAfterLast() == false) {
+			final String id = cursor.getString(0);
+			mListeIdsAsString.add(id);
+			cursor.moveToNext();
+		}
+		cursor.close();
+	}
+
+	/**
+	 * @param position: Current  cursor.getPosition()
+	 */
+	protected void markFreeAsRead(int position) {
+		if(position > mParentChildCount){  // 4>3
+			//int offset = mParentChildCount + 1;
+			//if(offset>-1){
+			//offset = offset*-1;
+			//System.out.println("  offset:" + offset);
+			//cursor.move(offset);
+			//long readID = cursor.getLong(idColumn);
+			long readID = Long.parseLong(mListeIdsAsString.get(position-mParentChildCount-1));
+			//System.out.println("  readID:" + readID);
+
+			markedAsRead.add(readID);
+			markedAsUnread.remove(readID);
+			//where = FeedData.EntryColumns.FEED_ID + " in (" + readID + ")";
+			// feedid in (1,2) AND _id=42
+			//String where = this.getSelectionFilter() + " AND _id=" + readID;
+			//mActivity.getContentResolver().update(uri, RSSOverview.getReadContentValues(), where, null);
+			//}
+		}
+	}
 
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
+
+		markFreeAsRead(cursor.getPosition());
 
 		String strTitle=cursor.getString(titleColumnPosition);
 		textView.setText(strTitle);
@@ -336,7 +402,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	}
 	
 	private static int mFeedFilter=1;
-	private static String mSelectionFilter=null;
+	protected static String mSelectionFilter=null;
 	/**
 	 * readdate is null AND _id in (1,2,3) 
 	 */
@@ -345,9 +411,8 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 	}
 	
 	private static Cursor createManagedCursor(Activity context, Uri uri, boolean showRead, int iFeedFilter, boolean bResetSearchFilter) {
-		String str=new StringBuilder(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_PRIORITIZE, false) ? SQLREAD : Strings.EMPTY).append(FeedData.EntryColumns.DATE).append(Strings.DB_DESC).toString();
 		mActivity = context;
-
+		mStrSortOrder=new StringBuilder(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Strings.SETTINGS_PRIORITIZE, false) ? SQLREAD : Strings.EMPTY).append(FeedData.EntryColumns.DATE).append(Strings.DB_DESC).toString();
 		mFeedFilter=iFeedFilter;
 		// READDATEISNULL = "readdate is null";
 		String selection = null;
@@ -374,7 +439,7 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			}
 		}
 		mSelectionFilter=selection;
-		return context.managedQuery(uri, null, selection, null,str);
+		return context.managedQuery(uri, null, selection, null,mStrSortOrder);
 	}
 	
 	public static String[]TOPFEED_PROJECTION={"_ID", FeedData.FeedColumns.TOPFEED, FeedData.FeedColumns.SYNC};

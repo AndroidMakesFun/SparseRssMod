@@ -40,6 +40,7 @@ import androidx.cardview.widget.CardView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -51,6 +52,7 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -67,6 +69,13 @@ public class RecycleListAdapter extends EntriesListAdapter {
 	@Override
 	public void bindView(View view, final Context context, Cursor cursor) {
 		TextView textView = (TextView) view.findViewById(android.R.id.text1);
+
+		//System.out.println("tt:" + textView.getText());
+
+		final long id = cursor.getLong(idColumn);
+		//System.out.println("  AA:" + id);
+
+		markFreeAsRead(cursor.getPosition());
 
 		String strTitle=cursor.getString(titleColumnPosition);
 
@@ -93,8 +102,6 @@ public class RecycleListAdapter extends EntriesListAdapter {
 
 		String linkGrafik=struktur.linkGrafik;
 
-		final long id = cursor.getLong(idColumn);
-		
 		String link=cursor.getString(linkColumn);
 		view.setTag(link);
 		
