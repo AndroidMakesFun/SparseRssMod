@@ -214,7 +214,10 @@ public class ParentActivity extends AppCompatActivity {
                 int aufrufart = 0;
 
                 // Link aus Content
+                //content://de.bernd.shandschuh.sparserss.provider.FeedData/feeds/5/entries/564
                 Uri contenUri = ContentUris.withAppendedId(uri, id);
+                //System.out.println(".." + position + " " + id + " " + contenUri);
+
                 Cursor entryCursor = getContentResolver().query(contenUri, null, null, null, null);
                 String link = "";
                 if (entryCursor.moveToFirst()) {
@@ -392,7 +395,7 @@ public class ParentActivity extends AppCompatActivity {
                     }
                     String where = FeedData.EntryColumns.DATE + "<=" + ParentActivity.this.mDateFromFirst;
                     where += " AND " + mAdapter.getSelectionFilter(); //readdate is null AND _id in (1,2,3)
-                    where += " AND " + FeedData.EntryColumns.DATE + ">=" + mAdapter.getmDateFromLastShownUpHere();
+                    //where += " AND " + FeedData.EntryColumns.DATE + ">=" + mAdapter.getmDateFromLastShownUpHere();
                     where += " AND " + "_id IN (";
                     for (Long lid : mAdapter.markedAsRead) {
                         where += lid + ",";
@@ -400,6 +403,8 @@ public class ParentActivity extends AppCompatActivity {
                     where = where.substring(0, where.length() - 1);
                     where += ")";
                     getContentResolver().update(uri, RSSOverview.getReadContentValues(), where, null);
+                    // date<=1664806440000 AND feedid in (1,2,3,4,5,6,7,8,9) AND _id IN (563,559,560,555,546,508,546,546,546,546,546,546,546,546)
+                    //System.out.println("..markAsRead where: " + where);
                     mAdapter.markedAsRead.clear();
                 }
             }.start();
@@ -644,7 +649,19 @@ public class ParentActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        clickMarkAsReadUpHereForIds(null);
+        //clickMarkAsReadUpHereForIds(null);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //System.out.println("onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //System.out.println("onDestroy");
+        clickMarkAsReadUpHereForIds(null);
+    }
 }

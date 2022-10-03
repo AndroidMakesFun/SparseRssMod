@@ -148,10 +148,9 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 
 		showRead = true;
 		this.uri = uri;
-		ermittleAlleIDs();
 
 		Cursor cursor = getCursor();
-		System.out.println("Count: " + cursor.getCount());
+		// System.out.println("Count: " + cursor.getCount());
 		
 		titleColumnPosition = cursor.getColumnIndex(FeedData.EntryColumns.TITLE);
 		fulltextColumnPosition = cursor.getColumnIndex(FeedData.EntryColumns.FULLTEXT);
@@ -203,12 +202,15 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 		return super.getView(position, convertView, parent);
 	}
 
-	protected ArrayList<String> mListeIdsAsString = new ArrayList<String>();
+	protected static ArrayList<String> mListeIdsAsString = new ArrayList<String>();
 
 	/** filled in createManagedCursor */
 	private static String mStrSortOrder="";
 
-	public void ermittleAlleIDs(){
+	/**
+	 * @param uri Uri durchreichen, wird erst später in mUri gesetzt!
+	 */
+	public static void ermittleAlleIDs(Uri uri){
 		mListeIdsAsString.clear();
 		Cursor cursor = mActivity.getContentResolver().query(uri, null, mSelectionFilter, null, mStrSortOrder);
 		cursor.moveToFirst();
@@ -440,6 +442,9 @@ public class EntriesListAdapter extends ResourceCursorAdapter {
 			}
 		}
 		mSelectionFilter=selection;
+
+		ermittleAlleIDs(uri);
+
 		return context.managedQuery(uri, null, selection, null,mStrSortOrder);
 	}
 	
